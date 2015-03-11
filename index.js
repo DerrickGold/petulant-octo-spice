@@ -6,7 +6,7 @@ var gbifOccurance = "http://api.gbif.org/v1/occurrence/search?scientificname="
 var eolIDLookup =  "http://eol.org/api/search/1.0.json?q=" + urlPlaceHolder +
 "&page=1&exact=true&filter_by_taxon_concept_id=&filter_by_hierarchy_entry_id=&filter_by_string=&cache_ttl="
 
-var eolTraits = "http://eol.org/api/traits/" + urlPlaceHolder;
+var eolTraits = "http://www.eol.org/api/traits/" + urlPlaceHolder + '/';
 
 
 
@@ -235,7 +235,7 @@ var SpeciesMap = (function() {
 					(function(specie) {
 						var url = eolTraits.replace(urlPlaceHolder, specie.id);
 						console.log("request url:" + url);
-						d3.json(url, function(error, obj){
+						/*d3.json(url,function(error, obj){
 							if (error) return;
 
 							console.log(obj.response);
@@ -243,6 +243,14 @@ var SpeciesMap = (function() {
 
 
 
+						});*/
+						$.ajax({
+						  url: url,
+						  dataType: "jsonp",
+						  success: function (data) {
+							console.log(data)
+							alert(data);
+						  }
 						});
 					})(d);
 				});
@@ -344,7 +352,8 @@ Program Start
 
 Script won't start until the page has finished loading.
 =============================================================================*/
-document.addEventListener("DOMContentLoaded", function(e) {
+//document.addEventListener("DOMContentLoaded", function(e) {
+function StartApp() {
 	
 	var chart = SpeciesMap.init({
 		divSelector: ".chartContainer",
@@ -365,7 +374,7 @@ document.addEventListener("DOMContentLoaded", function(e) {
 	
 	
 	
-});
+};
 
 
 
@@ -375,11 +384,13 @@ SpeciesList = {
 			id: 4433638,
 			name: "Tyrannosaurus Rex",
 			image: null
-		},
+		}
+	]
+};
+/*,
 	
 		{
 			name: "Woolly Mammoth",
 			image: null
 		}
-	]
-};
+*/
