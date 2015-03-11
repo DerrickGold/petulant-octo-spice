@@ -1,3 +1,15 @@
+var urlPlaceHolder = "###";
+var gbifSpecies = "http://api.gbif.org/v1/species/search?q=" + urlPlaceHolder;
+var gbifOccurance = "http://api.gbif.org/v1/occurrence/search?scientificname=" 
+					+ urlPlaceHolder + "&hasCoordinate=true"
+
+var eolIDLookup =  "http://eol.org/api/search/1.0.json?q=" + urlPlaceHolder +
+"&page=1&exact=true&filter_by_taxon_concept_id=&filter_by_hierarchy_entry_id=&filter_by_string=&cache_ttl="
+
+var eolTraits = "http://www.eol.org/api/traits/" + urlPlaceHolder + '/';
+
+
+
 /*=============================================================================
 ZoomHandler:
 	A zoom behaviour that works independent of d3's drag events allowing for
@@ -215,8 +227,37 @@ var SpeciesMap = (function() {
 		/*=====================================================
 			Load data
 		=====================================================*/
-			loadData: function(filename, fn) {
-			
+			loadData: function(fn) {
+				//d3.json(filename, function(error, data) {
+				SpeciesList.data.forEach(function(d) {
+					//go through every specie and get the data
+					//from the gbif api
+					(function(specie) {
+						var url = eolTraits.replace(urlPlaceHolder, specie.id);
+						console.log("request url:" + url);
+						/*d3.json(url,function(error, obj){
+							if (error) return;
+
+							console.log(obj.response);
+
+
+
+
+						});*/
+						$.ajax({
+						  url: url,
+						  dataType: "jsonp",
+						  success: function (data) {
+							console.log(data)
+							alert(data);
+						  }
+						});
+					})(d);
+				});
+					
+					
+					
+					
 				//create a scalable container for display data
 				/*var idNumber = 0;
 				var dataCache = self.svgBG.selectAll("svg")
@@ -236,8 +277,8 @@ var SpeciesMap = (function() {
 				*/
 				
 				
-				//once data is loaded, we can draw the display
-				self.draw(self.zoomHandler.offset, self.zoomHandler.zoom);
+					//once data is loaded, we can draw the display
+					//self.draw(self.zoomHandler.offset, self.zoomHandler.zoom);
 			}
 		}
 	}
@@ -311,7 +352,8 @@ Program Start
 
 Script won't start until the page has finished loading.
 =============================================================================*/
-document.addEventListener("DOMContentLoaded", function(e) {
+//document.addEventListener("DOMContentLoaded", function(e) {
+function StartApp() {
 	
 	var chart = SpeciesMap.init({
 		divSelector: ".chartContainer",
@@ -327,9 +369,28 @@ document.addEventListener("DOMContentLoaded", function(e) {
 		ul.append("li").append("p").text("random");
 	}
 	
+	chart.loadData();
 	
 	
 	
 	
+};
+
+
+
+SpeciesList = {
+	data: [
+		{
+			id: 4433638,
+			name: "Tyrannosaurus Rex",
+			image: null
+		}
+	]
+};
+/*,
 	
-});
+		{
+			name: "Woolly Mammoth",
+			image: null
+		}
+*/
