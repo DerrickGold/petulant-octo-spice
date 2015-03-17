@@ -301,8 +301,9 @@ Initialization
         			yRange: [instance.yPadding, instance.height - instance.yPadding]
     			});			
 				
-				instance.svgDisplay = d3.select(instance.divSelector).append("svg")
-					.attr("id", "svgSurface")
+				instance.svgDisplay = d3.select("#svgSurface")
+					//d3.select(instance.divSelector).append("svg")
+					//.attr("id", "svgSurface")
 					.attr("width", instance.width)
 					.attr("height", instance.height)
 					.call(instance.zoomHandler.z)
@@ -322,9 +323,11 @@ Initialization
 					}));
 
 				//create background and add axis to it
-				instance.svgBG = instance.svgDisplay.append("svg").
-									attr("id", "svgBG");
-				instance.svgFG = instance.svgDisplay.append("svg");
+				instance.svgBG = d3.select("#svgBG");
+						//instance.svgDisplay.append("svg").
+						//			attr("id", "svgBG");
+				instance.svgFG = d3.select("#svgFG");
+					//instance.svgDisplay.append("svg");
 				instance.svgPopup = instance.svgFG.append("g");
 
 				instance.zoomHandler.startZoom(function(e) {
@@ -340,6 +343,22 @@ Initialization
 				instance.zoomHandler.onZoom(function(e) {
 					instance.draw(e.offset, e.zoom);
 				});
+				
+				
+				/*var NA = instance.svgBG
+							.append("rect")
+							.attr("x", 50).attr("y", -700)
+							.attr("width", 500).attr("height", 500);
+				NA.attr("fill", "url(#continent1)");*/
+				
+				/*var NA = d3.select("#svgBG").append("image")
+					.attr("xlink:href", "http://www.e-pint.com/epint.jpg")
+					.attr("width", 500)
+					.attr("height", 500)
+					.attr("x", 50)
+					.attr("y", -700);*/
+							
+							
 				
 			}
 			return instance;
