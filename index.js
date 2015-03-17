@@ -108,15 +108,21 @@ var ChartScaler = (function() {
             yRange: [0, 0],
             yDomain: [0, 100],
 			
+			ContinentScale: d3.scale.linear(),
+			cRange: [0, 100],
+			cDomain: [0, 100],
+			
+			
             scale: function(s) {
                 var newXRange = [instance.xRange[0], instance.xRange[1] * s];
                 var newYRange = [instance.yRange[0], instance.yRange[1] * s];
 			
+				var newCRange = [instance.cRange[0], instance.cRange[1] * s];
+				
+				
                 instance.xScale.domain(instance.xDomain).range(newXRange);
                 instance.yScale.domain(instance.yDomain).range(newYRange);
-			
-                instance.xAxis.scale(instance.xScale);
-                instance.yAxis.scale(instance.yScale);
+				instance.ContinentScale.domain(instance.cDomain).range(newCRange);
             }
         }
     }
@@ -177,6 +183,8 @@ var SpeciesMap = (function() {
 			svgFG: null,
 			svgPopup: null,
 			
+			continents: null,
+			
 			
 			resize: function(wd, ht) {
 				this.chartScaler.xRange = [this.xPadding, wd - this.xPadding];
@@ -223,11 +231,55 @@ var SpeciesMap = (function() {
 				var self = this;
 				self.chartScaler.scale(scale);
 				
+
+				self.svgBG.selectAll(".scaledData")
+					.attr('x', function(d) {
+						this.drawPosX = d.x + translation[0] + self.chartScaler.xScale(0);
+						return this.drawPosX;
+					})
+					.attr('y', function(d) {
+						this.drawPosY = d.y + translation[1] + self.chartScaler.yScale(0);
+						return this.drawPosY;
+					})
+					.attr("width", function(d) { return self.chartScaler.ContinentScale(500); })
+					.attr("height", function(d) { return self.chartScaler.ContinentScale(500); })
+					.on('click', function(d) {
+						console.log("Test");
+					});
 			},
 		/*=====================================================
 			Load data
 		=====================================================*/
 			loadData: function(fn) {
+				d3.json("continents/continents.json", function(e, dataset) {
+					console.log(e);
+					var path = dataset.path;
+					dataset = dataset.data;
+					
+					 instance.continents = instance.svgBG.selectAll("svg")
+						.data(dataset).enter().append("svg")
+						.attr("class", "scaledData")
+					  	.attr("viewBox" , "0 0 " + 500 + " " + 500)
+					  	.style("display", "block");
+					
+					
+					instance.continents
+						.append("image")
+						.attr("xlink:href", function(d){
+							return path + '/' + d.contintent;
+						})
+						.attr("width", instance.chartScaler.ContinentScale(500))
+						.attr("height", instance.chartScaler.ContinentScale(500));
+					
+					
+					
+					
+					
+						instance.draw(instance.zoomHandler.offset, instance.zoomHandler.zoom);
+				});
+				
+				
+				
 				//d3.json(filename, function(error, data) {
 				SpeciesList.data.forEach(function(d) {
 					//go through every specie and get the data
@@ -249,7 +301,7 @@ var SpeciesMap = (function() {
 						  dataType: "jsonp",
 						  success: function (data) {
 							console.log(data)
-							alert(data);
+							//alert(data);
 						  }
 						});
 					})(d);
@@ -296,16 +348,12 @@ Initialization
                         instance[key] = values[key];
                 }
 				
-				instance.chartScaler = ChartScaler.init({
-					xRange: [instance.xPadding, instance.width - instance.xPadding],
-        			yRange: [instance.yPadding, instance.height - instance.yPadding]
-    			});			
-				
-				instance.svgDisplay = d3.select("#svgSurface")
-					//d3.select(instance.divSelector).append("svg")
-					//.attr("id", "svgSurface")
+
+				instance.svgDisplay = d3.select(instance.divSelector).append("svg")
+					.attr("id", "svgSurface")
 					.attr("width", instance.width)
 					.attr("height", instance.height)
+					.attr("y", 0).attr("x", 0)
 					.call(instance.zoomHandler.z)
 					 //disable d3's zoom drag to override with my own
 					.on("mousedown.zoom", null)
@@ -323,13 +371,13 @@ Initialization
 					}));
 
 				//create background and add axis to it
-				instance.svgBG = d3.select("#svgBG");
-						//instance.svgDisplay.append("svg").
-						//			attr("id", "svgBG");
-				instance.svgFG = d3.select("#svgFG");
-					//instance.svgDisplay.append("svg");
+				instance.svgBG = instance.svgDisplay.append("svg")
+									.attr("id", "svgBG");
+				instance.svgFG = instance.svgDisplay.append("svg");
 				instance.svgPopup = instance.svgFG.append("g");
 
+
+				
 				instance.zoomHandler.startZoom(function(e) {
 					instance.svgFG.select(".popup").remove();
 					instance.svgBG.selectAll("text")
@@ -344,21 +392,18 @@ Initialization
 					instance.draw(e.offset, e.zoom);
 				});
 				
+
+				var temp = d3.select("#svgSurface").node().getBoundingClientRect();
+				instance.chartScaler = ChartScaler.init({
+					xRange: [0, temp.width],
+        			yRange: [0, temp.height],
+					xDomain: [-180, 180],
+					yDomain: [-90, 90]
+    			});			
 				
-				/*var NA = instance.svgBG
-							.append("rect")
-							.attr("x", 50).attr("y", -700)
-							.attr("width", 500).attr("height", 500);
-				NA.attr("fill", "url(#continent1)");*/
+				console.log();
+				//console.log(instance.svgDisplay.getBBox().height);
 				
-				/*var NA = d3.select("#svgBG").append("image")
-					.attr("xlink:href", "http://www.e-pint.com/epint.jpg")
-					.attr("width", 500)
-					.attr("height", 500)
-					.attr("x", 50)
-					.attr("y", -700);*/
-							
-							
 				
 			}
 			return instance;
@@ -376,8 +421,10 @@ function StartApp() {
 	
 	var chart = SpeciesMap.init({
 		divSelector: ".chartContainer",
-		xPadding: 40,
-		yPadding: 40
+		xPadding: 0,
+		yPadding: 0,
+		width: "100%",
+		height: "100%"
 	});
 	
 	

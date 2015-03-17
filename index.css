@@ -1,7 +1,6 @@
 html, body {
 	width: 100%;
 	height: 100%;
-	overflow: hidden;
 	padding: 0;
 	margin: 0;
 }
@@ -20,27 +19,34 @@ html, body {
 	color: white;
 }
 
+.PageContent {
+	width: inherit;
+	height: 93%;
+}
+
 .CreaturesBox {
-	width: 20%;
+	width: 20.3%;
 	background: white;
-	height: inherit;
+	height: 100%;
 	border: solid 1px black;
 	overflow: scroll;
-	
-	margin-top: auto;
-	margin-bottom: auto;
-	float: left;
+	display: inline-block;
+	position: relative;
+	margin: 0;
 }
 
 .CreaturesList {
 	margin: 0;
 	width: 100%;
-	height: 100%;
+	height: inherit;
 }
 
 .chartContainer {
-	position: relative;
-	left: 20%;
-	width: 80%;
+	display: inline-block;
+	float: right;
+	width: 79.5%;
+	height: 100%;
 	background: #368caf;
+	padding: 0;
+	margin: 0;
 }

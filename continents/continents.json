@@ -1,0 +1,10 @@
+{
+	"path": "continents",
+	"data": [
+ 		{
+	 		"contintent": "NorthAmerica.png",
+			"x": 0,
+			"y": 0
+		}
+	]
+}
