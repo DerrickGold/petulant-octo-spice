@@ -6,56 +6,64 @@
 			"x": 0,
 			"y": 0,
 			"width": -8.783195,
-			"height": 34.508523
+			"height": 34.508523,
+			"rot": 0
 		},
  		{
 	 		"continent": "Antarctica.png",
 			"x": 0,
 			"y": 0,
 			"width": -82.862752,
-			"height": -135
+			"height": -135,
+			"rot": 0
 		},
  		{
 	 		"continent": "Asia.png",
 			"x": 0,
 			"y": 0,
 			"width": 34.047863,
-			"height": 100.619655
+			"height": 100.619655,
+			"rot": 0
 		},
  		{
 	 		"continent": "Australia.png",
 			"x": 0,
 			"y": 0,
 			"width": -25.274398,
-			"height": 133.775136
+			"height": 133.775136,
+			"rot": 0
 		},
  		{
 	 		"continent": "Europe.png",
 			"x": 0,
 			"y": 0,
 			"width": 54.525961,
-			"height": 15.255119
+			"height": 15.255119,
+			"rot": 0
 		},
  		{
 	 		"continent": "India.png",
 			"x": 0,
 			"y": 0,
 			"width": 20.593684,
-			"height": 78.962880
+			"height": 78.962880,
+			"rot": 0
 		},
  		{
 	 		"continent": "NorthAmerica.png",
 			"x": 0,
 			"y": 0,
 			"width": 54.525961,
-			"height": -105.255119
+			"height": -105.255119,
+			"rot": 0
 		},
  		{
 	 		"continent": "SouthAmerica.png",
 			"x": 0,
 			"y": 0,
 			"width": -8.783195,
-			"height": -55.491477
+			"height": -55.491477,
+			"rot": 0
 		}
 	]
 }
