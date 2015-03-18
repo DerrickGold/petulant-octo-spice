@@ -100,6 +100,8 @@ var ChartScaler = (function() {
 
     function _init() {
         return {
+			//convert screen points into longitude and latitude
+			//pixels
             xScale: d3.scale.linear(),
             xRange: [0, 0],
             xDomain: [0, 100],
@@ -108,20 +110,43 @@ var ChartScaler = (function() {
             yRange: [0, 0],
             yDomain: [0, 100],
 			
+			//these will be used for converting longitude and latitude
+			//positions into screen points
+			xLongToPix: d3.scale.linear(),
+			xLongRange: [0, 0],
+			xLongDomain: [0, 100],
+			
+			yLatToPix: d3.scale.linear(),
+			yLatRange: [0, 0],
+			yLatDomain: [0, 100],
+			
+			
+			
 			ContinentScale: d3.scale.linear(),
 			cRange: [0, 100],
 			cDomain: [0, 100],
 			
 			
+			
+			
+			
+			
             scale: function(s) {
                 var newXRange = [instance.xRange[0], instance.xRange[1] * s];
                 var newYRange = [instance.yRange[0], instance.yRange[1] * s];
-			
+				
+                var newLongXRange = [instance.xLongRange[0], instance.xLongRange[1] * s];
+                var newLatYRange = [instance.yLatRange[0], instance.yLatRange[1] * s];
+				
 				var newCRange = [instance.cRange[0], instance.cRange[1] * s];
 				
 				
                 instance.xScale.domain(instance.xDomain).range(newXRange);
                 instance.yScale.domain(instance.yDomain).range(newYRange);
+				
+                instance.xLongToPix.domain(instance.xLongDomain).range(newLongXRange);
+                instance.yLatToPix.domain(instance.yLatDomain).range(newLatYRange);
+				
 				instance.ContinentScale.domain(instance.cDomain).range(newCRange);
             }
         }
@@ -234,17 +259,22 @@ var SpeciesMap = (function() {
 
 				self.svgBG.selectAll(".scaledData")
 					.attr('x', function(d) {
-						this.drawPosX = d.x + translation[0] + self.chartScaler.xScale(0);
+						this.drawPosX = d.x + translation[0] + self.chartScaler.xScale(d.x - (d.width/2));
 						return this.drawPosX;
 					})
 					.attr('y', function(d) {
-						this.drawPosY = d.y + translation[1] + self.chartScaler.yScale(0);
+						this.drawPosY = d.y + translation[1] + self.chartScaler.yScale(d.y - (d.height/2));
 						return this.drawPosY;
 					})
-					.attr("width", function(d) { return self.chartScaler.ContinentScale(500); })
-					.attr("height", function(d) { return self.chartScaler.ContinentScale(500); })
+					.attr("width", function(d) { return self.chartScaler.xScale(d.width); })
+					.attr("height", function(d) { return self.chartScaler.yScale(d.height); })
 					.on('click', function(d) {
 						console.log("Test");
+					})
+					.each(function(d) {
+						var rotation = "rotate(" + d.Rotation + " " + (d.width/2) + " " + (d.height/2) + ")";
+						var img = d3.select(this).select("image");
+						img.attr("transform", rotation);
 					});
 			},
 		/*=====================================================
@@ -259,8 +289,17 @@ var SpeciesMap = (function() {
 					 instance.continents = instance.svgBG.selectAll("svg")
 						.data(dataset).enter().append("svg")
 						.attr("class", "scaledData")
-					  	.attr("viewBox" , "0 0 " + 500 + " " + 500)
-					  	.style("display", "block");
+					  	.style("display", "block")
+					 	.each(function(d) {
+							//transform all our long/lat positions in the continents.json
+						 	//to screen pixels
+							d.x = instance.chartScaler.xLongToPix(d.x);
+						 	d.y = instance.chartScaler.yLatToPix(d.y);
+						 	d.width = instance.chartScaler.xScale(d.width);
+						 	d.height = instance.chartScaler.yScale(d.height);
+						})
+					 	.attr("viewBox" , function(d) { return "0 0 " + d.width + " " + d.height;})
+					 	;
 					
 					
 					instance.continents
@@ -268,9 +307,18 @@ var SpeciesMap = (function() {
 						.attr("xlink:href", function(d){
 							return path + '/' + d.contintent;
 						})
-						.attr("width", instance.chartScaler.ContinentScale(500))
-						.attr("height", instance.chartScaler.ContinentScale(500));
-					
+						.attr("width", function(d) { 
+							console.log(d.width);
+							return instance.chartScaler.ContinentScale(d.width);
+						})
+						.attr("height", function(d) { 
+							return instance.chartScaler.ContinentScale(d.height);
+						})
+						.each(function(d) {
+							d.Rotation = d.rot; 
+							
+							//this.attr("transform", "rotation(" + d.Rotation + " 0 0)");
+					 	});
 					
 					
 					
@@ -398,7 +446,11 @@ Initialization
 					xRange: [0, temp.width],
         			yRange: [0, temp.height],
 					xDomain: [-180, 180],
-					yDomain: [-90, 90]
+					yDomain: [90, -90],
+					xLongRange: [-180, 180],
+					xLongDomain:[0, temp.width],
+					yLatRange: [90, -90],
+					yLatDomain: [0, temp.height]
     			});			
 				
 				console.log();
