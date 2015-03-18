@@ -122,9 +122,13 @@ var ChartScaler = (function() {
 			
 			
 			
-			ContinentScale: d3.scale.linear(),
-			cRange: [0, 100],
-			cDomain: [0, 100],
+			ContinentScaleLat: d3.scale.linear(),
+			cLatRange: [0, 180],
+			cDomain: [0, 180],
+			
+			ContinentScaleLon: d3.scale.linear(),
+			cLonRange: [0, 360],
+			cLonDomain: [0, 360],
 			
 			
 			
@@ -259,22 +263,26 @@ var SpeciesMap = (function() {
 
 				self.svgBG.selectAll(".scaledData")
 					.attr('x', function(d) {
-						this.drawPosX = d.x + translation[0] + self.chartScaler.xScale(d.x - (d.width/2));
+						this.drawPosX = d.x + translation[0];
 						return this.drawPosX;
 					})
 					.attr('y', function(d) {
-						this.drawPosY = d.y + translation[1] + self.chartScaler.yScale(d.y - (d.height/2));
+						this.drawPosY = d.y + translation[1];
 						return this.drawPosY;
 					})
-					.attr("width", function(d) { return self.chartScaler.xScale(d.width); })
-					.attr("height", function(d) { return self.chartScaler.yScale(d.height); })
+					.attr("width", function(d) { return instance.chartScaler.ContinentScaleLon(d.width); })
+					.attr("height", function(d) { return instnace.chartScaler.ContinentScaleLat(d.height); })
 					.on('click', function(d) {
 						console.log("Test");
 					})
 					.each(function(d) {
 						var rotation = "rotate(" + d.Rotation + " " + (d.width/2) + " " + (d.height/2) + ")";
-						var img = d3.select(this).select("image");
-						img.attr("transform", rotation);
+						//this.attr("transform", rotation);
+						//var img = d3.select(this).select("image");
+						//img.attr("transform", rotation);
+					})
+					.attr("transform", function(d) {
+						return "rotate(" + d.Rotation + " " + (d.width/2) + " " + (d.height/2) + ")";
 					});
 			},
 		/*=====================================================
@@ -293,10 +301,11 @@ var SpeciesMap = (function() {
 					 	.each(function(d) {
 							//transform all our long/lat positions in the continents.json
 						 	//to screen pixels
-							d.x = instance.chartScaler.xLongToPix(d.x);
+							/*d.x = instance.chartScaler.xLongToPix(d.x);
 						 	d.y = instance.chartScaler.yLatToPix(d.y);
-						 	d.width = instance.chartScaler.xScale(d.width);
-						 	d.height = instance.chartScaler.yScale(d.height);
+						 	d.x = instance.chartScaler.xScale(d.x);
+						 	d.y = instance.chartScaler.yScale(d.y);*/
+
 						})
 					 	.attr("viewBox" , function(d) { return "0 0 " + d.width + " " + d.height;})
 					 	;
@@ -307,13 +316,8 @@ var SpeciesMap = (function() {
 						.attr("xlink:href", function(d){
 							return path + '/' + d.contintent;
 						})
-						.attr("width", function(d) { 
-							console.log(d.width);
-							return instance.chartScaler.ContinentScale(d.width);
-						})
-						.attr("height", function(d) { 
-							return instance.chartScaler.ContinentScale(d.height);
-						})
+						.attr("width", "100%")
+						.attr("height", "100%")
 						.each(function(d) {
 							d.Rotation = d.rot; 
 							
