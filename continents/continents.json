@@ -53,9 +53,9 @@
 	 		"continent": "NorthAmerica.png",
 			"x": -100,
 			"y": 43,
-			"width": 100,
-			"height": 100,
-			"rot": 0
+			"width": 115.22,
+			"height": 163.746,
+			"rot": -35
 		},
  		{
 	 		"continent": "SouthAmerica.png",

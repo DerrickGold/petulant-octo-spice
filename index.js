@@ -110,48 +110,27 @@ var ChartScaler = (function() {
             yRange: [0, 0],
             yDomain: [0, 100],
 			
-			//these will be used for converting longitude and latitude
-			//positions into screen points
-			xLongToPix: d3.scale.linear(),
-			xLongRange: [0, 0],
-			xLongDomain: [0, 100],
-			
-			yLatToPix: d3.scale.linear(),
-			yLatRange: [0, 0],
-			yLatDomain: [0, 100],
-			
-			
-			
 			ContinentScaleLat: d3.scale.linear(),
 			cLatRange: [0, 180],
-			cDomain: [0, 180],
-			
+			cLatDomain: [0, 180],
+		
 			ContinentScaleLon: d3.scale.linear(),
 			cLonRange: [0, 360],
 			cLonDomain: [0, 360],
-			
-			
-			
-			
-			
 			
             scale: function(s) {
                 var newXRange = [instance.xRange[0], instance.xRange[1] * s];
                 var newYRange = [instance.yRange[0], instance.yRange[1] * s];
 				
-                var newLongXRange = [instance.xLongRange[0], instance.xLongRange[1] * s];
-                var newLatYRange = [instance.yLatRange[0], instance.yLatRange[1] * s];
-				
-				var newCRange = [instance.cRange[0], instance.cRange[1] * s];
-				
+				var newCLatRange = [instance.cLatRange[0], instance.cLatRange[1] * s];
+				var newCLonRange = [instance.cLonRange[0], instance.cLonRange[1] * s];
 				
                 instance.xScale.domain(instance.xDomain).range(newXRange);
                 instance.yScale.domain(instance.yDomain).range(newYRange);
+
 				
-                instance.xLongToPix.domain(instance.xLongDomain).range(newLongXRange);
-                instance.yLatToPix.domain(instance.yLatDomain).range(newLatYRange);
-				
-				instance.ContinentScale.domain(instance.cDomain).range(newCRange);
+				instance.ContinentScaleLat.domain(instance.cLatDomain).range(newCLatRange);
+				instance.ContinentScaleLon.domain(instance.cLonDomain).range(newCLonRange);
             }
         }
     }
@@ -263,26 +242,22 @@ var SpeciesMap = (function() {
 
 				self.svgBG.selectAll(".scaledData")
 					.attr('x', function(d) {
-						this.drawPosX = d.x + translation[0];
+						this.drawPosX = instance.chartScaler.xScale(d.x - (d.width/2)) + translation[0];
 						return this.drawPosX;
 					})
 					.attr('y', function(d) {
-						this.drawPosY = d.y + translation[1];
+						this.drawPosY = instance.chartScaler.yScale(d.y + (d.height/2)) + translation[1];
 						return this.drawPosY;
 					})
 					.attr("width", function(d) { return instance.chartScaler.ContinentScaleLon(d.width); })
-					.attr("height", function(d) { return instnace.chartScaler.ContinentScaleLat(d.height); })
+					.attr("height", function(d) { return instance.chartScaler.ContinentScaleLat(d.height); })
 					.on('click', function(d) {
 						console.log("Test");
 					})
-					.each(function(d) {
-						var rotation = "rotate(" + d.Rotation + " " + (d.width/2) + " " + (d.height/2) + ")";
-						//this.attr("transform", rotation);
-						//var img = d3.select(this).select("image");
-						//img.attr("transform", rotation);
-					})
-					.attr("transform", function(d) {
-						return "rotate(" + d.Rotation + " " + (d.width/2) + " " + (d.height/2) + ")";
+					.each(function(d) {					
+						var rotation = "rotate(" + d.Rotation + " " 
+											+ (d.width/2) + " " + (d.height/2) + ")";
+						var img = d3.select(this).select("image").attr("transform", rotation);
 					});
 			},
 		/*=====================================================
@@ -294,60 +269,42 @@ var SpeciesMap = (function() {
 					var path = dataset.path;
 					dataset = dataset.data;
 					
-					 instance.continents = instance.svgBG.selectAll("svg")
+					instance.continents = instance.svgBG.selectAll("svg")
 						.data(dataset).enter().append("svg")
 						.attr("class", "scaledData")
 					  	.style("display", "block")
 					 	.each(function(d) {
 							//transform all our long/lat positions in the continents.json
 						 	//to screen pixels
-							/*d.x = instance.chartScaler.xLongToPix(d.x);
-						 	d.y = instance.chartScaler.yLatToPix(d.y);
-						 	d.x = instance.chartScaler.xScale(d.x);
-						 	d.y = instance.chartScaler.yScale(d.y);*/
-
 						})
-					 	.attr("viewBox" , function(d) { return "0 0 " + d.width + " " + d.height;})
-					 	;
+					 	.attr("viewBox" , function(d) { 
+						 	return "0 0 " +  instance.chartScaler.ContinentScaleLon(d.width) + " " 
+											+ instance.chartScaler.ContinentScaleLat(d.height);
+					 	});
 					
 					
 					instance.continents
 						.append("image")
 						.attr("xlink:href", function(d){
-							return path + '/' + d.contintent;
+							return path + '/' + d.continent;
 						})
 						.attr("width", "100%")
 						.attr("height", "100%")
 						.each(function(d) {
 							d.Rotation = d.rot; 
-							
-							//this.attr("transform", "rotation(" + d.Rotation + " 0 0)");
 					 	});
-					
-					
-					
 					
 						instance.draw(instance.zoomHandler.offset, instance.zoomHandler.zoom);
 				});
 				
-				
-				
-				//d3.json(filename, function(error, data) {
+			
 				SpeciesList.data.forEach(function(d) {
 					//go through every specie and get the data
 					//from the gbif api
 					(function(specie) {
 						var url = eolTraits.replace(urlPlaceHolder, specie.id);
 						console.log("request url:" + url);
-						/*d3.json(url,function(error, obj){
-							if (error) return;
 
-							console.log(obj.response);
-
-
-
-
-						});*/
 						$.ajax({
 						  url: url,
 						  dataType: "jsonp",
@@ -358,31 +315,6 @@ var SpeciesMap = (function() {
 						});
 					})(d);
 				});
-					
-					
-					
-					
-				//create a scalable container for display data
-				/*var idNumber = 0;
-				var dataCache = self.svgBG.selectAll("svg")
-						.data(dataset).enter();
-				
-				createScaledSvg(dataCache, 200, 200)
-						.attr("id", function(d) {
-							var id = "plotPoint" + idNumber;
-							d.cssID = "#" + id;
-							idNumber += 1;
-							return id;
-						})
-						//create a reference to this object through the dataset
-						.each(function(d) { d.this = self.svgBG.select(d.cssID); })
-	
-				
-				*/
-				
-				
-					//once data is loaded, we can draw the display
-					//self.draw(self.zoomHandler.offset, self.zoomHandler.zoom);
 			}
 		}
 	}
@@ -451,14 +383,17 @@ Initialization
         			yRange: [0, temp.height],
 					xDomain: [-180, 180],
 					yDomain: [90, -90],
+					
 					xLongRange: [-180, 180],
 					xLongDomain:[0, temp.width],
 					yLatRange: [90, -90],
-					yLatDomain: [0, temp.height]
+					yLatDomain: [0, temp.height],
+					
+					cLatRange:[0, temp.height],
+					cLonRange:[0, temp.width]
     			});			
 				
 				console.log();
-				//console.log(instance.svgDisplay.getBBox().height);
 				
 				
 			}
