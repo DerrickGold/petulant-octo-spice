@@ -5,17 +5,19 @@ var eolIDLookup =  "http://eol.org/api/search/1.0.json?q=" + urlPlaceHolder + "&
 var eolTraits = "http://www.eol.org/api/traits/" + urlPlaceHolder + '/';
 var currentSelection = null;
 var currentSelectionObject = null;
-var instanceTest = null;
 
-function keyPress() {
-	console.log("Hit");
-	if (currentSelection != null) {
-		console.log(currentSelectionObject.x);
-		d3.select(currentSelection).attr('x', 0);
-	}
-}
 
-d3.select(window).on("keydown", keyPress);
+/*
+	d3.select(window).on("keydown", function(){
+		if (currentSelection != null) {
+			currentSelectionObject.x -= 1;
+			d3.select(currentSelection).attr('x', instance.chartScaler.xScale(currentSelectionObject.x - (currentSelectionObject.width/2)))
+		}
+	});*/
+
+
+
+
 
 /*=============================================================================
 ZoomHandler:
@@ -132,9 +134,9 @@ var ChartScaler = (function() {
                 instance.xScale.domain(instance.xDomain).range(newXRange);
                 instance.yScale.domain(instance.yDomain).range(newYRange);
 
-				
 				instance.ContinentScaleLat.domain(instance.cLatDomain).range(newCLatRange);
 				instance.ContinentScaleLon.domain(instance.cLonDomain).range(newCLonRange);
+				instanceTest = instance;
             }
         }
     }
@@ -154,9 +156,6 @@ var ChartScaler = (function() {
         }
     }
 })();
-
-
-
 
 /*=============================================================================
 Species Map:
@@ -311,6 +310,20 @@ var SpeciesMap = (function() {
 			}
 		}
 	}
+
+	//This is for debugging purposes only - allows us to move the continents around by clicking on a continent and using WASD to move it
+	window.addEventListener("keydown", function(e){
+		if (e.key == "w")
+			currentSelectionObject.y += 1;
+		if (e.key == "s")
+			currentSelectionObject.y -= 1;
+		if (e.key == "a")
+			currentSelectionObject.x -= 1;
+		if (e.key == "d")
+			currentSelectionObject.x += 1;
+		d3.select(currentSelection).attr('x', instance.chartScaler.xScale(currentSelectionObject.x - (currentSelectionObject.width/2)));
+		d3.select(currentSelection).attr('y', instance.chartScaler.yScale(currentSelectionObject.y + (currentSelectionObject.height/2)));
+	});
 	
 	return {
 		self: this,
