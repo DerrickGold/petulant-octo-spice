@@ -1,14 +1,21 @@
 var urlPlaceHolder = "###";
 var gbifSpecies = "http://api.gbif.org/v1/species/search?q=" + urlPlaceHolder;
-var gbifOccurance = "http://api.gbif.org/v1/occurrence/search?scientificname=" 
-					+ urlPlaceHolder + "&hasCoordinate=true"
-
-var eolIDLookup =  "http://eol.org/api/search/1.0.json?q=" + urlPlaceHolder +
-"&page=1&exact=true&filter_by_taxon_concept_id=&filter_by_hierarchy_entry_id=&filter_by_string=&cache_ttl="
-
+var gbifOccurance = "http://api.gbif.org/v1/occurrence/search?scientificname=" + urlPlaceHolder + "&hasCoordinate=true";
+var eolIDLookup =  "http://eol.org/api/search/1.0.json?q=" + urlPlaceHolder + "&page=1&exact=true&filter_by_taxon_concept_id=&filter_by_hierarchy_entry_id=&filter_by_string=&cache_ttl=";
 var eolTraits = "http://www.eol.org/api/traits/" + urlPlaceHolder + '/';
+var currentSelection = null;
+var currentSelectionObject = null;
+var instanceTest = null;
 
+function keyPress() {
+	console.log("Hit");
+	if (currentSelection != null) {
+		console.log(currentSelectionObject.x);
+		d3.select(currentSelection).attr('x', 0);
+	}
+}
 
+d3.select(window).on("keydown", keyPress);
 
 /*=============================================================================
 ZoomHandler:
@@ -53,7 +60,7 @@ var ZoomHandler = (function() {
                 instance.zoom = d3.event.scale;
                 instance.offset = d3.event.translate;
 
-                //make sure text reappears after scrolling
+                //Make sure text reappears after scrolling
                 clearTimeout(instance.timer);
                 instance.timer = setTimeout(instance.__zoomEndCb, 200);
 
@@ -75,13 +82,11 @@ var ZoomHandler = (function() {
             if (!instance) {
                 instance = _init();
 
-                //initialization values
+                //Initialization values
                 for (var key in values) {
                     if (values.hasOwnProperty(key))
                         instance[key] = values[key];
                 }
-
-               // instance.z.scaleExtent([instance.minZoom, instance.maxZoom]);
 				instance.zoomScale();
             }
             return instance;
@@ -92,7 +97,7 @@ var ZoomHandler = (function() {
 /*=============================================================================
 ChartScaler:
 	Keep track of axis and plot scales. Resizes everything appropriately 
-	according to zoom--objects are re-rendered as they are zoomed into rather
+	according to zoom-objects are re-rendered as they are zoomed into rather
 	upscaled from their initial low resolution.
 =============================================================================*/
 var ChartScaler = (function() {
@@ -100,8 +105,7 @@ var ChartScaler = (function() {
 
     function _init() {
         return {
-			//convert screen points into longitude and latitude
-			//pixels
+			//Convert screen points into longitude and latitude pixels
             xScale: d3.scale.linear(),
             xRange: [0, 0],
             xDomain: [0, 100],
@@ -139,7 +143,8 @@ var ChartScaler = (function() {
         init: function(values) {
             if (!instance) {
                 instance = _init();
-                //initialization values
+
+                //Initialization values
                 for (var key in values) {
                     if (values.hasOwnProperty(key))
                         instance[key] = values[key];
@@ -156,8 +161,6 @@ var ChartScaler = (function() {
 /*=============================================================================
 Species Map:
 	Creates a chart that plots species on the world through time.
-
-	
 =============================================================================*/
 var SpeciesMap = (function() {
 	var instance;
@@ -169,7 +172,7 @@ var SpeciesMap = (function() {
         	xPadding: 20,
 			yPadding: 10,
 			
-    		//internal resolution of dots
+    		//Internal resolution of dots
     		pointContentWidth: 200,
         	pointContentHeight: 200,
 
@@ -182,10 +185,9 @@ var SpeciesMap = (function() {
 			
 			cullMax: 300,
 			
-			
 			divSelector: null,
 			
-			//svg surfaces
+			//SVG surfaces
 			svgDisplay: null,
 			svgBG: null,
 			svgFG: null,
@@ -221,14 +223,14 @@ var SpeciesMap = (function() {
 			that can be scaled up or down nicely.
 			Width and height refer to its maximum limits.
 			Content that exceed this width and height within
-			the svg will be scaled down to fit.
+			the SVG will be scaled down to fit.
 			*/
 			createScaledSvg: function(svgSrc, width, height) {
 				svgSrc.append("svg").attr("class", "scaledData")
 					  .attr("viewBox" , "0 0 " + width + " " + height)
 					  .style("display", "block");
 				
-				//return the source so we can chain this function
+				//Return the source so we can chain this function
 				return svgSrc;
 			},
 			
@@ -239,33 +241,29 @@ var SpeciesMap = (function() {
 				var self = this;
 				self.chartScaler.scale(scale);
 				
-
 				self.svgBG.selectAll(".scaledData")
 					.attr('x', function(d) {
-						this.drawPosX = instance.chartScaler.xScale(d.x - (d.width/2)) + translation[0];
-						return this.drawPosX;
+						return instance.chartScaler.xScale(d.x - (d.width/2)) + translation[0];
 					})
 					.attr('y', function(d) {
-						this.drawPosY = instance.chartScaler.yScale(d.y + (d.height/2)) + translation[1];
-						return this.drawPosY;
+						return instance.chartScaler.yScale(d.y + (d.height/2)) + translation[1];
 					})
 					.attr("width", function(d) { return instance.chartScaler.ContinentScaleLon(d.width); })
 					.attr("height", function(d) { return instance.chartScaler.ContinentScaleLat(d.height); })
-					.on('click', function(d) {
-						console.log("Test");
+					.on('click', function(d) { 
+						currentSelection = this;
+						currentSelectionObject = d;
 					})
 					.each(function(d) {					
-						var rotation = "rotate(" + d.Rotation + " " 
-											+ (d.width/2) + " " + (d.height/2) + ")";
+						var rotation = "rotate(" + d.Rotation + " "	+ (d.width/2) + " " + (d.height/2) + ")";
 						var img = d3.select(this).select("image").attr("transform", rotation);
 					});
 			},
 		/*=====================================================
-			Load data
+		Load data
 		=====================================================*/
 			loadData: function(fn) {
 				d3.json("continents/continents.json", function(e, dataset) {
-					console.log(e);
 					var path = dataset.path;
 					dataset = dataset.data;
 					
@@ -274,14 +272,12 @@ var SpeciesMap = (function() {
 						.attr("class", "scaledData")
 					  	.style("display", "block")
 					 	.each(function(d) {
-							//transform all our long/lat positions in the continents.json
-						 	//to screen pixels
+							//Transform all our long/lat positions in the continents.json to screen pixels
 						})
 					 	.attr("viewBox" , function(d) { 
 						 	return "0 0 " +  instance.chartScaler.ContinentScaleLon(d.width) + " " 
 											+ instance.chartScaler.ContinentScaleLat(d.height);
 					 	});
-					
 					
 					instance.continents
 						.append("image")
@@ -297,10 +293,8 @@ var SpeciesMap = (function() {
 						instance.draw(instance.zoomHandler.offset, instance.zoomHandler.zoom);
 				});
 				
-			
 				SpeciesList.data.forEach(function(d) {
-					//go through every specie and get the data
-					//from the gbif api
+					//Go through all species and get the data from the gbif api
 					(function(specie) {
 						var url = eolTraits.replace(urlPlaceHolder, specie.id);
 						console.log("request url:" + url);
@@ -310,7 +304,6 @@ var SpeciesMap = (function() {
 						  dataType: "jsonp",
 						  success: function (data) {
 							console.log(data)
-							//alert(data);
 						  }
 						});
 					})(d);
@@ -332,19 +325,18 @@ Initialization
                         instance[key] = values[key];
                 }
 				
-
 				instance.svgDisplay = d3.select(instance.divSelector).append("svg")
 					.attr("id", "svgSurface")
 					.attr("width", instance.width)
 					.attr("height", instance.height)
 					.attr("y", 0).attr("x", 0)
 					.call(instance.zoomHandler.z)
-					 //disable d3's zoom drag to override with my own
+					 //Disable d3's zoom drag to override with my own
 					.on("mousedown.zoom", null)
 					.on("mousemove.zoom", null)
 					.on("dblclick.zoom", null)
 					.on("touchstart.zoom", null)
-					//my own drag to override the zoom one
+					//My own drag to override the zoom one
 					.call(d3.behavior.drag().on("drag", function() {
 						instance.zoomHandler.offset[0] += d3.event.dx;
 						instance.zoomHandler.offset[1] += d3.event.dy;
@@ -354,14 +346,13 @@ Initialization
 						instance.draw(instance.zoomHandler.offset, instance.zoomHandler.zoom);
 					}));
 
-				//create background and add axis to it
+				//Create background and add axis to it
 				instance.svgBG = instance.svgDisplay.append("svg")
 									.attr("id", "svgBG");
+
 				instance.svgFG = instance.svgDisplay.append("svg");
 				instance.svgPopup = instance.svgFG.append("g");
 
-
-				
 				instance.zoomHandler.startZoom(function(e) {
 					instance.svgFG.select(".popup").remove();
 					instance.svgBG.selectAll("text")
@@ -376,7 +367,6 @@ Initialization
 					instance.draw(e.offset, e.zoom);
 				});
 				
-
 				var temp = d3.select("#svgSurface").node().getBoundingClientRect();
 				instance.chartScaler = ChartScaler.init({
 					xRange: [0, temp.width],
@@ -391,11 +381,7 @@ Initialization
 					
 					cLatRange:[0, temp.height],
 					cLonRange:[0, temp.width]
-    			});			
-				
-				console.log();
-				
-				
+    			});
 			}
 			return instance;
 		}
@@ -404,10 +390,8 @@ Initialization
 
 /*=============================================================================
 Program Start
-
-Script won't start until the page has finished loading.
+	Script won't start until the page has finished loading.
 =============================================================================*/
-//document.addEventListener("DOMContentLoaded", function(e) {
 function StartApp() {
 	
 	var chart = SpeciesMap.init({
@@ -418,8 +402,6 @@ function StartApp() {
 		height: "100%"
 	});
 	
-	
-	//chart.loadData();
 	var ul = d3.select(".CreaturesList");
 	var i = 0;
 	for( i = 0; i < 40; i++) {
@@ -427,13 +409,7 @@ function StartApp() {
 	}
 	
 	chart.loadData();
-	
-	
-	
-	
 };
-
-
 
 SpeciesList = {
 	data: [
@@ -444,10 +420,3 @@ SpeciesList = {
 		}
 	]
 };
-/*,
-	
-		{
-			name: "Woolly Mammoth",
-			image: null
-		}
-*/
