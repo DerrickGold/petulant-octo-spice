@@ -311,18 +311,33 @@ var SpeciesMap = (function() {
 		}
 	}
 
-	//This is for debugging purposes only - allows us to move the continents around by clicking on a continent and using WASD to move it
-	window.addEventListener("keydown", function(e){
-		if (e.key == "w")
-			currentSelectionObject.y += 1;
-		if (e.key == "s")
-			currentSelectionObject.y -= 1;
-		if (e.key == "a")
-			currentSelectionObject.x -= 1;
-		if (e.key == "d")
-			currentSelectionObject.x += 1;
+	//This is for debugging purposes only - allows us to move the continents around by clicking on a continent and using WASD to move it and QE to rotate it
+	window.addEventListener("keydown", function(e) {
+		switch (e.key){
+			case ("w"):
+				currentSelectionObject.y += 1;
+				break;
+			case ("s"):
+				currentSelectionObject.y -= 1;
+				break;
+			case ("a"):
+				currentSelectionObject.x -= 1;
+				break;
+			case ("d"):
+				currentSelectionObject.x += 1;
+				break;
+			case ("q"):
+				currentSelectionObject.rot -= 1;
+				break;
+			case ("e"):
+				currentSelectionObject.rot += 1;
+				break;
+		}
+
 		d3.select(currentSelection).attr('x', instance.chartScaler.xScale(currentSelectionObject.x - (currentSelectionObject.width/2)));
 		d3.select(currentSelection).attr('y', instance.chartScaler.yScale(currentSelectionObject.y + (currentSelectionObject.height/2)));
+		var rotation = "rotate(" + currentSelectionObject.rot + " "	+ (currentSelectionObject.width/2) + " " + (currentSelectionObject.height/2) + ")";
+		d3.select(currentSelection).select("image").attr("transform", rotation);
 	});
 	
 	return {
