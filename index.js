@@ -435,12 +435,30 @@ function StartApp() {
 		height: "100%"
 	});
 	
+	//Create the list on the left to hold all the species
 	var ul = d3.select(".CreaturesList");
 	var i = 0;
 	for( i = 0; i < 40; i++) {
 		ul.append("li").append("p").text("random");
 	}
-	d3.slider();
+
+	//Tick formatter
+	var formatter = d3.format(",.2f");
+	//Initialize slider
+	var slider = d3.slider()
+					.min(-250)
+					.max(0)
+					//.ticks(250)
+					.tickValues([-250, -200, -150, -100, -50, 0])
+					.stepValues([-250, -240, -230, -220, -210, -200, -190, -180, -170, -160, -150, -140, -130, -120, -110, -100, -90, -80, -70, -60, -50, -40, -30, -20, -10, 0])
+					.showRange(false)
+					.value(0)
+					.tickFormat(function(d) {
+						return formatter(d) + "mya";
+					});
+	//Render the slider into the div
+	d3.select("#slider").call(slider);
+
 	chart.loadData();
 };
 
