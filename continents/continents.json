@@ -3,66 +3,66 @@
 	"data": [
 		{
 			"continent": "Africa.png",
-			"x": 20,
-			"y": 12,
-			"width": 100,
-			"height": 100,
-			"rot": 0
+			"x": -32,
+			"y": -28,
+			"width": 50,
+			"height": 50,
+			"rot": -17
 		},
  		{
 	 		"continent": "Antarctica.png",
 			"x": 0,
 			"y": -78,
-			"width": 100,
-			"height": 100,
+			"width": 50,
+			"height": 50,
 			"rot": 0
 		},
  		{
 	 		"continent": "Asia.png",
 			"x": 94,
 			"y": 57,
-			"width": 100,
-			"height": 100,
+			"width": 50,
+			"height": 50,
 			"rot": 0
 		},
  		{
 	 		"continent": "Australia.png",
 			"x": 133,
 			"y": -26,
-			"width": 100,
-			"height": 100,
+			"width": 50,
+			"height": 50,
 			"rot": 0
 		},
  		{
 	 		"continent": "Europe.png",
 			"x": 17,
 			"y": 49,
-			"width": 100,
-			"height": 100,
+			"width": 50,
+			"height": 50,
 			"rot": 0
 		},
  		{
 	 		"continent": "India.png",
 			"x": 78,
 			"y": 22,
-			"width": 100,
-			"height": 100,
+			"width": 50,
+			"height": 50,
 			"rot": 0
 		},
  		{
 	 		"continent": "NorthAmerica.png",
-			"x": 0,
-			"y": 0,
-			"width": 100,
-			"height": 100,
+			"x": -122,
+			"y": 12,
+			"width": 50,
+			"height": 50,
 			"rot": -35
 		},
  		{
 	 		"continent": "SouthAmerica.png",
-			"x": -56,
-			"y": -14,
-			"width": 100,
-			"height": 100,
+			"x": -102,
+			"y": -36,
+			"width": 50,
+			"height": 50,
 			"rot": 0
 		}
 	]

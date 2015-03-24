@@ -332,6 +332,11 @@ var SpeciesMap = (function() {
 			case ("e"):
 				currentSelectionObject.rot += 1;
 				break;
+			case ("p"):
+				console.log("Continent: " + currentSelectionObject.continent +
+							"\nX: " + currentSelectionObject.x + 
+							"\nY: " + currentSelectionObject.y +
+							"\nRotation: " + currentSelectionObject.rot);
 		}
 
 		d3.select(currentSelection).attr('x', instance.chartScaler.xScale(currentSelectionObject.x - (currentSelectionObject.width/2)));
@@ -435,7 +440,7 @@ function StartApp() {
 	for( i = 0; i < 40; i++) {
 		ul.append("li").append("p").text("random");
 	}
-	
+	d3.slider();
 	chart.loadData();
 };
 
