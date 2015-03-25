@@ -311,7 +311,10 @@ var SpeciesMap = (function() {
 		}
 	}
 
-	//This is for debugging purposes only - allows us to move the continents around by clicking on a continent and using WASD to move it and QE to rotate it
+	/* 
+	 * This is for debugging purposes only
+	 * Allows us to move, rotate and scale the continents using WASD, QE and ZC respectively
+	 */
 	window.addEventListener("keydown", function(e) {
 		switch (e.key){
 			case ("w"):
@@ -332,10 +335,24 @@ var SpeciesMap = (function() {
 			case ("e"):
 				currentSelectionObject.rot += 1;
 				break;
+			case ("z"):
+				currentSelectionObject.width -=1;
+				break;
+			case ("c"):
+				currentSelectionObject.width += 1;
+				break;
+			case ("r"):
+				currentSelectionObject.height -=1;
+				break;
+			case ("f"):
+				currentSelectionObject.height += 1;
+				break;
 			case ("p"):
 				console.log("Continent: " + currentSelectionObject.continent +
 							"\nX: " + currentSelectionObject.x + 
 							"\nY: " + currentSelectionObject.y +
+							"\nHeight: " + currentSelectionObject.height +
+							"\nWidth: " + currentSelectionObject.width +
 							"\nRotation: " + currentSelectionObject.rot);
 		}
 
@@ -343,6 +360,8 @@ var SpeciesMap = (function() {
 		d3.select(currentSelection).attr('y', instance.chartScaler.yScale(currentSelectionObject.y + (currentSelectionObject.height/2)));
 		var rotation = "rotate(" + currentSelectionObject.rot + " "	+ (currentSelectionObject.width/2) + " " + (currentSelectionObject.height/2) + ")";
 		d3.select(currentSelection).select("image").attr("transform", rotation);
+		d3.select(currentSelection).attr("width", function(d) { return instance.chartScaler.ContinentScaleLon(currentSelectionObject.width); });
+		d3.select(currentSelection).attr("height", function(d) { return instance.chartScaler.ContinentScaleLat(currentSelectionObject.height); });
 	});
 	
 	return {

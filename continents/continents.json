@@ -10,14 +10,6 @@
 			"rot": -17
 		},
  		{
-	 		"continent": "Antarctica.png",
-			"x": 0,
-			"y": -78,
-			"width": 50,
-			"height": 50,
-			"rot": 0
-		},
- 		{
 	 		"continent": "Asia.png",
 			"x": 94,
 			"y": 57,
@@ -34,9 +26,9 @@
 			"rot": 0
 		},
  		{
-	 		"continent": "Europe.png",
-			"x": 17,
-			"y": 49,
+	 		"continent": "Greenland.png",
+			"x": 0,
+			"y": 0,
 			"width": 50,
 			"height": 50,
 			"rot": 0
@@ -50,12 +42,28 @@
 			"rot": 0
 		},
  		{
-	 		"continent": "NorthAmerica.png",
-			"x": -122,
-			"y": 12,
+	 		"continent": "Japan.png",
+			"x": 0,
+			"y": 0,
 			"width": 50,
 			"height": 50,
-			"rot": -35
+			"rot": 0
+		},
+ 		{
+	 		"continent": "Madagascar.png",
+			"x": 0,
+			"y": 0,
+			"width": 50,
+			"height": 50,
+			"rot": 0
+		},
+ 		{
+	 		"continent": "NorthAmerica.png",
+			"x": -123,
+			"y": 24,
+			"width": 50,
+			"height": 50,
+			"rot": 0
 		},
  		{
 	 		"continent": "SouthAmerica.png",
