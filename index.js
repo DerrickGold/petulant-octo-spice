@@ -108,10 +108,20 @@ var ChartScaler = (function() {
     function _init() {
         return {
 			//Convert screen points into longitude and latitude pixels
+            xAxis: d3.svg.axis(),
+            xTickCount: 36,
+            xTicks: function(e) {
+                return instance.xAxis.ticks(e);
+            },
             xScale: d3.scale.linear(),
             xRange: [0, 0],
             xDomain: [0, 100],
 
+            yAxis: d3.svg.axis().orient("left"),
+            yTickCount: 36,
+            yTicks: function(e) {
+                return instance.yAxis.ticks(e);
+            },
             yScale: d3.scale.linear(),
             yRange: [0, 0],
             yDomain: [0, 100],
@@ -136,7 +146,9 @@ var ChartScaler = (function() {
 
 				instance.ContinentScaleLat.domain(instance.cLatDomain).range(newCLatRange);
 				instance.ContinentScaleLon.domain(instance.cLonDomain).range(newCLonRange);
-				instanceTest = instance;
+
+				instance.xAxis.scale(instance.xScale);
+                instance.yAxis.scale(instance.yScale);
             }
         }
     }
@@ -151,6 +163,9 @@ var ChartScaler = (function() {
                     if (values.hasOwnProperty(key))
                         instance[key] = values[key];
                 }
+				
+				instance.xTicks(instance.xTickCount);
+				instance.yTicks(instance.yTickCount);
             }
             return instance;
         }
@@ -240,12 +255,23 @@ var SpeciesMap = (function() {
 				var self = this;
 				self.chartScaler.scale(scale);
 				
+				
+				//redraw axis
+				d3.select("#xaxis").attr("transform", "translate(" +
+					translation[0] + ", " + parseFloat(self.chartScaler.yScale(0) + translation[1]) + ")")
+					.call(self.chartScaler.xAxis);
+
+				d3.select("#yaxis").attr("transform", "translate(" +
+					parseFloat(self.chartScaler.xScale(0) + translation[0]) + "," + translation[1] + ")")
+					.call(self.chartScaler.yAxis);
+				
+				
 				self.svgBG.selectAll(".scaledData")
 					.attr('x', function(d) {
-						return instance.chartScaler.xScale(d.x - (d.width/2)) + translation[0];
+						return instance.chartScaler.xScale(d.x) + translation[0];
 					})
 					.attr('y', function(d) {
-						return instance.chartScaler.yScale(d.y + (d.height/2)) + translation[1];
+						return instance.chartScaler.yScale(d.y) + translation[1];
 					})
 					.attr("width", function(d) { return instance.chartScaler.ContinentScaleLon(d.width); })
 					.attr("height", function(d) { return instance.chartScaler.ContinentScaleLat(d.height); })
@@ -254,8 +280,8 @@ var SpeciesMap = (function() {
 						currentSelectionObject = d;
 					})
 					.each(function(d) {					
-						var rotation = "rotate(" + d.Rotation + " "	+ (d.width/2) + " " + (d.height/2) + ")";
-						var img = d3.select(this).select("image").attr("transform", rotation);
+						//var rotation = "rotate(" + d.Rotation + " "	+ (d.width/2) + " " + (d.height/2) + ")";
+						//var img = d3.select(this).select("image").attr("transform", rotation);
 					});
 			},
 		/*=====================================================
@@ -271,12 +297,13 @@ var SpeciesMap = (function() {
 						.attr("class", "scaledData")
 					  	.style("display", "block")
 					 	.each(function(d) {
+							console.log(d);
+						
 							//Transform all our long/lat positions in the continents.json to screen pixels
 						})
-					 	.attr("viewBox" , function(d) { 
-						 	return "0 0 " +  instance.chartScaler.ContinentScaleLon(d.width) + " " 
-											+ instance.chartScaler.ContinentScaleLat(d.height);
-					 	});
+						.attr("width", function(d) { return instance.chartScaler.ContinentScaleLon(d.width); })
+						.attr("height", function(d) { return instance.chartScaler.ContinentScaleLat(d.height);})
+						.attr("preserveAspectRatio", "none");
 					
 					instance.continents
 						.append("image")
@@ -286,8 +313,9 @@ var SpeciesMap = (function() {
 						.attr("width", "100%")
 						.attr("height", "100%")
 						.each(function(d) {
-							d.Rotation = d.rot; 
-					 	});
+							d.Rotation = 0; 
+					 	})
+						.attr("preserveAspectRatio", "none");
 					
 						instance.draw(instance.zoomHandler.offset, instance.zoomHandler.zoom);
 				});
@@ -337,14 +365,10 @@ var SpeciesMap = (function() {
 				break;
 			case ("z"):
 				currentSelectionObject.width -=1;
+				currentSelectionObject.height -=1;
 				break;
 			case ("c"):
 				currentSelectionObject.width += 1;
-				break;
-			case ("r"):
-				currentSelectionObject.height -=1;
-				break;
-			case ("f"):
 				currentSelectionObject.height += 1;
 				break;
 			case ("p"):
@@ -356,8 +380,8 @@ var SpeciesMap = (function() {
 							"\nRotation: " + currentSelectionObject.rot);
 		}
 
-		d3.select(currentSelection).attr('x', instance.chartScaler.xScale(currentSelectionObject.x - (currentSelectionObject.width/2)));
-		d3.select(currentSelection).attr('y', instance.chartScaler.yScale(currentSelectionObject.y + (currentSelectionObject.height/2)));
+		d3.select(currentSelection).attr('x', instance.chartScaler.xScale(currentSelectionObject.x) + instance.zoomHandler.offset[0]);
+		d3.select(currentSelection).attr('y', instance.chartScaler.yScale(currentSelectionObject.y) + instance.zoomHandler.offset[1]);
 		var rotation = "rotate(" + currentSelectionObject.rot + " "	+ (currentSelectionObject.width/2) + " " + (currentSelectionObject.height/2) + ")";
 		d3.select(currentSelection).select("image").attr("transform", rotation);
 		d3.select(currentSelection).attr("width", function(d) { return instance.chartScaler.ContinentScaleLon(currentSelectionObject.width); });
@@ -396,8 +420,7 @@ Initialization
 
 						instance.svgFG.select(".popup").remove();
 						instance.draw(instance.zoomHandler.offset, instance.zoomHandler.zoom);
-					}));
-
+				}));
 				//Create background and add axis to it
 				instance.svgBG = instance.svgDisplay.append("svg")
 									.attr("id", "svgBG");
@@ -405,6 +428,16 @@ Initialization
 				instance.svgFG = instance.svgDisplay.append("svg");
 				instance.svgPopup = instance.svgFG.append("g");
 
+				
+
+				//create x axis title
+				instance.svgFG.append("g")
+					.attr("class", "axis").attr("id", "xaxis")
+
+				//create y axis title
+				instance.svgFG.append("g")
+					.attr("class", "axis").attr("id", "yaxis");
+				
 				instance.zoomHandler.startZoom(function(e) {
 					instance.svgFG.select(".popup").remove();
 					instance.svgBG.selectAll("text")
@@ -422,17 +455,14 @@ Initialization
 				var temp = d3.select("#svgSurface").node().getBoundingClientRect();
 				instance.chartScaler = ChartScaler.init({
 					xRange: [0, temp.width],
-        			yRange: [0, temp.height],
-					xDomain: [-180, 180],
-					yDomain: [90, -90],
-					
-					xLongRange: [-180, 180],
-					xLongDomain:[0, temp.width],
-					yLatRange: [90, -90],
-					yLatDomain: [0, temp.height],
-					
-					cLatRange:[0, temp.height],
-					cLonRange:[0, temp.width]
+        			yRange: [0, temp.width],
+					xDomain: [-179, 179],
+					yDomain: [179, -179],
+
+					cLatDomain:[0, 360],
+					cLonDomain:[0, 360],
+					cLatRange:[0, temp.width],
+					cLonRange:[0,temp.width]
     			});
 			}
 			return instance;

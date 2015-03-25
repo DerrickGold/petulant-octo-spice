@@ -3,75 +3,93 @@
 	"data": [
 		{
 			"continent": "Africa.png",
-			"x": -32,
-			"y": -28,
-			"width": 50,
-			"height": 50,
-			"rot": -17
+			"x": -11,
+			"y": 38,
+			"width": 46,
+			"height": 67,
+			"rot": 0,
+			"srcWd": 407,
+			"srcHt": 481
 		},
  		{
 	 		"continent": "Asia.png",
-			"x": 94,
-			"y": 57,
-			"width": 50,
-			"height": 50,
-			"rot": 0
+			"x": -16,
+			"y": 81,
+			"width": 148,
+			"height": 90,
+			"rot": 0,
+			"srcWd": 1117,
+			"srcHt": 701
 		},
  		{
 	 		"continent": "Australia.png",
-			"x": 133,
-			"y": -26,
-			"width": 50,
-			"height": 50,
-			"rot": 0
+			"x": 75,
+			"y": -10,
+			"width": 40,
+			"height": 33,
+			"rot": 0,
+			"srcWd": 219,
+			"srcHt": 224
 		},
  		{
 	 		"continent": "Greenland.png",
-			"x": 0,
-			"y": 0,
-			"width": 50,
-			"height": 50,
-			"rot": 0
+			"x": -49,
+			"y": 84,
+			"width": 40,
+			"height": 23,
+			"rot": 0,
+			"srcWd": 318,
+			"srcHt": 233
 		},
  		{
 	 		"continent": "India.png",
-			"x": 78,
-			"y": 22,
-			"width": 50,
-			"height": 50,
-			"rot": 0
+			"x": 47,
+			"y": 36,
+			"width": 21,
+			"height": 26,
+			"rot": 0,
+			"srcWd": 116,
+			"srcHt": 189
 		},
  		{
 	 		"continent": "Japan.png",
-			"x": 0,
-			"y": 0,
-			"width": 50,
-			"height": 50,
-			"rot": 0
+			"x": 88,
+			"y": 46,
+			"width": 10,
+			"height": 15,
+			"rot": 0,
+			"srcWd": 86,
+			"srcHt": 109
 		},
  		{
 	 		"continent": "Madagascar.png",
-			"x": 0,
-			"y": 0,
-			"width": 50,
-			"height": 50,
-			"rot": 0
+			"x": 28,
+			"y": -11,
+			"width": 5,
+			"height": 10,
+			"rot": 0,
+			"srcWd": 41,
+			"srcHt": 89
 		},
  		{
 	 		"continent": "NorthAmerica.png",
-			"x": -123,
-			"y": 24,
-			"width": 50,
-			"height": 50,
-			"rot": 0
+			"x": -110,
+			"y": 83,
+			"width": 75,
+			"height": 72,
+			"rot": 0,
+			"srcWd": 610,
+			"srcHt": 617
 		},
  		{
 	 		"continent": "SouthAmerica.png",
-			"x": -102,
-			"y": -36,
-			"width": 50,
-			"height": 50,
-			"rot": 0
+			"x": -55,
+			"y": 12,
+			"width": 30,
+			"height": 65,
+			"rot": 0,
+			"srcWd": 249,
+			"srcHt": 468
 		}
 	]
 }
