@@ -6,19 +6,6 @@ var eolTraits = "http://www.eol.org/api/traits/" + urlPlaceHolder + '/';
 var currentSelection = null;
 var currentSelectionObject = null;
 
-
-/*
-	d3.select(window).on("keydown", function(){
-		if (currentSelection != null) {
-			currentSelectionObject.x -= 1;
-			d3.select(currentSelection).attr('x', instance.chartScaler.xScale(currentSelectionObject.x - (currentSelectionObject.width/2)))
-		}
-	});*/
-
-
-
-
-
 /*=============================================================================
 ZoomHandler:
 	A zoom behaviour that works independent of d3's drag events allowing for
@@ -268,10 +255,10 @@ var SpeciesMap = (function() {
 				
 				self.svgBG.selectAll(".scaledData")
 					.attr('x', function(d) {
-						return instance.chartScaler.xScale(d.x) + translation[0];
+						return instance.chartScaler.xScale(d.x[0]) + translation[0];
 					})
 					.attr('y', function(d) {
-						return instance.chartScaler.yScale(d.y) + translation[1];
+						return instance.chartScaler.yScale(d.y[0]) + translation[1];
 					})
 					.attr("width", function(d) { return instance.chartScaler.ContinentScaleLon(d.width); })
 					.attr("height", function(d) { return instance.chartScaler.ContinentScaleLat(d.height); })
@@ -279,7 +266,8 @@ var SpeciesMap = (function() {
 						currentSelection = this;
 						currentSelectionObject = d;
 					})
-					.each(function(d) {					
+					.each(function(d) {		
+						addContinent(this, d);
 						//var rotation = "rotate(" + d.Rotation + " "	+ (d.width/2) + " " + (d.height/2) + ")";
 						//var img = d3.select(this).select("image").attr("transform", rotation);
 					});
@@ -297,8 +285,6 @@ var SpeciesMap = (function() {
 						.attr("class", "scaledData")
 					  	.style("display", "block")
 					 	.each(function(d) {
-							console.log(d);
-						
 							//Transform all our long/lat positions in the continents.json to screen pixels
 						})
 						.attr("width", function(d) { return instance.chartScaler.ContinentScaleLon(d.width); })
@@ -317,7 +303,7 @@ var SpeciesMap = (function() {
 					 	})
 						.attr("preserveAspectRatio", "none");
 					
-						instance.draw(instance.zoomHandler.offset, instance.zoomHandler.zoom);
+					instance.draw(instance.zoomHandler.offset, instance.zoomHandler.zoom);
 				});
 				
 				SpeciesList.data.forEach(function(d) {
@@ -330,11 +316,20 @@ var SpeciesMap = (function() {
 						  url: url,
 						  dataType: "jsonp",
 						  success: function (data) {
-							console.log(data)
+							//console.log(data)
 						  }
 						});
 					})(d);
 				});
+			},
+
+			moveContinent: function(continent, continentObject) {
+				d3.select(continent).attr('x', instance.chartScaler.xScale(continentObject.x[1]) + instance.zoomHandler.offset[0]);
+				d3.select(continent).attr('y', instance.chartScaler.yScale(continentObject.y[1]) + instance.zoomHandler.offset[1]);
+				var rotation = "rotate(" + continentObject.rot + " "	+ (continentObject.width/2) + " " + (continentObject.height/2) + ")";
+				d3.select(continent).select("image").attr("transform", rotation);
+				d3.select(continent).attr("width", function(d) { return instance.chartScaler.ContinentScaleLon(continentObject.width); });
+				d3.select(continent).attr("height", function(d) { return instance.chartScaler.ContinentScaleLat(continentObject.height); });
 			}
 		}
 	}
@@ -499,7 +494,7 @@ function StartApp() {
 					.max(0)
 					//.ticks(250)
 					.tickValues([-250, -200, -150, -100, -50, 0])
-					.stepValues([-250, -240, -230, -220, -210, -200, -190, -180, -170, -160, -150, -140, -130, -120, -110, -100, -90, -80, -70, -60, -50, -40, -30, -20, -10, 0])
+					.stepValues([-250, -240, -230, -220, -210, -200, -190, -180, -170, -160, -150, -140, -130, -120, -110, -100, -90, -80, -70, -60, -50, -40, -30, -20, -10, -9, -8, -7, -6, -5, -4, -3, -2, -1, 0])
 					.showRange(false)
 					.value(0)
 					.tickFormat(function(d) {
@@ -508,7 +503,14 @@ function StartApp() {
 	//Render the slider into the div
 	d3.select("#slider").call(slider);
 
+	/*var dragBehaviour = d3.behavior.drag();
+	dragBehaviour.on("drag", function(){
+		chart.fuck();
+	});
+	d3.select("#slider").call(dragBehaviour);*/
+
 	chart.loadData();
+	setChart(chart);
 };
 
 SpeciesList = {
