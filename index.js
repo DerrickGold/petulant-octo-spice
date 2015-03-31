@@ -1,11 +1,18 @@
 var urlPlaceHolder = "###";
 var gbifSpecies = "http://api.gbif.org/v1/species/search?q=" + urlPlaceHolder;
+
 var gbifOccurance = "http://api.gbif.org/v1/occurrence/search?scientificname=" + urlPlaceHolder + "&hasCoordinate=true";
+
 var eolIDLookup =  "http://eol.org/api/search/1.0.json?q=" + urlPlaceHolder + "&page=1&exact=true&filter_by_taxon_concept_id=&filter_by_hierarchy_entry_id=&filter_by_string=&cache_ttl=";
+
+//with this api, we are mostly just grabbing year of appearance for a given species
 var eolTraits = "http://www.eol.org/api/traits/" + urlPlaceHolder + '/';
+
 var currentSelection = null;
 var currentSelectionObject = null;
 
+
+var iconFolder = "creatureIcons";
 /*=============================================================================
 ZoomHandler:
 	A zoom behaviour that works independent of d3's drag events allowing for
@@ -271,6 +278,24 @@ var SpeciesMap = (function() {
 						//var rotation = "rotate(" + d.Rotation + " "	+ (d.width/2) + " " + (d.height/2) + ")";
 						//var img = d3.select(this).select("image").attr("transform", rotation);
 					});
+                
+				self.svgBG.selectAll(".creature")
+					.attr('x', function(d) {
+						return instance.chartScaler.xScale(d.x) + translation[0];
+					})
+					.attr('y', function(d) {
+						return instance.chartScaler.yScale(d.y) + translation[1];
+					})
+					.attr("width", function(d) { return d.width; })
+					.attr("height", function(d) { return d.height; })
+					.on('click', function(d) { 
+						currentSelection = this;
+						currentSelectionObject = d;
+					})
+					.each(function(d) {		
+						//var rotation = "rotate(" + d.Rotation + " "	+ (d.width/2) + " " + (d.height/2) + ")";
+						//var img = d3.select(this).select("image").attr("transform", rotation);
+					});
 			},
 		/*=====================================================
 		Load data
@@ -312,13 +337,63 @@ var SpeciesMap = (function() {
 						var url = eolTraits.replace(urlPlaceHolder, specie.id);
 						console.log("request url:" + url);
 
+                        //grab year data for species
 						$.ajax({
 						  url: url,
 						  dataType: "jsonp",
 						  success: function (data) {
-							//console.log(data)
-						  }
-						});
+							console.log(data)
+						
+                            var locDataURL = gbifOccurance.replace(urlPlaceHolder, specie.name.replace(' ', ''));
+                            //and here we'll grab the location data
+                            $.ajax({
+                                url: locDataURL,
+                                dataType: "json",
+                                success: function(data) {
+                                    
+                                    var locations = data.results.map(function(loc) {
+                                        var newData = {
+                                            "x": loc.decimalLongitude,
+                                            "y": loc.decimalLatitude
+                                        }
+                                        return newData;
+                                    });
+                                    
+                                    //add all locations to the species
+                                    specie.locations = locations;
+                                    
+                                    //test creation of icon for the species
+                                  instance.svgBG.selectAll("creatures")
+                                    .data(locations).enter().append("svg")
+                                    .each(function(d) {
+                                        d.x = parseFloat(d.x);
+                                        d.y = parseFloat(d.y);
+                                        console.log(d);
+                                        d.width = 50;
+                                        d.height = 50;
+                                    })
+                                    .attr("class", "creature")
+                                    .style("display", "block")
+                                    .attr("width",  "50px")
+                                    .attr("height", "50px")
+                                    .attr("preserveAspectRatio", "none")
+                                    .append("image")
+                                    .attr("xlink:href", function(d){
+                                      //jpeg now for testing
+                                        return iconFolder + '/' + specie.name.replace(' ', '') + '.jpg';
+                                    })
+                                    .attr("width", "50px")
+                                    .attr("height", "50px")
+                                    .each(function(d) {
+                                        d.Rotation = 0; 
+                                    })
+                                    .attr("preserveAspectRatio", "none");
+                                        
+                                    console.log(locations);
+                                }
+                            });
+                          }
+						}); 
 					})(d);
 				});
 			},
