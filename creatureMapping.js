@@ -15,6 +15,7 @@ var eolIDLookup =  "http://eol.org/api/search/1.0.json?q=" + urlPlaceHolder + "&
 //with this api, we are mostly just grabbing year of appearance for a given species
 var eolTraits = "http://www.eol.org/api/traits/" + urlPlaceHolder + '/';
 
+
 var SpeciesMap = (function() {
 	var instance;
 	
@@ -59,6 +60,9 @@ var SpeciesMap = (function() {
 			//for the current time period.
 			//this is the list of species to draw on screen
 			currentTimePeriod: null,
+			
+			//our main initial species list from file
+			speciesList: {},
 			
 			clusterPoints: function(inLocations, radius) {
 				//all locations start off ungrouped
@@ -107,6 +111,10 @@ var SpeciesMap = (function() {
 							return d["dwc:measurementValue"]; 
 						});
 						//store the dates back to the species
+						var oldFirst = first;
+						first = Math.max(first, last);
+						last = Math.min(oldFirst, last);
+						
 						specie.dates = [first, last];				
 						if(doneCB) doneCB(specie);
 						
@@ -139,14 +147,20 @@ var SpeciesMap = (function() {
 					dataType: "json",
 					success: function(data) {
 						var locations = data.results.map(function(loc) {
-							var newData = {
-								"x": loc.decimalLongitude,
-								"y": loc.decimalLatitude
-							}
-							return newData;
+								var newData = {
+									"x": loc.decimalLongitude,
+									"y": loc.decimalLatitude
+								}
+								return newData;
 						});
+						
+						/*locations = locations.filter(function(loc) {
+							return (loc.x && loc.y);
+						});*/
+						
 
 						//add all locations to the species	
+						if (!specie.locations) specie.locations = [];
 						specie.locations = specie.locations.concat(locations);
 						if(doneCB) {
 							doneCB(specie, data.count, offset, limit);
@@ -178,6 +192,8 @@ var SpeciesMap = (function() {
 											   instance.clusterPoints(s.locations, 1),
 											   instance.clusterPoints(s.locations, 0.7)
 											  ];
+							
+							console.log(specie);
 							return;
 						} else {
 							//otherwise, lets keep going
@@ -357,13 +373,18 @@ var SpeciesMap = (function() {
 				});
 				
 				
+				d3.json("species.json", function(e, species) {
+					console.log(e);
 				//Runs through all our species in our list
 				//and fetches the data online.
-				SpeciesList.data.forEach(function(d) {
-					//Go through all species and get the data from the gbif api
-					(function(specie) {
-						instance.fetchCreatureData(specie);
-					})(d);
+					instance.speciesList = species;
+					instance.speciesList.data.forEach(function(d) {
+						//Go through all species and get the data from the gbif api
+						(function(specie) {
+							instance.fetchCreatureData(specie);
+						})(d);
+					});
+					
 				});
 			},
 			
@@ -435,7 +456,7 @@ var SpeciesMap = (function() {
 				is created for it.
 			*/
 			updateCreatures: function(year) {
-				instance.currentTimePeriod = SpeciesList.data.filter(function(c) {
+				instance.currentTimePeriod = instance.speciesList.data.filter(function(c) {
 					return (year < c.dates[0] && year > c.dates[1]);
 				});
 				

@@ -210,10 +210,10 @@ function StartApp() {
 	var formatter = d3.format(",.0f");
 	//Initialize slider
 	slider = d3.slider()
-					.min(-227)
+					.min(-250)
 					.max(0)
 					//.ticks(227)
-					.tickValues([-227, -205, -180, -159, -144, -98, -65, 0])
+					.tickValues([-250, -205, -180, -159, -144, -98, -65, 0])
 					//.stepValues([-250, -240, -230, -220, -210, -200, -190, -180, -170, -160, -150, -140, -130, -120, -110, -100, -90, -80, -70, -60, -50, -40, -30, -20, -10, -9, -8, -7, -6, -5, -4, -3, -2, -1, 0])
 					.showRange(false)
 					.value(0)
@@ -237,22 +237,3 @@ function StartApp() {
 	setChart(chart);
 };
 
-SpeciesList = {
-	data: [
-		{
-			id: 4433638,
-			name: "Tyrannosaurus Rex",
-			locations: []
-		},
-		{
-			id: 4454738,
-			name: "Woolly Mammoth",
-			locations: []
-		},
-		{
-			id: 4471366,
-			name: "Mylodon",
-			locations: []
-		}
-	]
-};
