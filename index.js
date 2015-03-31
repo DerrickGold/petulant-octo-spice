@@ -10,6 +10,8 @@ var eolTraits = "http://www.eol.org/api/traits/" + urlPlaceHolder + '/';
 
 var currentSelection = null;
 var currentSelectionObject = null;
+var slider;
+var currentSliderVal = 0, previousSliderVal = 0, count = 0;
 
 
 var iconFolder = "creatureIcons";
@@ -369,7 +371,7 @@ var SpeciesMap = (function() {
                                     .each(function(d) {
                                         d.x = parseFloat(d.x);
                                         d.y = parseFloat(d.y);
-                                        console.log(d);
+                                        //console.log(d);
                                         d.width = 50;
                                         d.height = 50;
                                     })
@@ -380,8 +382,7 @@ var SpeciesMap = (function() {
                                     .attr("preserveAspectRatio", "none")
                                     .append("image")
                                     .attr("xlink:href", function(d){
-                                      //jpeg now for testing
-                                        return iconFolder + '/' + specie.name.replace(' ', '') + '.jpg';
+                                        return iconFolder + '/' + specie.name.replace(' ', '') + '.png';
                                     })
                                     .attr("width", "50px")
                                     .attr("height", "50px")
@@ -409,13 +410,56 @@ var SpeciesMap = (function() {
 					//Late = 159 - 144
 				//Triassic Period = 227 MYA - 205 MYA
 					//Late = 227 - 205
+				currentSliderVal = -slider.value();
+				if (currentSliderVal != previousSliderVal) {
+					if (count == 10) {
+						previousSliderVal = currentSliderVal;
+						count = 0;
+					}
+					else
+						count++;
 
-				d3.select(continent).attr('x', instance.chartScaler.xScale(continentObject.x[1]) + instance.zoomHandler.offset[0]);
-				d3.select(continent).attr('y', instance.chartScaler.yScale(continentObject.y[1]) + instance.zoomHandler.offset[1]);
-				var rotation = "rotate(" + continentObject.rot + " "	+ (continentObject.width/2) + " " + (continentObject.height/2) + ")";
-				d3.select(continent).select("svg").attr("transform", rotation);
-				d3.select(continent).attr("width", function(d) { return instance.chartScaler.ContinentScaleLon(continentObject.width); });
-				d3.select(continent).attr("height", function(d) { return instance.chartScaler.ContinentScaleLat(continentObject.height); });
+					//This is up here for debugging purposes only - This section will be moved down after
+					d3.select(continent).attr('x', instance.chartScaler.xScale(continentObject.x[0]) + instance.zoomHandler.offset[0]);
+					d3.select(continent).attr('y', instance.chartScaler.yScale(continentObject.y[0]) + instance.zoomHandler.offset[1]);
+					var rotation = "rotate(" + continentObject.rot[0] + " "	+ (continentObject.width/2) + " " + (continentObject.height/2) + ")";
+					d3.select(continent).select("svg").attr("transform", rotation);
+					d3.select(continent).attr("width", function(d) { return instance.chartScaler.ContinentScaleLon(continentObject.width); });
+					d3.select(continent).attr("height", function(d) { return instance.chartScaler.ContinentScaleLat(continentObject.height); });
+
+					var xPos, yPos, rot;
+					//Late Triassic Period
+					if (currentSliderVal <= 227 && currentSliderVal > 205) {
+
+					}
+					//Early Jurassic Period
+					else if (currentSliderVal <= -205 && currentSliderVal > 180) {
+
+					}
+					//Middle Jurassic Period
+					else if (currentSliderVal <= 180 && currentSliderVal > 159) {
+
+					}
+					//Late Jurassic Period
+					else if (currentSliderVal <= 159 && currentSliderVal > 144) {
+
+					}
+					//Early Cretaceous Period
+					else if (currentSliderVal <= 144 && currentSliderVal > 98) {
+
+					}
+					//Late Cretaceous Period
+					else if (currentSliderVal <= 98 && currentSliderVal > 65) {
+
+					}
+					//Present Day - Index[1] - Index[0]
+					else if (currentSliderVal <= 65 && currentSliderVal >= 0) {
+						xPos = CalculateSliderPosition(65, 0, currentSliderVal, continentObject.x[0], continentObject.x[1]);
+						yPos = CalculateSliderPosition(65, 0, currentSliderVal, continentObject.y[0], continentObject.y[1]);
+						d3.select(continent).attr('x', instance.chartScaler.xScale(xPos) + instance.zoomHandler.offset[0]);
+						d3.select(continent).attr('y', instance.chartScaler.yScale(yPos) + instance.zoomHandler.offset[1]);
+					}
+				}
 			}
 		}
 	}
@@ -439,10 +483,10 @@ var SpeciesMap = (function() {
 				currentSelectionObject.x[0] += 1;
 				break;
 			case ("q"):
-				currentSelectionObject.rot -= 1;
+				currentSelectionObject.rot[0] -= 1;
 				break;
 			case ("e"):
-				currentSelectionObject.rot += 1;
+				currentSelectionObject.rot[0] += 1;
 				break;
 			case ("z"):
 				currentSelectionObject.width -=1;
@@ -463,8 +507,8 @@ var SpeciesMap = (function() {
 
 		d3.select(currentSelection).attr('x', instance.chartScaler.xScale(currentSelectionObject.x[0]) + instance.zoomHandler.offset[0]);
 		d3.select(currentSelection).attr('y', instance.chartScaler.yScale(currentSelectionObject.y[0]) + instance.zoomHandler.offset[1]);
-		var rotation = "rotate(" + currentSelectionObject.rot + " "	+ (currentSelectionObject.width/2) + " " + (currentSelectionObject.height/2) + ")";
-		d3.select(currentSelection).select("svg").attr("transform", rotation);
+		var rotation = "rotate(" + currentSelectionObject.rot[0] + " "	+ (currentSelectionObject.width/2) + " " + (currentSelectionObject.height/2) + ")";
+		d3.select(currentSelection).select("image").attr("transform", rotation);
 		d3.select(currentSelection).attr("width", function(d) { return instance.chartScaler.ContinentScaleLon(currentSelectionObject.width); });
 		d3.select(currentSelection).attr("height", function(d) { return instance.chartScaler.ContinentScaleLat(currentSelectionObject.height); });
 	});
@@ -552,6 +596,30 @@ Initialization
 })();
 
 /*=============================================================================
+Calculates the coordinate between two values on the slider.
+	This is a helper function.
+=============================================================================*/
+function CalculateSliderPosition(maxSliderVal, minSliderVal, sliderVal, valOne, valTwo) {
+	//Get the difference between the two values
+	var sliderValDiff = maxSliderVal - minSliderVal;
+
+	//Calculate the percentage between the two values
+	var percent = (sliderVal - minSliderVal) / sliderValDiff;
+
+	//Find the largest and smallest coordinate value
+	var largestCoord = valOne > valTwo ? valOne : valTwo;
+	var smallestCoord = valOne < valTwo ? valOne : valTwo;
+
+	//Calculate the difference between the two coordinates
+	var coordDiff = largestCoord - smallestCoord;
+
+	//Calculate the amount to add to the smallestCoord
+	var coordAmount = coordDiff * percent;
+
+	return smallestCoord + coordAmount;
+}
+
+/*=============================================================================
 Program Start
 	Script won't start until the page has finished loading.
 =============================================================================*/
@@ -573,9 +641,9 @@ function StartApp() {
 	}
 
 	//Tick formatter
-	var formatter = d3.format(",.2f");
+	var formatter = d3.format(",.0f");
 	//Initialize slider
-	var slider = d3.slider()
+	slider = d3.slider()
 					.min(-227)
 					.max(0)
 					//.ticks(227)
@@ -584,10 +652,14 @@ function StartApp() {
 					.showRange(false)
 					.value(0)
 					.tickFormat(function(d) {
-						return formatter(d) + "mya";
+						return -formatter(d) + "mya";
 					});
 	//Render the slider into the div
 	d3.select("#slider").call(slider);
+
+	//Set the current and previous slider values
+	currentSliderVal = -slider.value();
+	previousSliderVal = -slider.value();
 
 	/*var dragBehaviour = d3.behavior.drag();
 	dragBehaviour.on("drag", function(){
