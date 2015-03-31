@@ -248,6 +248,11 @@ SpeciesList = {
 			id: 4454738,
 			name: "Woolly Mammoth",
 			locations: []
+		},
+		{
+			id: 4471366,
+			name: "Mylodon",
+			locations: []
 		}
 	]
 };

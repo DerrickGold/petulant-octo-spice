@@ -87,6 +87,7 @@ var SpeciesMap = (function() {
 			//was alive between
 			eolGetSpecieYears: function (specie, doneCB) {
 				var url = eolTraits.replace(urlPlaceHolder, specie.id);
+				console.log(url);
 				$.ajax({
 					url: url,
 					dataType: "jsonp",
@@ -117,6 +118,7 @@ var SpeciesMap = (function() {
 			gbifGetScientificName: function(specie, doneCB) {
 				//then we need to look up the scientific name for the species
 				var url = gbifSpecies.replace(urlPlaceHolder, specie.name);
+				console.log(url);
 				$.ajax({
 					url: url,
 					dataType: "json",
@@ -130,7 +132,7 @@ var SpeciesMap = (function() {
 			//gets the location for all the occurances of remains in 
 			gbifGetOccurances: function(specie, offset, limit, doneCB) {
 				var url = gbifOccurance.replace(urlPlaceHolder, specie.scientificName) + "&limit=" + limit + "&offset=" + offset;
-				//console.log(url);
+				console.log(url);
 				//and here we'll grab the location data
 				$.ajax({
 					url: url,
