@@ -45,6 +45,8 @@ var SpeciesMap = (function() {
 			
 			continents: null,
 			
+			creaturesInstanced: false,
+			
 			//a list of all species (from SpeciesList.data)
 			//for the current time period.
 			//this is the list of species to draw on screen
@@ -419,9 +421,13 @@ var SpeciesMap = (function() {
 					//Late = 227 - 205
 				currentSliderVal = -slider.value();
 				
-				setTimeout(function(){
-					instance.updateCreatures(currentSliderVal);
-				}, 1000);
+				if (!instance.creaturesInstanced) {
+					instance.creaturesInstanced = true;
+					setTimeout(function(){
+							instance.updateCreatures(currentSliderVal);
+							instance.creaturesInstanced = false;
+					}, 1000);	
+				}
 				
 
 				
