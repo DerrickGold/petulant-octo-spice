@@ -133,8 +133,8 @@ var ChartScaler = (function() {
 				instance.ContinentScaleLat.domain(instance.cLatDomain).range(newCLatRange);
 				instance.ContinentScaleLon.domain(instance.cLonDomain).range(newCLonRange);
 
-				instance.xAxis.scale(instance.xScale);
-                instance.yAxis.scale(instance.yScale);
+				//instance.xAxis.scale(instance.xScale);
+                //instance.yAxis.scale(instance.yScale);
             }
         }
     }

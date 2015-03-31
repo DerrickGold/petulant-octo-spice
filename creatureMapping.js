@@ -1,3 +1,6 @@
+//Domain = input
+//range = output
+
 /*=============================================================================
 Species Map:
 	Creates a chart that plots species on the world through time.
@@ -47,12 +50,39 @@ var SpeciesMap = (function() {
 			
 			creaturesInstanced: false,
 			
+			clusterScale: d3.scale.linear().clamp(true),
+			clusterPerSpecie: 10,
+			clusterRange: [0, 10],
+			clusterDomain: [0, 100],
+			
 			//a list of all species (from SpeciesList.data)
 			//for the current time period.
 			//this is the list of species to draw on screen
 			currentTimePeriod: null,
 			
-		
+			clusterPoints: function(inLocations, radius) {
+				//all locations start off ungrouped
+				var unGrouped = inLocations.slice();
+				var groups = [];
+				
+				
+				unGrouped.forEach(function(unGroup) {
+					
+					var canGroup = groups.filter(function(g) {
+						return Math.abs(unGroup.x - g.start.x) < radius && Math.abs(unGroup.y - g.start.y) < radius;
+					});
+					
+					//a group exists for this ungrouped element
+					if(canGroup.length > 0) {
+						canGroup[0].data.push(unGroup);
+						
+					} else {
+						//otherwise, make a new group
+						groups.push({start: unGroup, data: []});
+					}
+				});
+				return groups;
+			},
 			//Searches EOL database for the years a specie
 			//was alive between
 			eolGetSpecieYears: function (specie, doneCB) {
@@ -61,8 +91,6 @@ var SpeciesMap = (function() {
 					url: url,
 					dataType: "jsonp",
 					success: function (data) {	
-						//console.log(specie.name);
-						//console.log(data);
 						//first grab the traits that actually has the year values
 						var dates = data["@graph"].filter(function(d) {
 							var param = d["dwc:measurementValue"];
@@ -77,10 +105,6 @@ var SpeciesMap = (function() {
 						var last = d3.min(dates, function(d) {
 							return d["dwc:measurementValue"]; 
 						});
-
-						//console.log(first);
-						//console.log(last);
-
 						//store the dates back to the species
 						specie.dates = [first, last];				
 						if(doneCB) doneCB(specie);
@@ -112,8 +136,6 @@ var SpeciesMap = (function() {
 					url: url,
 					dataType: "json",
 					success: function(data) {
-						//console.log(data);
-
 						var locations = data.results.map(function(loc) {
 							var newData = {
 								"x": loc.decimalLongitude,
@@ -122,11 +144,9 @@ var SpeciesMap = (function() {
 							return newData;
 						});
 
-						//add all locations to the species
-						
+						//add all locations to the species	
 						specie.locations = specie.locations.concat(locations);
 						if(doneCB) {
-							//console.log("callback!");
 							doneCB(specie, data.count, offset, limit);
 						}
 							
@@ -142,21 +162,30 @@ var SpeciesMap = (function() {
 				function getOccurances(s, o, l) {
 					
 					instance.gbifGetOccurances(s, o, l, function(z, count, curOffset, curLimit){
-						//console.log(count);
 						//we are on the last page
 						if(curOffset + curLimit >= count) {
+							specie.clusters = [instance.clusterPoints(s.locations, 10),
+											   instance.clusterPoints(s.locations, 9),
+											   instance.clusterPoints(s.locations, 8),
+											   instance.clusterPoints(s.locations, 7),
+											   instance.clusterPoints(s.locations, 6),
+											   instance.clusterPoints(s.locations, 5),
+											   instance.clusterPoints(s.locations, 4),
+											   instance.clusterPoints(s.locations, 3),
+											   instance.clusterPoints(s.locations, 2),
+											   instance.clusterPoints(s.locations, 1),
+											   instance.clusterPoints(s.locations, 0.7)
+											  ];
 							return;
 						} else {
 							//otherwise, lets keep going
 							curOffset += curLimit;
-							//console.log("fetching more!");
 							getOccurances(s, curOffset, curLimit);
 						}
 					});	
 				}
 				
 				(function(z) {
-					//console.log("test");
 					instance.eolGetSpecieYears(z, function(){
 						instance.gbifGetScientificName(z, function(){
 							getOccurances(z, 0, 300);	
@@ -206,9 +235,7 @@ var SpeciesMap = (function() {
 				return svgSrc;
 			},
 			
-			clusterPoints: function(inLocation, radius) {
-				
-			},
+
 			
 		/*=====================================================
 		Draw
@@ -219,14 +246,14 @@ var SpeciesMap = (function() {
 				
 				
 				//redraw axis
-				d3.select("#xaxis").attr("transform", "translate(" +
+				/*d3.select("#xaxis").attr("transform", "translate(" +
 					translation[0] + ", " + parseFloat(self.chartScaler.yScale(0) + translation[1]) + ")")
 					.call(self.chartScaler.xAxis);
 
 				d3.select("#yaxis").attr("transform", "translate(" +
 					parseFloat(self.chartScaler.xScale(0) + translation[0]) + "," + translation[1] + ")")
 					.call(self.chartScaler.yAxis);
-				
+				*/
 				
 				self.svgBG.selectAll(".scaledData")
 					.attr('x', function(d) {
@@ -259,10 +286,12 @@ var SpeciesMap = (function() {
 				
 					self.svgBG.selectAll(".creature")
 					.attr('x', function(d) {
-						return instance.chartScaler.xScale(d.x) + translation[0];
+						d.drawX = instance.chartScaler.xScale(d.x) + translation[0];
+						return d.drawX;
 					})
 					.attr('y', function(d) {
-						return instance.chartScaler.yScale(d.y) + translation[1];
+						d.drawY = instance.chartScaler.yScale(d.y) + translation[1];
+						return d.drawY;
 					})
 					.attr("width", function(d) { return d.width; })
 					.attr("height", function(d) { return d.height; })
@@ -271,6 +300,21 @@ var SpeciesMap = (function() {
 						currentSelectionObject = d;
 					})
 					.each(function(d) {		
+						if ( d.drawX < -d.width || d.drawX > instance.width ||
+							 d.drawY < -d.height || d.drawY > instance.height) {
+							
+							if( d.this.style("display") != "block") return;
+
+							d.this.transition().style("opacity", "0.0").each("end", function() {
+								d.this.style("display", "none");
+							});
+							
+						}
+						else  {
+							if( d.this.style("display") != "none") return ;
+							d.this.style("display", "block");
+							d.this.transition().style("opacity", "1.0");
+						}				
 						//var rotation = "rotate(" + d.Rotation + " "	+ (d.width/2) + " " + (d.height/2) + ")";
 						//var img = d3.select(this).select("image").attr("transform", rotation);
 					});
@@ -331,19 +375,28 @@ var SpeciesMap = (function() {
 			*/
 			createCreature: function(specie) {
 				var translation = instance.zoomHandler.offset;
+				var clusterNum = parseInt(instance.clusterScale(instance.zoomHandler.zoom));
 				
+				var idNum = 0;
 				var creatures = instance.svgBG.selectAll("creature")
-					.data(specie.locations).enter().append("svg")
-					.each(function(d) {
-						d.name = specie.name;
-						d.x = parseFloat(d.x);
-						d.y = parseFloat(d.y);
-						//console.log(d);
-						d.width = 50;
-						d.height = 50;
+					.data(specie.clusters[clusterNum]).enter().append("svg")
+					.attr("id", function(d) {
+						var id = "creatureID" + idNum;
+						d.cssID = "#" + id;
+						idNum += 1;
+						return id;
 					})
 					.attr("class", function(d) {
 						return "creature " + specie.name.replace(' ', '');
+					})
+					.each(function(d) {
+						d.this = instance.svgBG.select( d.cssID);
+						d.name = specie.name;
+						d.x = parseFloat(d.start.x);
+						d.y = parseFloat(d.start.y);
+						//console.log(d);
+						d.width = 50;
+						d.height = 50;
 					})
 					.style("display", "block")
 					.attr("preserveAspectRatio", "none")
@@ -353,6 +406,7 @@ var SpeciesMap = (function() {
 					.attr('y', function(d) {
 						return instance.chartScaler.yScale(d.y) + translation[1];
 					})
+				
 					//link the image up to the creature
 					.append("image")
 					.attr("xlink:href", function(d){
@@ -384,7 +438,8 @@ var SpeciesMap = (function() {
 				});
 				
 				var toCreate = instance.currentTimePeriod.slice();
-				//clear out the creatures that no longer exist
+				instance.svgBG.selectAll(".creature").remove();
+				/*//clear out the creatures that no longer exist
 				instance.svgBG.selectAll(".creature").each(function(d) {
 					
 					var filter = instance.currentTimePeriod.filter(function(c) {
@@ -400,11 +455,13 @@ var SpeciesMap = (function() {
 							return z.name != filter[0].name;
 						});
 					}
-				});
+				});*/
 				
 				//and re-create new ones
 				toCreate.forEach(function(c) {
-					instance.createCreature(c);
+					setTimeout(function() {
+						instance.createCreature(c);
+					}, 50);
 				});	
 			},
 			
@@ -592,6 +649,8 @@ Initialization
                     if (values.hasOwnProperty(key))
                         instance[key] = values[key];
                 }
+				instance.zoomHandler.zoomScale(1, 16);
+				
 				
 				instance.svgDisplay = d3.select(instance.divSelector).append("svg")
 					.attr("id", "svgSurface")
@@ -612,7 +671,7 @@ Initialization
 
 						instance.svgFG.select(".popup").remove();
 						instance.draw(instance.zoomHandler.offset, instance.zoomHandler.zoom);
-				}));
+					}));
 				//Create background and add axis to it
 				instance.svgBG = instance.svgDisplay.append("svg")
 									.attr("id", "svgBG");
@@ -637,6 +696,13 @@ Initialization
 				});
 
 				instance.zoomHandler.endZoom(function(e) {
+					if (!instance.creaturesInstanced) {
+						instance.creaturesInstanced = true;
+						setTimeout(function(){
+								instance.updateCreatures(currentSliderVal);
+								instance.creaturesInstanced = false;
+						}, 50);	
+					}
 					instance.svgBG.selectAll("text").attr("display", "block");
 				});
 
@@ -656,6 +722,11 @@ Initialization
 					cLonRange:[0,temp.width]
     			});
 				
+				
+				//fix up clustering for species
+				
+				instance.clusterDomain = [instance.zoomHandler.minZoom, instance.zoomHandler.maxZoom];
+				instance.clusterScale.domain(instance.clusterDomain).range(instance.clusterRange);
 			}
 			return instance;
 		}
