@@ -8,8 +8,8 @@
 			"width": 78.572,
 			"height": 73.837,
 			"rot": [0, 8],
-			"srcWd": 449,
-			"srcHt": 425
+			"srcWd": 438,
+			"srcHt": 412
 		},
  		{
 	 		"continent": "Antarctica.png",
@@ -23,13 +23,13 @@
 		},
  		{
 	 		"continent": "Asia.png",
-			"x": [-23.993, -37.993],
-			"y": [81.157, 78.157],
+			"x": [-24.525, -37.993],
+			"y": [82.333, 78.157],
 			"width": 214.280,
-			"height": 93.902,
+			"height": 104.699,
 			"rot": [0, -2],
-			"srcWd": 1219,
-			"srcHt": 534
+			"srcWd": 1217,
+			"srcHt": 595
 		},
  		{
 	 		"continent": "Australia.png",
@@ -38,8 +38,8 @@
 			"width": 40.266,
 			"height": 28.123,
 			"rot": [0, 0],
-			"srcWd": 228,
-			"srcHt": 160
+			"srcWd": 231,
+			"srcHt": 189
 		},
  		{
 	 		"continent": "Greenland.png",
@@ -48,18 +48,18 @@
 			"width": 60.092,
 			"height": 23.734,
 			"rot": [0, 3],
-			"srcWd": 342,
-			"srcHt": 135
+			"srcWd": 348,
+			"srcHt": 138
 		},
  		{
 	 		"continent": "India.png",
-			"x": [65.453, 61.453],
-			"y": [36.807, -1.193],
-			"width": 31.863,
-			"height": 31.869,
+			"x": [67.6, 61.453],
+			"y": [36, -1.193],
+			"width": 20.995,
+			"height": 29.847,
 			"rot": [0, 9],
-			"srcWd": 176,
-			"srcHt": 172
+			"srcWd": 120,
+			"srcHt": 169
 		},
  		{
 	 		"continent": "Japan.png",
@@ -68,8 +68,8 @@
 			"width": 16.057,
 			"height": 14.442,
 			"rot": [0, 0],
-			"srcWd": 92,
-			"srcHt": 82
+			"srcWd": 111,
+			"srcHt": 84
 		},
  		{
 	 		"continent": "Madagascar.png",
@@ -78,8 +78,8 @@
 			"width": 7.214,
 			"height": 13.281,
 			"rot": [0, 2],
-			"srcWd": 42,
-			"srcHt": 76
+			"srcWd": 43,
+			"srcHt": 79
 		},
  		{
 	 		"continent": "NorthAmerica.png",
@@ -88,8 +88,8 @@
 			"width": 114.423,
 			"height": 75.974,
 			"rot": [0, 4],
-			"srcWd": 650,
-			"srcHt": 431
+			"srcWd": 667,
+			"srcHt": 434
 		},
  		{
 	 		"continent": "SouthAmerica.png",
@@ -99,7 +99,7 @@
 			"height": 67.883,
 			"rot": [0, 0],
 			"srcWd": 265,
-			"srcHt": 388
+			"srcHt": 390
 		}
 	]
 }
