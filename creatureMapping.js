@@ -61,8 +61,8 @@ var SpeciesMap = (function() {
 					url: url,
 					dataType: "jsonp",
 					success: function (data) {	
-						console.log(specie.name);
-						console.log(data);
+						//console.log(specie.name);
+						//console.log(data);
 						//first grab the traits that actually has the year values
 						var dates = data["@graph"].filter(function(d) {
 							var param = d["dwc:measurementValue"];
@@ -78,8 +78,8 @@ var SpeciesMap = (function() {
 							return d["dwc:measurementValue"]; 
 						});
 
-						console.log(first);
-						console.log(last);
+						//console.log(first);
+						//console.log(last);
 
 						//store the dates back to the species
 						specie.dates = [first, last];				
@@ -106,13 +106,13 @@ var SpeciesMap = (function() {
 			//gets the location for all the occurances of remains in 
 			gbifGetOccurances: function(specie, offset, limit, doneCB) {
 				var url = gbifOccurance.replace(urlPlaceHolder, specie.scientificName) + "&limit=" + limit + "&offset=" + offset;
-				console.log(url);
+				//console.log(url);
 				//and here we'll grab the location data
 				$.ajax({
 					url: url,
 					dataType: "json",
 					success: function(data) {
-						console.log(data);
+						//console.log(data);
 
 						var locations = data.results.map(function(loc) {
 							var newData = {
@@ -126,7 +126,7 @@ var SpeciesMap = (function() {
 						
 						specie.locations = specie.locations.concat(locations);
 						if(doneCB) {
-							console.log("callback!");
+							//console.log("callback!");
 							doneCB(specie, data.count, offset, limit);
 						}
 							
@@ -142,21 +142,21 @@ var SpeciesMap = (function() {
 				function getOccurances(s, o, l) {
 					
 					instance.gbifGetOccurances(s, o, l, function(z, count, curOffset, curLimit){
-						console.log(count);
+						//console.log(count);
 						//we are on the last page
 						if(curOffset + curLimit >= count) {
 							return;
 						} else {
 							//otherwise, lets keep going
 							curOffset += curLimit;
-							console.log("fetching more!");
+							//console.log("fetching more!");
 							getOccurances(s, curOffset, curLimit);
 						}
 					});	
 				}
 				
 				(function(z) {
-					console.log("test");
+					//console.log("test");
 					instance.eolGetSpecieYears(z, function(){
 						instance.gbifGetScientificName(z, function(){
 							getOccurances(z, 0, 300);	
@@ -235,8 +235,8 @@ var SpeciesMap = (function() {
 					.attr('y', function(d) {
 						return instance.chartScaler.yScale(d.y[0]) + translation[1];
 					})
-					.attr("width", function(d) { return instance.chartScaler.ContinentScaleLon(d.width); })
-					.attr("height", function(d) { return instance.chartScaler.ContinentScaleLat(d.height); })
+					.attr("width", function(d) { return instance.chartScaler.ContinentScaleLon(d.width[0]); })
+					.attr("height", function(d) { return instance.chartScaler.ContinentScaleLat(d.height[0]); })
 					.on('click', function(d) { 
 						currentSelection = this;
 						currentSelectionObject = d;
@@ -290,8 +290,8 @@ var SpeciesMap = (function() {
 					 	.each(function(d) {
 							//Transform all our long/lat positions in the continents.json to screen pixels
 						})
-						.attr("width", function(d) { return instance.chartScaler.ContinentScaleLon(d.width); })
-						.attr("height", function(d) { return instance.chartScaler.ContinentScaleLat(d.height);})
+						.attr("width", function(d) { return instance.chartScaler.ContinentScaleLon(d.width[0]); })
+						.attr("height", function(d) { return instance.chartScaler.ContinentScaleLat(d.height[0]);})
 						.attr("preserveAspectRatio", "none")
 						//.attr("transform", "rotate(-45 0 0)");
 					
@@ -443,10 +443,10 @@ var SpeciesMap = (function() {
 					//This is up here for debugging purposes only - This section will be moved down after
 					d3.select(continent).attr('x', instance.chartScaler.xScale(continentObject.x[0]) + instance.zoomHandler.offset[0]);
 					d3.select(continent).attr('y', instance.chartScaler.yScale(continentObject.y[0]) + instance.zoomHandler.offset[1]);
-					var rotation = "rotate(" + continentObject.rot[0] + " "	+ (continentObject.width/2) + " " + (continentObject.height/2) + ")";
+					var rotation = "rotate(" + continentObject.rot[0] + " "	+ (continentObject.width[0]/2) + " " + (continentObject.height[0]/2) + ")";
 					d3.select(continent).select("svg").attr("transform", rotation);
-					d3.select(continent).attr("width", function(d) { return instance.chartScaler.ContinentScaleLon(continentObject.width); });
-					d3.select(continent).attr("height", function(d) { return instance.chartScaler.ContinentScaleLat(continentObject.height); });
+					d3.select(continent).attr("width", function(d) { return instance.chartScaler.ContinentScaleLon(continentObject.width[0]); });
+					d3.select(continent).attr("height", function(d) { return instance.chartScaler.ContinentScaleLat(continentObject.height[0]); });
 
 					var xPos, yPos, rot;
 					//Late Triassic Period
@@ -481,6 +481,10 @@ var SpeciesMap = (function() {
 						d3.select(continent).attr('y', instance.chartScaler.yScale(yPos) + instance.zoomHandler.offset[1]);
 					}
 				}
+
+				function() {
+					
+				}
 			}
 		}
 	}
@@ -490,49 +494,91 @@ var SpeciesMap = (function() {
 	 * Allows us to move, rotate and scale the continents using WASD, QE and ZC respectively
 	 */
 	window.addEventListener("keydown", function(e) {
+		var currentSliderVal = -slider.value();
 		switch (e.key){
 			case ("w"):
 				currentSelectionObject.y[0] += 1;
+				debugMoveContinent();
 				break;
 			case ("s"):
 				currentSelectionObject.y[0] -= 1;
+				debugMoveContinent();
 				break;
 			case ("a"):
 				currentSelectionObject.x[0] -= 1;
+				debugMoveContinent();
 				break;
 			case ("d"):
 				currentSelectionObject.x[0] += 1;
+				debugMoveContinent();
 				break;
 			case ("q"):
 				currentSelectionObject.rot[0] -= 1;
+				debugMoveContinent();
 				break;
 			case ("e"):
 				currentSelectionObject.rot[0] += 1;
+				debugMoveContinent();
 				break;
 			case ("z"):
-				currentSelectionObject.width -=1;
-				currentSelectionObject.height -=1;
+				currentSelectionObject.width[0] -=1;
+				currentSelectionObject.height[0] -=1;
+				debugMoveContinent();
 				break;
 			case ("c"):
-				currentSelectionObject.width += 1;
-				currentSelectionObject.height += 1;
+				currentSelectionObject.width[0] += 1;
+				currentSelectionObject.height[0] += 1;
+				debugMoveContinent();
 				break;
 			case ("p"):
-				console.log("Continent: " + currentSelectionObject.continent +
-							"\nX: " + currentSelectionObject.x + 
-							"\nY: " + currentSelectionObject.y +
-							"\nHeight: " + currentSelectionObject.height +
-							"\nWidth: " + currentSelectionObject.width +
-							"\nRotation: " + currentSelectionObject.rot);
+				//Late Triassic Period
+				if (currentSliderVal <= 227 && currentSliderVal > 205) {
+					debugPrintContinent(6, 7);
+				}
+				//Early Jurassic Period
+				else if (currentSliderVal <= -205 && currentSliderVal > 180) {
+					debugPrintContinent(5, 6);
+				}
+				//Middle Jurassic Period
+				else if (currentSliderVal <= 180 && currentSliderVal > 159) {
+					debugPrintContinent(4, 5);
+				}
+				//Late Jurassic Period
+				else if (currentSliderVal <= 159 && currentSliderVal > 144) {
+					debugPrintContinent(3, 4);
+				}
+				//Early Cretaceous Period
+				else if (currentSliderVal <= 144 && currentSliderVal > 98) {
+					debugPrintContinent(2, 3);
+				}
+				//Late Cretaceous Period
+				else if (currentSliderVal <= 98 && currentSliderVal > 65) {
+					debugPrintContinent(1, 2);
+				}
+				//Present Day - Index[1] - Index[0]
+				else if (currentSliderVal <= 65 && currentSliderVal >= 0) {
+					debugPrintContinent(0, 1);
+				}
 		}
+	});
 
+	function debugPrintContinent(indexOne, indexTwo) {
+		console.log("Continent: " + currentSelectionObject.continent +
+					"\nX: " + CalculateSliderPosition(65, 0, currentSliderVal, currentSelectionObject.x[indexOne], currentSelectionObject.x[indexTwo]) + 
+					"\nY: " + CalculateSliderPosition(65, 0, currentSliderVal, currentSelectionObject.y[indexOne], currentSelectionObject.y[indexTwo]) +
+					"\nHeight: " + CalculateSliderPosition(65, 0, currentSliderVal, currentSelectionObject.height[indexOne], currentSelectionObject.height[indexTwo]) +
+					"\nWidth: " + CalculateSliderPosition(65, 0, currentSliderVal, currentSelectionObject.width[indexOne], currentSelectionObject.width[indexTwo]) +
+					"\nRotation: " + CalculateSliderPosition(65, 0, currentSliderVal, currentSelectionObject.rot[indexOne], currentSelectionObject.rot[indexTwo]));
+	}
+
+	function debugMoveContinent() {
 		d3.select(currentSelection).attr('x', instance.chartScaler.xScale(currentSelectionObject.x[0]) + instance.zoomHandler.offset[0]);
 		d3.select(currentSelection).attr('y', instance.chartScaler.yScale(currentSelectionObject.y[0]) + instance.zoomHandler.offset[1]);
-		var rotation = "rotate(" + currentSelectionObject.rot[0] + " "	+ (currentSelectionObject.width/2) + " " + (currentSelectionObject.height/2) + ")";
+		var rotation = "rotate(" + currentSelectionObject.rot[0] + " "	+ (currentSelectionObject.width[0]/2) + " " + (currentSelectionObject.height[0]/2) + ")";
 		d3.select(currentSelection).select("image").attr("transform", rotation);
-		d3.select(currentSelection).attr("width", function(d) { return instance.chartScaler.ContinentScaleLon(currentSelectionObject.width); });
-		d3.select(currentSelection).attr("height", function(d) { return instance.chartScaler.ContinentScaleLat(currentSelectionObject.height); });
-	});
+		d3.select(currentSelection).attr("width", function(d) { return instance.chartScaler.ContinentScaleLon(currentSelectionObject.width[0]); });
+		d3.select(currentSelection).attr("height", function(d) { return instance.chartScaler.ContinentScaleLat(currentSelectionObject.height[0]); });
+	}
 	
 	return {
 		self: this,
