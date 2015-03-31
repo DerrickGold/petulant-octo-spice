@@ -616,7 +616,9 @@ function CalculateSliderPosition(maxSliderVal, minSliderVal, sliderVal, valOne, 
 	//Calculate the amount to add to the smallestCoord
 	var coordAmount = coordDiff * percent;
 
-	return smallestCoord + coordAmount;
+	if (valOne < valTwo)
+		return smallestCoord + coordAmount;
+	return largestCoord - coordAmount;
 }
 
 /*=============================================================================
