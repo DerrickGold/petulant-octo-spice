@@ -5,7 +5,7 @@ Species Map:
 var urlPlaceHolder = "###";
 var gbifSpecies = "http://api.gbif.org/v1/species/search?q=" + urlPlaceHolder;
 
-var gbifOccurance = "http://api.gbif.org/v1/occurrence/search?scientificname=" + urlPlaceHolder + "&hasCoordinate=true&limit=300";
+var gbifOccurance = "http://api.gbif.org/v1/occurrence/search?scientificname=" + urlPlaceHolder + "&hasCoordinate=true";
 
 var eolIDLookup =  "http://eol.org/api/search/1.0.json?q=" + urlPlaceHolder + "&page=1&exact=true&filter_by_taxon_concept_id=&filter_by_hierarchy_entry_id=&filter_by_string=&cache_ttl=";
 
@@ -49,6 +49,121 @@ var SpeciesMap = (function() {
 			//for the current time period.
 			//this is the list of species to draw on screen
 			currentTimePeriod: null,
+			
+		
+			//Searches EOL database for the years a specie
+			//was alive between
+			eolGetSpecieYears: function (specie, doneCB) {
+				var url = eolTraits.replace(urlPlaceHolder, specie.id);
+				$.ajax({
+					url: url,
+					dataType: "jsonp",
+					success: function (data) {	
+						console.log(specie.name);
+						console.log(data);
+						//first grab the traits that actually has the year values
+						var dates = data["@graph"].filter(function(d) {
+							var param = d["dwc:measurementValue"];
+							return  param && typeof(param) == 'string';
+						});
+
+						//get years in which creature existed  
+						var first = d3.max(dates, function(d) {
+							return d["dwc:measurementValue"];
+						});
+
+						var last = d3.min(dates, function(d) {
+							return d["dwc:measurementValue"]; 
+						});
+
+						console.log(first);
+						console.log(last);
+
+						//store the dates back to the species
+						specie.dates = [first, last];				
+						if(doneCB) doneCB(specie);
+						
+					}	
+				});
+			},
+			
+			//get the scientific name for a specie from the GBIF database
+			gbifGetScientificName: function(specie, doneCB) {
+				//then we need to look up the scientific name for the species
+				var url = gbifSpecies.replace(urlPlaceHolder, specie.name);
+				$.ajax({
+					url: url,
+					dataType: "json",
+					success: function(data) {	
+						specie.scientificName = data.results[0].canonicalName;
+						if(doneCB)doneCB(specie);
+					}
+				});
+			},
+			
+			//gets the location for all the occurances of remains in 
+			gbifGetOccurances: function(specie, offset, limit, doneCB) {
+				var url = gbifOccurance.replace(urlPlaceHolder, specie.scientificName) + "&limit=" + limit + "&offset=" + offset;
+				console.log(url);
+				//and here we'll grab the location data
+				$.ajax({
+					url: url,
+					dataType: "json",
+					success: function(data) {
+						console.log(data);
+
+						var locations = data.results.map(function(loc) {
+							var newData = {
+								"x": loc.decimalLongitude,
+								"y": loc.decimalLatitude
+							}
+							return newData;
+						});
+
+						//add all locations to the species
+						
+						specie.locations = specie.locations.concat(locations);
+						if(doneCB) {
+							console.log("callback!");
+							doneCB(specie, data.count, offset, limit);
+						}
+							
+					}
+				});					
+			},
+			
+			
+			
+			fetchCreatureData: function(specie) {
+				var offset = 0, limit = 300;
+				
+				function getOccurances(s, o, l) {
+					
+					instance.gbifGetOccurances(s, o, l, function(z, count, curOffset, curLimit){
+						console.log(count);
+						//we are on the last page
+						if(curOffset + curLimit >= count) {
+							return;
+						} else {
+							//otherwise, lets keep going
+							curOffset += curLimit;
+							console.log("fetching more!");
+							getOccurances(s, curOffset, curLimit);
+						}
+					});	
+				}
+				
+				(function(z) {
+					console.log("test");
+					instance.eolGetSpecieYears(z, function(){
+						instance.gbifGetScientificName(z, function(){
+							getOccurances(z, 0, 300);	
+						});
+					});
+				})(specie);
+			},
+			
+			
 			
 			
 			resize: function(wd, ht) {
@@ -199,70 +314,7 @@ var SpeciesMap = (function() {
 				SpeciesList.data.forEach(function(d) {
 					//Go through all species and get the data from the gbif api
 					(function(specie) {
-						var url = eolTraits.replace(urlPlaceHolder, specie.id);
-						//console.log("request url:" + url);
-
-                        //grab year data for species
-						$.ajax({
-							url: url,
-						  	dataType: "jsonp",
-						  	success: function (data) {
-								console.log(specie.name);
-								console.log(data);
-								//first grab the traits that actually has the year values
-								var dates = data["@graph"].filter(function(d) {
-									var param = d["dwc:measurementValue"];
-								  	return  param && typeof(param) == 'string';
-								});
-							  
-								//get years in which creature existed  
-								var first = d3.max(dates, function(d) {
-									return d["dwc:measurementValue"];
-								});
-
-								var last = d3.min(dates, function(d) {
-								 	return d["dwc:measurementValue"]; 
-								});
-								
-								console.log(first);
-								console.log(last);
-								
-								//store the dates back to the species
-								specie.dates = [first, last];
-								
-								//then we need to look up the scientific name for the species
-								var lookupUrl = gbifSpecies.replace(urlPlaceHolder, specie.name);
-								$.ajax({
-									url: lookupUrl,
-									dataType: "json",
-									success: function(data) {
-										specie.scientificName = data.results[0].canonicalName;
-	
-		                            	var locDataURL = gbifOccurance.replace(urlPlaceHolder, specie.scientificName);
-										//and here we'll grab the location data
-										$.ajax({
-											url: locDataURL,
-											dataType: "json",
-											success: function(data) {
-												console.log(data);
-
-												var locations = data.results.map(function(loc) {
-													var newData = {
-														"x": loc.decimalLongitude,
-														"y": loc.decimalLatitude
-													}
-													return newData;
-												});
-
-												//add all locations to the species
-												specie.locations = locations;
-												$(document).trigger( "newCreature", [specie] );
-											}
-										});									
-									}
-								});
-                          }
-						}); 
+						instance.fetchCreatureData(specie);
 					})(d);
 				});
 			},

@@ -241,11 +241,13 @@ SpeciesList = {
 	data: [
 		{
 			id: 4433638,
-			name: "Tyrannosaurus Rex"
+			name: "Tyrannosaurus Rex",
+			locations: []
 		},
 		{
 			id: 4454738,
-			name: "Woolly Mammoth"
+			name: "Woolly Mammoth",
+			locations: []
 		}
 	]
 };

@@ -3,6 +3,7 @@ html, body {
 	height: 100%;
 	padding: 0;
 	margin: 0;
+	overflow: hidden;
 }
 
 #titleBox {
@@ -27,7 +28,7 @@ html, body {
 .CreaturesBox {
 	width: 20.3%;
 	background: white;
-	height: 100%;
+	height: 80%;
 	border: solid 1px black;
 	overflow: scroll;
 	display: inline-block;
@@ -45,7 +46,7 @@ html, body {
 	display: inline-block;
 	float: right;
 	width: 79.5%;
-	height: 100%;
+	height: 80%;
 	background: #368caf;
 	padding: 0;
 	margin: 0;
