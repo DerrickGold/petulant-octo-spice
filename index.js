@@ -314,7 +314,8 @@ var SpeciesMap = (function() {
 						})
 						.attr("width", function(d) { return instance.chartScaler.ContinentScaleLon(d.width); })
 						.attr("height", function(d) { return instance.chartScaler.ContinentScaleLat(d.height);})
-						.attr("preserveAspectRatio", "none");
+						.attr("preserveAspectRatio", "none")
+						//.attr("transform", "rotate(-45 0 0)");
 					
 					instance.continents
 						.append("image")
@@ -335,7 +336,7 @@ var SpeciesMap = (function() {
 					//Go through all species and get the data from the gbif api
 					(function(specie) {
 						var url = eolTraits.replace(urlPlaceHolder, specie.id);
-						console.log("request url:" + url);
+						//console.log("request url:" + url);
 
                         //grab year data for species
 						$.ajax({
@@ -399,10 +400,20 @@ var SpeciesMap = (function() {
 			},
 
 			moveContinent: function(continent, continentObject) {
+				//Cretaceous Period = 144 MYA - 65 MYA
+					//Early = 144 - 98
+					//Late = 98 - 65
+				//Jurassic Period = 205 MYA - 144 MYA
+					// Early = 205 - 180
+					// Midlle = 180 - 159
+					//Late = 159 - 144
+				//Triassic Period = 227 MYA - 205 MYA
+					//Late = 227 - 205
+
 				d3.select(continent).attr('x', instance.chartScaler.xScale(continentObject.x[1]) + instance.zoomHandler.offset[0]);
 				d3.select(continent).attr('y', instance.chartScaler.yScale(continentObject.y[1]) + instance.zoomHandler.offset[1]);
 				var rotation = "rotate(" + continentObject.rot + " "	+ (continentObject.width/2) + " " + (continentObject.height/2) + ")";
-				d3.select(continent).select("image").attr("transform", rotation);
+				d3.select(continent).select("svg").attr("transform", rotation);
 				d3.select(continent).attr("width", function(d) { return instance.chartScaler.ContinentScaleLon(continentObject.width); });
 				d3.select(continent).attr("height", function(d) { return instance.chartScaler.ContinentScaleLat(continentObject.height); });
 			}
@@ -416,16 +427,16 @@ var SpeciesMap = (function() {
 	window.addEventListener("keydown", function(e) {
 		switch (e.key){
 			case ("w"):
-				currentSelectionObject.y += 1;
+				currentSelectionObject.y[0] += 1;
 				break;
 			case ("s"):
-				currentSelectionObject.y -= 1;
+				currentSelectionObject.y[0] -= 1;
 				break;
 			case ("a"):
-				currentSelectionObject.x -= 1;
+				currentSelectionObject.x[0] -= 1;
 				break;
 			case ("d"):
-				currentSelectionObject.x += 1;
+				currentSelectionObject.x[0] += 1;
 				break;
 			case ("q"):
 				currentSelectionObject.rot -= 1;
@@ -450,10 +461,10 @@ var SpeciesMap = (function() {
 							"\nRotation: " + currentSelectionObject.rot);
 		}
 
-		d3.select(currentSelection).attr('x', instance.chartScaler.xScale(currentSelectionObject.x) + instance.zoomHandler.offset[0]);
-		d3.select(currentSelection).attr('y', instance.chartScaler.yScale(currentSelectionObject.y) + instance.zoomHandler.offset[1]);
+		d3.select(currentSelection).attr('x', instance.chartScaler.xScale(currentSelectionObject.x[0]) + instance.zoomHandler.offset[0]);
+		d3.select(currentSelection).attr('y', instance.chartScaler.yScale(currentSelectionObject.y[0]) + instance.zoomHandler.offset[1]);
 		var rotation = "rotate(" + currentSelectionObject.rot + " "	+ (currentSelectionObject.width/2) + " " + (currentSelectionObject.height/2) + ")";
-		d3.select(currentSelection).select("image").attr("transform", rotation);
+		d3.select(currentSelection).select("svg").attr("transform", rotation);
 		d3.select(currentSelection).attr("width", function(d) { return instance.chartScaler.ContinentScaleLon(currentSelectionObject.width); });
 		d3.select(currentSelection).attr("height", function(d) { return instance.chartScaler.ContinentScaleLat(currentSelectionObject.height); });
 	});
@@ -565,11 +576,11 @@ function StartApp() {
 	var formatter = d3.format(",.2f");
 	//Initialize slider
 	var slider = d3.slider()
-					.min(-250)
+					.min(-227)
 					.max(0)
-					//.ticks(250)
-					.tickValues([-250, -200, -150, -100, -50, 0])
-					.stepValues([-250, -240, -230, -220, -210, -200, -190, -180, -170, -160, -150, -140, -130, -120, -110, -100, -90, -80, -70, -60, -50, -40, -30, -20, -10, -9, -8, -7, -6, -5, -4, -3, -2, -1, 0])
+					//.ticks(227)
+					.tickValues([-227, -205, -180, -159, -144, -98, -65, 0])
+					//.stepValues([-250, -240, -230, -220, -210, -200, -190, -180, -170, -160, -150, -140, -130, -120, -110, -100, -90, -80, -70, -60, -50, -40, -30, -20, -10, -9, -8, -7, -6, -5, -4, -3, -2, -1, 0])
 					.showRange(false)
 					.value(0)
 					.tickFormat(function(d) {
