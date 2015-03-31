@@ -539,9 +539,6 @@ var SpeciesMap = (function() {
 					}
 				}
 
-				function() {
-					
-				}
 			}
 		}
 	}
