@@ -166,7 +166,7 @@ var SpeciesMap = (function() {
 							
 								//wasn't inside a continent, find nearest one
 								if(!newData.continent) {
-									console.log();
+									//console.log();
 									//var dist = Math.pow(newData.x, 	
 									/*var continent = d3.min( d3.selectAll(".scaledData")[0], function(d) {
 										
@@ -196,7 +196,7 @@ var SpeciesMap = (function() {
 									
 									newData.continent = continent;
 									
-									console.log(continent);
+									//console.log(continent);
 									
 								}
 								
@@ -457,7 +457,7 @@ var SpeciesMap = (function() {
                     .on('click', function(d) { 
 						currentSelection = this;
 						currentSelectionObject = d;
-                        console.log(this);
+                        //console.log(this);
 					})
 					//link the image up to the creature
 					.append("image")
@@ -583,8 +583,8 @@ var SpeciesMap = (function() {
 					
 					d3.select(continent).attr('x', instance.chartScaler.xScale(xPos) + instance.zoomHandler.offset[0]);
 					d3.select(continent).attr('y', instance.chartScaler.yScale(yPos) + instance.zoomHandler.offset[1]);
-					var rotation = "rotate(" + newRot + " " + (width/2) + " " + (height/2) + ")";
-					d3.select(continent).select("image").attr("transform", rotation);
+					var rotation = "rotate(" + newRot + " " + rotationX + " " + rotationY + ")";
+					d3.select(continent).attr("transform", rotation);
 					d3.select(continent).attr("width", function(d) { return instance.chartScaler.ContinentScaleLon(width); });
 					d3.select(continent).attr("height", function(d) { return instance.chartScaler.ContinentScaleLat(height); });
 				}
@@ -693,11 +693,11 @@ var SpeciesMap = (function() {
 				currentSelectionObject.height[8] = CalculateSliderPosition(sliderPosFirst, sliderPosSecond, currentSliderVal, currentSelectionObject.height[indexOne], currentSelectionObject.height[indexTwo]);
 				currentSelectionObject.width[8] = CalculateSliderPosition(sliderPosFirst, sliderPosSecond, currentSliderVal, currentSelectionObject.width[indexOne], currentSelectionObject.width[indexTwo]);
 				currentSelectionObject.rot[8] = CalculateSliderPosition(sliderPosFirst, sliderPosSecond, currentSliderVal, currentSelectionObject.rot[indexOne], currentSelectionObject.rot[indexTwo]);
-				console.log(currentSelectionObject.x[8]);
-				console.log(currentSelectionObject.y[8]);
-				console.log(currentSelectionObject.height[8]);
-				console.log(currentSelectionObject.width[8]);
-				console.log(currentSelectionObject.rot[8]);
+				console.log("Recorded X: " + currentSelectionObject.x[8]);
+				console.log("Recorded Y: " + currentSelectionObject.y[8]);
+				console.log("Recorded Height: " + currentSelectionObject.height[8]);
+				console.log("Recorded Width: " + currentSelectionObject.width[8]);
+				console.log("Recorded Rotation: " + currentSelectionObject.rot[8]);
 				break;
 			case ("p"):
 				debugPrintContinent(sliderPosFirst, sliderPosSecond, indexOne, indexTwo);
@@ -715,10 +715,12 @@ var SpeciesMap = (function() {
 	}
 
 	function debugMoveContinent() {
-		d3.select(currentSelection).attr('x', instance.chartScaler.xScale(currentSelectionObject.x[8]) + instance.zoomHandler.offset[0]);
-		d3.select(currentSelection).attr('y', instance.chartScaler.yScale(currentSelectionObject.y[8]) + instance.zoomHandler.offset[1]);
-		var rotation = "rotate(" + currentSelectionObject.rot[8] + " "	+ (currentSelectionObject.width[8]/2) + " " + (currentSelectionObject.height[8]/2) + ")";
-		d3.select(currentSelection).select("image").attr("transform", rotation);
+		var posX = instance.chartScaler.xScale(currentSelectionObject.x[8]) + instance.zoomHandler.offset[0];
+		var posY = instance.chartScaler.yScale(currentSelectionObject.y[8]) + instance.zoomHandler.offset[1];
+		d3.select(currentSelection).attr('x', posX);
+		d3.select(currentSelection).attr('y', posY);
+		var rotation = "rotate(" + currentSelectionObject.rot[8] + " "	+ (posX + (currentSelectionObject.width[8])) + " " + (posY + (currentSelectionObject.height[8])) + ")";
+		d3.select(currentSelection).attr("transform", rotation);
 		d3.select(currentSelection).attr("width", function(d) { return instance.chartScaler.ContinentScaleLon(currentSelectionObject.width[8]); });
 		d3.select(currentSelection).attr("height", function(d) { return instance.chartScaler.ContinentScaleLat(currentSelectionObject.height[8]); });
 	}
