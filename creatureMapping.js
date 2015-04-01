@@ -295,14 +295,14 @@ var SpeciesMap = (function() {
 				
 				instance.svgBG.selectAll(".scaledData")
 					.attr('x', function(d) {
-						return instance.chartScaler.xScale(d.x[0]) + translation[0];
+						return instance.chartScaler.xScale(d.drawX) + translation[0];
 					})
 					.attr('y', function(d) {
-						return instance.chartScaler.yScale(d.y[0]) + translation[1];
+						return instance.chartScaler.yScale(d.drawY) + translation[1];
 					})
-					.attr("width", function(d) { return instance.chartScaler.ContinentScaleLon(d.width[0]); })
+					.attr("width", function(d) { return instance.chartScaler.ContinentScaleLon(d.drawWd); })
 
-					.attr("height", function(d) { return instance.chartScaler.ContinentScaleLat(d.height[0]); });
+					.attr("height", function(d) { return instance.chartScaler.ContinentScaleLat(d.drawHt); });
 					/*.each(function(d) {		
 						addContinent(this, d);
 						//var rotation = "rotate(" + d.Rotation + " "	+ (d.width/2) + " " + (d.height/2) + ")";
@@ -336,6 +336,10 @@ var SpeciesMap = (function() {
 					  	.style("display", "block")
 					 	.each(function(d) {		
 						      addContinent(this, d);
+							d.drawX = d.x[0];
+							d.drawY = d.y[0];
+							d.drawWd = d.width[0];
+							d.drawHt = d.height[0];
 						//var rotation = "rotate(" + d.Rotation + " "	+ (d.width/2) + " " + (d.height/2) + ")";
 						//var img = d3.select(this).select("image").attr("transform", rotation);
                 
@@ -351,7 +355,8 @@ var SpeciesMap = (function() {
                         .on('click', function(d) { 
                             currentSelection = this;
                             currentSelectionObject = d;
-                        });
+                        })
+						.attr("transform", function(d) { return d.rotation; });
 						//.attr("transform", "rotate(-45 0 0)");
 					
 					instance.continents
@@ -442,7 +447,6 @@ var SpeciesMap = (function() {
 			
 			instanceAllCreatures: function (cb) {
 				if (!instance.creaturesInstanced) {
-					console.log("instancing!");
 					instance.creaturesInstanced = true;
 					setTimeout(function(){
 						instance.updateCreatures(currentSliderVal);
@@ -491,7 +495,9 @@ var SpeciesMap = (function() {
 
 				//Get the current value of the slider
 				currentSliderVal = -slider.value();
-				instance.instanceAllCreatures();
+				instance.instanceAllCreatures(function(){
+					instance.redraw();
+				});
 
 				//Only update the continent positions if the slider has changed by a value of 1 million years
 				if (currentSliderVal != previousSliderVal) {
@@ -555,12 +561,21 @@ var SpeciesMap = (function() {
 					var height = CalculateSliderPosition(sliderPosOne, sliderPosTwo, currentSliderVal, continentObject.height[firstIndex], continentObject.height[secondIndex]);
 					var width = CalculateSliderPosition(sliderPosOne, sliderPosTwo, currentSliderVal, continentObject.width[firstIndex], continentObject.width[secondIndex]);
 					
-					d3.select(continent).attr('x', instance.chartScaler.xScale(xPos) + instance.zoomHandler.offset[0]);
+					/*d3.select(continent).attr('x', instance.chartScaler.xScale(xPos) + instance.zoomHandler.offset[0]);
 					d3.select(continent).attr('y', instance.chartScaler.yScale(yPos) + instance.zoomHandler.offset[1]);
 					var rotation = "rotate(" + newRot + " " + rotationX + " " + rotationY + ")";
 					d3.select(continent).attr("transform", rotation);
 					d3.select(continent).attr("width", function(d) { return instance.chartScaler.ContinentScaleLon(width); });
-					d3.select(continent).attr("height", function(d) { return instance.chartScaler.ContinentScaleLat(height); });
+					d3.select(continent).attr("height", function(d) { return instance.chartScaler.ContinentScaleLat(height); });*/
+					var rotation = "rotate(" + newRot + " " + rotationX + " " + rotationY + ")";
+					d3.select(continent).each(function(d) {
+						d.drawX = xPos;
+						d.drawY = yPos;
+						d.drawWd = width;
+						d.drawHt = height;
+						d.rotation = rotation;
+						
+					});
 				}
 
 			}
