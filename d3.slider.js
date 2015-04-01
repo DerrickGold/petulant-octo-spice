@@ -15,12 +15,6 @@ function moveContinents() {
     for (i = 0; i < continents.length; i++) {
         chart.moveContinent(continents[i], continentObjects[i]);
     }
-    /*d3.select(currentSelection).attr('x', instance.chartScaler.xScale(currentSelectionObject.x) + instance.zoomHandler.offset[0]);
-    d3.select(currentSelection).attr('y', instance.chartScaler.yScale(currentSelectionObject.y) + instance.zoomHandler.offset[1]);
-    var rotation = "rotate(" + currentSelectionObject.rot + " " + (currentSelectionObject.width/2) + " " + (currentSelectionObject.height/2) + ")";
-    d3.select(currentSelection).select("image").attr("transform", rotation);
-    d3.select(currentSelection).attr("width", function(d) { return instance.chartScaler.ContinentScaleLon(currentSelectionObject.width); });
-    d3.select(currentSelection).attr("height", function(d) { return instance.chartScaler.ContinentScaleLat(currentSelectionObject.height); });*/
 }
 
 d3.slider = function module() {

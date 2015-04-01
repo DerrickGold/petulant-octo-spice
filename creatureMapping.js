@@ -91,7 +91,7 @@ var SpeciesMap = (function() {
 			//was alive between
 			eolGetSpecieYears: function (specie, doneCB) {
 				var url = eolTraits.replace(urlPlaceHolder, specie.id);
-				console.log(url);
+				//console.log(url);
 				$.ajax({
 					url: url,
 					dataType: "jsonp",
@@ -126,7 +126,7 @@ var SpeciesMap = (function() {
 			gbifGetScientificName: function(specie, doneCB) {
 				//then we need to look up the scientific name for the species
 				var url = gbifSpecies.replace(urlPlaceHolder, specie.name);
-				console.log(url);
+				//console.log(url);
 				$.ajax({
 					url: url,
 					dataType: "json",
@@ -140,7 +140,7 @@ var SpeciesMap = (function() {
 			//gets the location for all the occurances of remains in 
 			gbifGetOccurances: function(specie, offset, limit, doneCB) {
 				var url = gbifOccurance.replace(urlPlaceHolder, specie.scientificName) + "&limit=" + limit + "&offset=" + offset;
-				console.log(url);
+				//console.log(url);
 				//and here we'll grab the location data
 				$.ajax({
 					url: url,
@@ -170,8 +170,6 @@ var SpeciesMap = (function() {
 				});					
 			},
 			
-			
-			
 			fetchCreatureData: function(specie) {
 				var offset = 0, limit = 300;
 				
@@ -193,7 +191,7 @@ var SpeciesMap = (function() {
 											   instance.clusterPoints(s.locations, 0.7)
 											  ];
 							
-							console.log(specie);
+							//console.log(specie);
 							return;
 						} else {
 							//otherwise, lets keep going
@@ -211,9 +209,6 @@ var SpeciesMap = (function() {
 					});
 				})(specie);
 			},
-			
-			
-			
 			
 			resize: function(wd, ht) {
 				this.chartScaler.xRange = [this.xPadding, wd - this.xPadding];
@@ -253,8 +248,6 @@ var SpeciesMap = (function() {
 				return svgSrc;
 			},
 			
-
-			
 		/*=====================================================
 		Draw
 		=====================================================*/
@@ -262,16 +255,15 @@ var SpeciesMap = (function() {
 				var self = this;
 				self.chartScaler.scale(scale);
 				
-				
 				//redraw axis
-				/*d3.select("#xaxis").attr("transform", "translate(" +
+				d3.select("#xaxis").attr("transform", "translate(" +
 					translation[0] + ", " + parseFloat(self.chartScaler.yScale(0) + translation[1]) + ")")
 					.call(self.chartScaler.xAxis);
 
 				d3.select("#yaxis").attr("transform", "translate(" +
 					parseFloat(self.chartScaler.xScale(0) + translation[0]) + "," + translation[1] + ")")
 					.call(self.chartScaler.yAxis);
-				*/
+				
 				
 				self.svgBG.selectAll(".scaledData")
 					.attr('x', function(d) {
@@ -292,7 +284,6 @@ var SpeciesMap = (function() {
 						//var img = d3.select(this).select("image").attr("transform", rotation);
 					});
                 
-				
 					//clear all creatures
 					/*instance.svgBG.selectAll("creatures").each(function(c) {
 						c.this.remove();
@@ -300,8 +291,6 @@ var SpeciesMap = (function() {
 				
 					//loop through all the species
 
-				
-				
 					self.svgBG.selectAll(".creature")
 					.attr('x', function(d) {
 						d.drawX = instance.chartScaler.xScale(d.x) + translation[0];
@@ -374,7 +363,7 @@ var SpeciesMap = (function() {
 				
 				
 				d3.json("species.json", function(e, species) {
-					console.log(e);
+					//console.log(e);
 				//Runs through all our species in our list
 				//and fetches the data online.
 					instance.speciesList = species;
@@ -499,6 +488,8 @@ var SpeciesMap = (function() {
 					//Late = 159 - 144
 				//Triassic Period = 227 MYA - 205 MYA
 					//Late = 227 - 205
+
+				//Get the current value of the slider
 				currentSliderVal = -slider.value();
 				
 				if (!instance.creaturesInstanced) {
@@ -509,57 +500,72 @@ var SpeciesMap = (function() {
 					}, 1000);	
 				}
 				
-
-				
+				//Only update the continent positions if the slider has changed by a value of 1 million years
 				if (currentSliderVal != previousSliderVal) {
 					if (count == 10) {
 						previousSliderVal = currentSliderVal;
 						count = 0;
-						//instance.updateCreatures(currentSliderVal);
 					}
 					else
 						count++;
 
-					//This is up here for debugging purposes only - This section will be moved down after
-					d3.select(continent).attr('x', instance.chartScaler.xScale(continentObject.x[0]) + instance.zoomHandler.offset[0]);
-					d3.select(continent).attr('y', instance.chartScaler.yScale(continentObject.y[0]) + instance.zoomHandler.offset[1]);
-					var rotation = "rotate(" + continentObject.rot[0] + " "	+ (continentObject.width[0]/2) + " " + (continentObject.height[0]/2) + ")";
-					d3.select(continent).select("svg").attr("transform", rotation);
-					d3.select(continent).attr("width", function(d) { return instance.chartScaler.ContinentScaleLon(continentObject.width[0]); });
-					d3.select(continent).attr("height", function(d) { return instance.chartScaler.ContinentScaleLat(continentObject.height[0]); });
-
-					var xPos, yPos, rot;
-					//Late Triassic Period
-					if (currentSliderVal <= 227 && currentSliderVal > 205) {
-
+					var sliderPosOne, sliderPosTwo, firstIndex, secondIndex;
+					//Late Triassic Period (227 - 205) Goes back a little farther
+					if (currentSliderVal <= 250 && currentSliderVal > 205) {
+						sliderPosOne = 250;
+						sliderPosTwo = 205;
+						firstIndex = 6;
 					}
 					//Early Jurassic Period
-					else if (currentSliderVal <= -205 && currentSliderVal > 180) {
-
+					else if (currentSliderVal <= 205 && currentSliderVal > 180) {
+						sliderPosOne = 205;
+						sliderPosTwo = 180;
+						firstIndex = 5;
 					}
 					//Middle Jurassic Period
 					else if (currentSliderVal <= 180 && currentSliderVal > 159) {
-
+						sliderPosOne = 180;
+						sliderPosTwo = 159;
+						firstIndex = 4;
 					}
 					//Late Jurassic Period
 					else if (currentSliderVal <= 159 && currentSliderVal > 144) {
-
+						sliderPosOne = 159;
+						sliderPosTwo = 144;
+						firstIndex = 3;
 					}
 					//Early Cretaceous Period
 					else if (currentSliderVal <= 144 && currentSliderVal > 98) {
-
+						sliderPosOne = 144;
+						sliderPosTwo = 98;
+						firstIndex = 2;
 					}
 					//Late Cretaceous Period
 					else if (currentSliderVal <= 98 && currentSliderVal > 65) {
-
+						sliderPosOne = 98;
+						sliderPosTwo = 65;
+						firstIndex = 1;
 					}
 					//Present Day - Index[1] - Index[0]
 					else if (currentSliderVal <= 65 && currentSliderVal >= 0) {
-						xPos = CalculateSliderPosition(65, 0, currentSliderVal, continentObject.x[0], continentObject.x[1]);
-						yPos = CalculateSliderPosition(65, 0, currentSliderVal, continentObject.y[0], continentObject.y[1]);
-						d3.select(continent).attr('x', instance.chartScaler.xScale(xPos) + instance.zoomHandler.offset[0]);
-						d3.select(continent).attr('y', instance.chartScaler.yScale(yPos) + instance.zoomHandler.offset[1]);
+						sliderPosOne = 65;
+						sliderPosTwo = 0;
+						firstIndex = 0;
 					}
+					secondIndex = firstIndex + 1;
+
+					var xPos = CalculateSliderPosition(sliderPosOne, sliderPosTwo, currentSliderVal, continentObject.x[firstIndex], continentObject.x[secondIndex]);
+					var yPos = CalculateSliderPosition(sliderPosOne, sliderPosTwo, currentSliderVal, continentObject.y[firstIndex], continentObject.y[secondIndex]);
+					var newRot = CalculateSliderPosition(sliderPosOne, sliderPosTwo, currentSliderVal, continentObject.rot[firstIndex], continentObject.rot[secondIndex]);
+					var height = CalculateSliderPosition(sliderPosOne, sliderPosTwo, currentSliderVal, continentObject.height[firstIndex], continentObject.height[secondIndex]);
+					var width = CalculateSliderPosition(sliderPosOne, sliderPosTwo, currentSliderVal, continentObject.width[firstIndex], continentObject.width[secondIndex]);
+					
+					d3.select(continent).attr('x', instance.chartScaler.xScale(xPos) + instance.zoomHandler.offset[0]);
+					d3.select(continent).attr('y', instance.chartScaler.yScale(yPos) + instance.zoomHandler.offset[1]);
+					var rotation = "rotate(" + newRot + " " + (width/2) + " " + (height/2) + ")";
+					d3.select(continent).select("image").attr("transform", rotation);
+					d3.select(continent).attr("width", function(d) { return instance.chartScaler.ContinentScaleLon(width); });
+					d3.select(continent).attr("height", function(d) { return instance.chartScaler.ContinentScaleLat(height); });
 				}
 
 			}
@@ -572,89 +578,128 @@ var SpeciesMap = (function() {
 	 */
 	window.addEventListener("keydown", function(e) {
 		var currentSliderVal = -slider.value();
+		var sliderPosFirst, sliderPosSecond, indexOne, indexTwo;
+
+		//Late Triassic Period (227 - 205) Goes back a little farther
+		if (currentSliderVal <= 250 && currentSliderVal > 205) {
+			sliderPosFirst = 227;
+			sliderPosSecond = 205;
+			indexOne = 6;
+		}
+		//Early Jurassic Period
+		else if (currentSliderVal <= -205 && currentSliderVal > 180) {
+			sliderPosFirst = 205;
+			sliderPosSecond = 180;
+			indexOne = 5;
+		}
+		//Middle Jurassic Period
+		else if (currentSliderVal <= 180 && currentSliderVal > 159) {
+			sliderPosFirst = 180;
+			sliderPosSecond = 159;
+			indexOne = 4;
+		}
+		//Late Jurassic Period
+		else if (currentSliderVal <= 159 && currentSliderVal > 144) {
+			sliderPosFirst = 159;
+			sliderPosSecond = 144;
+			indexOne = 3;
+		}
+		//Early Cretaceous Period
+		else if (currentSliderVal <= 144 && currentSliderVal > 98) {
+			sliderPosFirst = 144;
+			sliderPosSecond = 98;
+			indexOne = 2;
+		}
+		//Late Cretaceous Period
+		else if (currentSliderVal <= 98 && currentSliderVal > 65) {
+			sliderPosFirst = 98;
+			sliderPosSecond = 65;
+			indexOne = 1;
+		}
+		//Present Day - Index[1] - Index[0]
+		else if (currentSliderVal <= 65 && currentSliderVal >= 0) {
+			sliderPosFirst = 65;
+			sliderPosSecond = 0;
+			indexOne = 0;
+		}
+		indexTwo = indexOne + 1;
+
 		switch (e.key){
 			case ("w"):
-				currentSelectionObject.y[0] += 1;
+				currentSelectionObject.y[8] += 1;
 				debugMoveContinent();
 				break;
 			case ("s"):
-				currentSelectionObject.y[0] -= 1;
+				currentSelectionObject.y[8] -= 1;
 				debugMoveContinent();
 				break;
 			case ("a"):
-				currentSelectionObject.x[0] -= 1;
+				currentSelectionObject.x[8] -= 1;
 				debugMoveContinent();
 				break;
 			case ("d"):
-				currentSelectionObject.x[0] += 1;
+				currentSelectionObject.x[8] += 1;
 				debugMoveContinent();
 				break;
 			case ("q"):
-				currentSelectionObject.rot[0] -= 1;
+				currentSelectionObject.rot[8] -= 1;
 				debugMoveContinent();
 				break;
 			case ("e"):
-				currentSelectionObject.rot[0] += 1;
+				currentSelectionObject.rot[8] += 1;
 				debugMoveContinent();
 				break;
 			case ("z"):
-				currentSelectionObject.width[0] -=1;
-				currentSelectionObject.height[0] -=1;
+				currentSelectionObject.width[8] -=1;
 				debugMoveContinent();
 				break;
-			case ("c"):
-				currentSelectionObject.width[0] += 1;
-				currentSelectionObject.height[0] += 1;
+			case ("x"):
+				currentSelectionObject.width[8] += 1;
 				debugMoveContinent();
+				break;
+
+			case ("c"):
+				currentSelectionObject.height[8] -=1;
+				debugMoveContinent();
+				break;
+			case ("v"):
+				currentSelectionObject.height[8] += 1;
+				debugMoveContinent();
+				break;
+			case ("r"):
+				currentSelectionObject.x[8] = CalculateSliderPosition(sliderPosFirst, sliderPosSecond, currentSliderVal, currentSelectionObject.x[indexOne], currentSelectionObject.x[indexTwo]);
+				currentSelectionObject.y[8] = CalculateSliderPosition(sliderPosFirst, sliderPosSecond, currentSliderVal, currentSelectionObject.y[indexOne], currentSelectionObject.y[indexTwo]);
+				currentSelectionObject.height[8] = CalculateSliderPosition(sliderPosFirst, sliderPosSecond, currentSliderVal, currentSelectionObject.height[indexOne], currentSelectionObject.height[indexTwo]);
+				currentSelectionObject.width[8] = CalculateSliderPosition(sliderPosFirst, sliderPosSecond, currentSliderVal, currentSelectionObject.width[indexOne], currentSelectionObject.width[indexTwo]);
+				currentSelectionObject.rot[8] = CalculateSliderPosition(sliderPosFirst, sliderPosSecond, currentSliderVal, currentSelectionObject.rot[indexOne], currentSelectionObject.rot[indexTwo]);
+				console.log(currentSelectionObject.x[8]);
+				console.log(currentSelectionObject.y[8]);
+				console.log(currentSelectionObject.height[8]);
+				console.log(currentSelectionObject.width[8]);
+				console.log(currentSelectionObject.rot[8]);
 				break;
 			case ("p"):
-				//Late Triassic Period
-				if (currentSliderVal <= 227 && currentSliderVal > 205) {
-					debugPrintContinent(6, 7);
-				}
-				//Early Jurassic Period
-				else if (currentSliderVal <= -205 && currentSliderVal > 180) {
-					debugPrintContinent(5, 6);
-				}
-				//Middle Jurassic Period
-				else if (currentSliderVal <= 180 && currentSliderVal > 159) {
-					debugPrintContinent(4, 5);
-				}
-				//Late Jurassic Period
-				else if (currentSliderVal <= 159 && currentSliderVal > 144) {
-					debugPrintContinent(3, 4);
-				}
-				//Early Cretaceous Period
-				else if (currentSliderVal <= 144 && currentSliderVal > 98) {
-					debugPrintContinent(2, 3);
-				}
-				//Late Cretaceous Period
-				else if (currentSliderVal <= 98 && currentSliderVal > 65) {
-					debugPrintContinent(1, 2);
-				}
-				//Present Day - Index[1] - Index[0]
-				else if (currentSliderVal <= 65 && currentSliderVal >= 0) {
-					debugPrintContinent(0, 1);
-				}
+				debugPrintContinent(sliderPosFirst, sliderPosSecond, indexOne, indexTwo);
+				break;
 		}
 	});
 
-	function debugPrintContinent(indexOne, indexTwo) {
+	function debugPrintContinent(sliderPosOne, sliderPosTwo, indexOne, indexTwo) {
 		console.log("Continent: " + currentSelectionObject.continent +
-					"\nX: " + CalculateSliderPosition(65, 0, currentSliderVal, currentSelectionObject.x[indexOne], currentSelectionObject.x[indexTwo]) + 
-					"\nY: " + CalculateSliderPosition(65, 0, currentSliderVal, currentSelectionObject.y[indexOne], currentSelectionObject.y[indexTwo]) +
-					"\nHeight: " + CalculateSliderPosition(65, 0, currentSliderVal, currentSelectionObject.height[indexOne], currentSelectionObject.height[indexTwo]) +
-					"\nWidth: " + CalculateSliderPosition(65, 0, currentSliderVal, currentSelectionObject.width[indexOne], currentSelectionObject.width[indexTwo]) +
-					"\nRotation: " + CalculateSliderPosition(65, 0, currentSliderVal, currentSelectionObject.rot[indexOne], currentSelectionObject.rot[indexTwo]));
+					"\nX: " + CalculateSliderPosition(sliderPosOne, sliderPosTwo, currentSliderVal, currentSelectionObject.x[8], currentSelectionObject.x[8]) +
+					"\nY: " + CalculateSliderPosition(sliderPosOne, sliderPosTwo, currentSliderVal, currentSelectionObject.y[8], currentSelectionObject.y[8]) +
+					"\nHeight: " + CalculateSliderPosition(sliderPosOne, sliderPosTwo, currentSliderVal, currentSelectionObject.height[8], currentSelectionObject.height[8]) +
+					"\nWidth: " + CalculateSliderPosition(sliderPosOne, sliderPosTwo, currentSliderVal, currentSelectionObject.width[8], currentSelectionObject.width[8]) +
+					"\nRotation: " + CalculateSliderPosition(sliderPosOne, sliderPosTwo, currentSliderVal, currentSelectionObject.rot[8], currentSelectionObject.rot[8]));
 	}
 
 	function debugMoveContinent() {
-		d3.select(currentSelection).attr('x', instance.chartScaler.xScale(currentSelectionObject.x[0]) + instance.zoomHandler.offset[0]);
-		d3.select(currentSelection).attr('y', instance.chartScaler.yScale(currentSelectionObject.y[0]) + instance.zoomHandler.offset[1]);
-		var rotation = "rotate(" + currentSelectionObject.rot[0] + " "	+ (currentSelectionObject.width[0]/2) + " " + (currentSelectionObject.height[0]/2) + ")";
+		d3.select(currentSelection).attr('x', instance.chartScaler.xScale(currentSelectionObject.x[8]) + instance.zoomHandler.offset[0]);
+		d3.select(currentSelection).attr('y', instance.chartScaler.yScale(currentSelectionObject.y[8]) + instance.zoomHandler.offset[1]);
+		var rotation = "rotate(" + currentSelectionObject.rot[8] + " "	+ (currentSelectionObject.width[8]/2) + " " + (currentSelectionObject.height[8]/2) + ")";
 		d3.select(currentSelection).select("image").attr("transform", rotation);
-		d3.select(currentSelection).attr("width", function(d) { return instance.chartScaler.ContinentScaleLon(currentSelectionObject.width[0]); });
-		d3.select(currentSelection).attr("height", function(d) { return instance.chartScaler.ContinentScaleLat(currentSelectionObject.height[0]); });
+		d3.select(currentSelection).attr("width", function(d) { return instance.chartScaler.ContinentScaleLon(currentSelectionObject.width[8]); });
+		d3.select(currentSelection).attr("height", function(d) { return instance.chartScaler.ContinentScaleLat(currentSelectionObject.height[8]); });
 	}
 	
 	return {
