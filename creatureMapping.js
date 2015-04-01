@@ -149,14 +149,66 @@ var SpeciesMap = (function() {
 						var locations = data.results.map(function(loc) {
 								var newData = {
 									"x": loc.decimalLongitude,
-									"y": loc.decimalLatitude
+									"y": loc.decimalLatitude,
+									"continent": null
+								};
+								
+								//figure out which continent to use as reference
+								/* d3.selectAll(".scaledData").each(function(d) {
+									 console.log("checking this");
+									//check if inside a continent
+									if (newData.x >= d.x && newData.x <= d.x + d.width &&
+										newData.y >= d.y && newData.y <= d.y + d.height) {
+										console.log("Inside continent!");
+										newData.continent = d3.select(this);
+									}
+								});*/
+							
+								//wasn't inside a continent, find nearest one
+								if(!newData.continent) {
+									console.log();
+									//var dist = Math.pow(newData.x, 	
+									/*var continent = d3.min( d3.selectAll(".scaledData")[0], function(d) {
+										
+										var data = d.__data__;
+	
+										var dist = Math.pow(newData.x + ((data.x[0] + data.width[0])/2), 2) +  
+													Math.pow(newData.y + ((data.y[0] + data.height[0])/2), 2);
+										return dist;
+									});
+									newData.continent = continent;*/
+									continents = d3.selectAll(".scaledData")[0];
+									
+									var continent = continents.reduce(function(a, b) {
+										aData = a.__data__;
+										bData = b.__data__;		
+			
+										var distA =  Math.pow(newData.x + 180 - aData.x[0] + 180, 2) +
+													Math.pow(newData.y + 180 + aData.y[0] + 90, 2);
+										
+										
+										var distB = Math.pow(newData.x + 180 + bData.x[0] + 180, 2) +  
+													Math.pow(newData.y + 90 + bData.y[0] + 90, 2);
+										if(distA < distB) return a;
+										else return b;
+										
+									});
+									
+									newData.continent = continent;
+									
+									console.log(continent);
+									
 								}
+								
 								return newData;
 						});
 						
-						/*locations = locations.filter(function(loc) {
+						locations = locations.filter(function(loc) {
 							return (loc.x && loc.y);
-						});*/
+						});
+						
+
+						
 						
 
 						//add all locations to the species	
@@ -314,6 +366,7 @@ var SpeciesMap = (function() {
 				d3.json("continents/continents.json", function(e, dataset) {
 					var path = dataset.path;
 					dataset = dataset.data;
+					instance.continentData = dataset;
 					
 					instance.continents = instance.svgBG.selectAll("svg")
 						.data(dataset).enter().append("svg")
@@ -375,6 +428,8 @@ var SpeciesMap = (function() {
 				array.
 			*/
 			createCreature: function(specie) {
+				if(!specie.clusters) return;
+				
 				var translation = instance.zoomHandler.offset;
 				var clusterNum = parseInt(instance.clusterScale(instance.zoomHandler.zoom));
 				
