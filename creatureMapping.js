@@ -303,7 +303,7 @@ var SpeciesMap = (function() {
 					.attr("width", function(d) { return instance.chartScaler.ContinentScaleLon(d.drawWd); })
 
 					.attr("height", function(d) { return instance.chartScaler.ContinentScaleLat(d.drawHt); })
-					.attr("transform", function(d) {return d.rotation; });
+					.attr("transform", function(d) {return d.drawRot; });
 					/*.each(function(d) {		
 						addContinent(this, d);
 						//var rotation = "rotate(" + d.Rotation + " "	+ (d.width/2) + " " + (d.height/2) + ")";
@@ -331,10 +331,10 @@ var SpeciesMap = (function() {
 					dataset = dataset.data;
 					instance.continentData = dataset;
 					
-					instance.continents = instance.svgBG.selectAll("svg")
+					instance.continents = instance.svgBG.selectAll(".scaledData")
 						.data(dataset).enter().append("svg")
 						.attr("class", "scaledData")
-					  	.style("display", "block")
+					  	.attr("display", "block")
 					 	.each(function(d) {		
 						      addContinent(this, d);
 							d.drawX = d.x[0];
@@ -449,11 +449,11 @@ var SpeciesMap = (function() {
 			instanceAllCreatures: function (cb) {
 				if (!instance.creaturesInstanced) {
 					instance.creaturesInstanced = true;
-					setTimeout(function(){
+					//setTimeout(function(){
 						instance.updateCreatures(currentSliderVal);
 						instance.creaturesInstanced = false;
 						if(cb) cb();	
-					}, 10);	
+					//}, 10);	
 				}
 			},
 			
@@ -568,14 +568,12 @@ var SpeciesMap = (function() {
 					d3.select(continent).attr("transform", rotation);
 					d3.select(continent).attr("width", function(d) { return instance.chartScaler.ContinentScaleLon(width); });
 					d3.select(continent).attr("height", function(d) { return instance.chartScaler.ContinentScaleLat(height); });*/
-					var rotation = "rotate(" + newRot + " " + rotationX + " " + rotationY + ")";
 					d3.select(continent).each(function(d) {
 						d.drawX = xPos;
 						d.drawY = yPos;
 						d.drawWd = width;
 						d.drawHt = height;
-						d.rotation = rotation;
-						
+						d.drawRot = "rotate(" + newRot + " " + rotationX + " " + rotationY + ")";
 					});
 				}
 
