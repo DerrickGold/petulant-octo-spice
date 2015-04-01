@@ -578,6 +578,8 @@ var SpeciesMap = (function() {
 					var xPos = CalculateSliderPosition(sliderPosOne, sliderPosTwo, currentSliderVal, continentObject.x[firstIndex], continentObject.x[secondIndex]);
 					var yPos = CalculateSliderPosition(sliderPosOne, sliderPosTwo, currentSliderVal, continentObject.y[firstIndex], continentObject.y[secondIndex]);
 					var newRot = CalculateSliderPosition(sliderPosOne, sliderPosTwo, currentSliderVal, continentObject.rot[firstIndex], continentObject.rot[secondIndex]);
+					var rotationX = instance.chartScaler.xScale(xPos) + instance.zoomHandler.offset[0];
+					var rotationY = instance.chartScaler.yScale(yPos) + instance.zoomHandler.offset[1];
 					var height = CalculateSliderPosition(sliderPosOne, sliderPosTwo, currentSliderVal, continentObject.height[firstIndex], continentObject.height[secondIndex]);
 					var width = CalculateSliderPosition(sliderPosOne, sliderPosTwo, currentSliderVal, continentObject.width[firstIndex], continentObject.width[secondIndex]);
 					
