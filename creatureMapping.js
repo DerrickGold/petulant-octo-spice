@@ -302,7 +302,8 @@ var SpeciesMap = (function() {
 					})
 					.attr("width", function(d) { return instance.chartScaler.ContinentScaleLon(d.drawWd); })
 
-					.attr("height", function(d) { return instance.chartScaler.ContinentScaleLat(d.drawHt); });
+					.attr("height", function(d) { return instance.chartScaler.ContinentScaleLat(d.drawHt); })
+					.attr("transform", function(d) {return d.rotation; });
 					/*.each(function(d) {		
 						addContinent(this, d);
 						//var rotation = "rotate(" + d.Rotation + " "	+ (d.width/2) + " " + (d.height/2) + ")";
@@ -367,7 +368,7 @@ var SpeciesMap = (function() {
 						.attr("width", "100%")
 						.attr("height", "100%")
 						.each(function(d) {
-							d.Rotation = 0; 
+							d.rotation = "rotate(0 0 0)"; 
 					 	})
 						.attr("preserveAspectRatio", "none");
 					
@@ -469,15 +470,15 @@ var SpeciesMap = (function() {
 			*/
 			updateCreatures: function(year) {
 				instance.currentTimePeriod = instance.speciesList.data.filter(function(c) {
-					if(c.dates) return (year < c.dates[0] && year > c.dates[1]);
+					if(c.dates)return (year < c.dates[0] && year > c.dates[1]);
 				});
 
 				instance.clearCreatures();
 				//and re-create new ones
 				instance.currentTimePeriod.forEach(function(c) {
-					setTimeout(function() {
+					//setTimeout(function() {
 						instance.createCreature(c);
-					}, 50);
+					//}, 50);
 				});	
 			},
 			
