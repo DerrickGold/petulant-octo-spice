@@ -127,6 +127,7 @@ var ChartScaler = (function() {
 				var newCLatRange = [instance.cLatRange[0], instance.cLatRange[1] * s];
 				var newCLonRange = [instance.cLonRange[0], instance.cLonRange[1] * s];
 				
+				
                 instance.xScale.domain(instance.xDomain).range(newXRange);
                 instance.yScale.domain(instance.yDomain).range(newYRange);
 

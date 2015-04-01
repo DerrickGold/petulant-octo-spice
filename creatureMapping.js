@@ -82,7 +82,7 @@ var SpeciesMap = (function() {
 						
 					} else {
 						//otherwise, make a new group
-						groups.push({start: unGroup, data: []});
+						groups.push({start: unGroup, data: [], continent: unGroup.continent});
 					}
 				});
 				return groups;
@@ -104,16 +104,16 @@ var SpeciesMap = (function() {
 
 						//get years in which creature existed  
 						var first = d3.max(dates, function(d) {
-							return d["dwc:measurementValue"];
+							return parseFloat(d["dwc:measurementValue"]);
 						});
 
 						var last = d3.min(dates, function(d) {
-							return d["dwc:measurementValue"]; 
+							return parseFloat(d["dwc:measurementValue"]); 
 						});
 						//store the dates back to the species
-						var oldFirst = first;
-						first = Math.max(first, last);
-						last = Math.min(oldFirst, last);
+						//var oldFirst = first;
+						//first = Math.max(first, last);
+						//last = Math.min(oldFirst, last);
 						
 						specie.dates = [first, last];				
 						if(doneCB) doneCB(specie);
@@ -152,53 +152,30 @@ var SpeciesMap = (function() {
 									"y": loc.decimalLatitude,
 									"continent": null
 								};
-								
-								//figure out which continent to use as reference
-								/* d3.selectAll(".scaledData").each(function(d) {
-									 console.log("checking this");
-									//check if inside a continent
-									if (newData.x >= d.x && newData.x <= d.x + d.width &&
-										newData.y >= d.y && newData.y <= d.y + d.height) {
-										console.log("Inside continent!");
-										newData.continent = d3.select(this);
-									}
-								});*/
+								var continent = instance.continentData.filter(function(c) {
+									var continentScreenX = instance.chartScaler.xScale(c.x[0]),
+										continentWidth = instance.chartScaler.ContinentScaleLon(c.width[0]);
+									
+									var continentScreenY = instance.chartScaler.yScale(c.y[0]),
+										continentHeight = instance.chartScaler.ContinentScaleLat(c.height[0]);								
+									
+									
+									var creatureX = instance.chartScaler.xScale(newData.x),
+										creatureY = instance.chartScaler.yScale(newData.y);
+									
+									
+									
+									return (creatureX >= continentScreenX && creatureX <= continentScreenX + continentWidth &&
+											creatureY >= continentScreenY && creatureY <= continentScreenY + continentHeight);
+									
+									
+								});
 							
-								//wasn't inside a continent, find nearest one
-								if(!newData.continent) {
-									//console.log();
-									//var dist = Math.pow(newData.x, 	
-									/*var continent = d3.min( d3.selectAll(".scaledData")[0], function(d) {
-										
-										var data = d.__data__;
-	
-										var dist = Math.pow(newData.x + ((data.x[0] + data.width[0])/2), 2) +  
-													Math.pow(newData.y + ((data.y[0] + data.height[0])/2), 2);
-										return dist;
-									});
-									newData.continent = continent;*/
-									continents = d3.selectAll(".scaledData")[0];
 									
-									var continent = continents.reduce(function(a, b) {
-										aData = a.__data__;
-										bData = b.__data__;		
-			
-										var distA =  Math.pow(newData.x + 180 - aData.x[0] + 180, 2) +
-													Math.pow(newData.y + 180 + aData.y[0] + 90, 2);
-										
-										
-										var distB = Math.pow(newData.x + 180 + bData.x[0] + 180, 2) +  
-													Math.pow(newData.y + 90 + bData.y[0] + 90, 2);
-										if(distA < distB) return a;
-										else return b;
-										
-									});
-									
-									newData.continent = continent;
-									
-									//console.log(continent);
-									
-								}
+								newData.continent = {
+									all: continent,
+									closest: continent[0],
+								};		
 								
 								return newData;
 						});
@@ -305,18 +282,18 @@ var SpeciesMap = (function() {
 		=====================================================*/
 			draw: function(translation, scale) {
 				var self = this;
-				self.chartScaler.scale(scale);
+				instance.chartScaler.scale(scale);
 
 				//redraw axis
-				d3.select("#xaxis").attr("transform", "translate(" +
+				/*d3.select("#xaxis").attr("transform", "translate(" +
 					translation[0] + ", " + parseFloat(self.chartScaler.yScale(0) + translation[1]) + ")")
 					.call(self.chartScaler.xAxis);
 
 				d3.select("#yaxis").attr("transform", "translate(" +
 					parseFloat(self.chartScaler.xScale(0) + translation[0]) + "," + translation[1] + ")")
-					.call(self.chartScaler.yAxis);
+					.call(self.chartScaler.yAxis);*/
 				
-				self.svgBG.selectAll(".scaledData")
+				instance.svgBG.selectAll(".scaledData")
 					.attr('x', function(d) {
 						return instance.chartScaler.xScale(d.x[0]) + translation[0];
 					})
@@ -325,31 +302,16 @@ var SpeciesMap = (function() {
 					})
 					.attr("width", function(d) { return instance.chartScaler.ContinentScaleLon(d.width[0]); })
 
-					.attr("height", function(d) { return instance.chartScaler.ContinentScaleLat(d.height[0]); })
-					.on('click', function(d) { 
-						currentSelection = this;
-						currentSelectionObject = d;
-					})
-					.each(function(d) {		
+					.attr("height", function(d) { return instance.chartScaler.ContinentScaleLat(d.height[0]); });
+					/*.each(function(d) {		
 						addContinent(this, d);
 						//var rotation = "rotate(" + d.Rotation + " "	+ (d.width/2) + " " + (d.height/2) + ")";
 						//var img = d3.select(this).select("image").attr("transform", rotation);
-					});
-                
-					//clear all creatures
-					/*instance.svgBG.selectAll("creatures").each(function(c) {
-						c.this.remove();
 					});*/
-				
-					//loop through all the species
-
-					self.svgBG.selectAll(".creature")
-					.attr("height", function(d) { return instance.chartScaler.ContinentScaleLat(d.height[0]); });
-
 
 				
 				//loop through all the species
-				self.svgBG.selectAll(".creature")
+				instance.svgBG.selectAll(".creature")
 					.attr('x', function(d) {
 						d.drawX = instance.chartScaler.xScale(d.x) + translation[0];
 						return d.drawX;
@@ -378,6 +340,10 @@ var SpeciesMap = (function() {
 						//var img = d3.select(this).select("image").attr("transform", rotation);
                 
 							//Transform all our long/lat positions in the continents.json to screen pixels
+						})
+						.on('click', function(d) { 
+							currentSelection = this;
+							currentSelectionObject = d;
 						})
 						.attr("width", function(d) { return instance.chartScaler.ContinentScaleLon(d.width[0]); })
 						.attr("height", function(d) { return instance.chartScaler.ContinentScaleLat(d.height[0]);})
@@ -458,6 +424,7 @@ var SpeciesMap = (function() {
 						currentSelection = this;
 						currentSelectionObject = d;
                         //console.log(this);
+						console.log(d.continent);
 					})
 					//link the image up to the creature
 					.append("image")
@@ -471,6 +438,18 @@ var SpeciesMap = (function() {
 			
 			clearCreatures: function(d) {
 				instance.svgBG.selectAll(".creature").on('click', null).remove();
+			},
+			
+			instanceAllCreatures: function (cb) {
+				if (!instance.creaturesInstanced) {
+					console.log("instancing!");
+					instance.creaturesInstanced = true;
+					setTimeout(function(){
+						instance.updateCreatures(currentSliderVal);
+						instance.creaturesInstanced = false;
+						if(cb) cb();	
+					}, 10);	
+				}
 			},
 			
 			/*
@@ -512,15 +491,8 @@ var SpeciesMap = (function() {
 
 				//Get the current value of the slider
 				currentSliderVal = -slider.value();
-				
-				if (!instance.creaturesInstanced) {
-					instance.creaturesInstanced = true;
-					setTimeout(function(){
-							instance.updateCreatures(currentSliderVal);
-							instance.creaturesInstanced = false;
-					}, 10);	
-				}
-				
+				instance.instanceAllCreatures();
+
 				//Only update the continent positions if the slider has changed by a value of 1 million years
 				if (currentSliderVal != previousSliderVal) {
 					if (count == 10) {
@@ -765,17 +737,7 @@ Initialization
 									.attr("id", "svgBG");
 
 				instance.svgFG = instance.svgDisplay.append("svg");
-				instance.svgPopup = instance.svgFG.append("g");
 
-				
-
-				//create x axis title
-				instance.svgFG.append("g")
-					.attr("class", "axis").attr("id", "xaxis")
-
-				//create y axis title
-				instance.svgFG.append("g")
-					.attr("class", "axis").attr("id", "yaxis");
 				
 				instance.zoomHandler.startZoom(function(e) {
 					instance.svgFG.select(".popup").remove();
@@ -784,7 +746,7 @@ Initialization
 				});
 
 				instance.zoomHandler.endZoom(function(e) {
-				    instance.updateCreatures( -slider.value());
+					instance.instanceAllCreatures();
 				});
 
 				instance.zoomHandler.onZoom(function(e) {
