@@ -469,15 +469,15 @@ var SpeciesMap = (function() {
 			*/
 			updateCreatures: function(year) {
 				instance.currentTimePeriod = instance.speciesList.data.filter(function(c) {
-					return (year < c.dates[0] && year > c.dates[1]);
+					if(c.dates) return (year < c.dates[0] && year > c.dates[1]);
 				});
 
 				instance.clearCreatures();
 				//and re-create new ones
 				instance.currentTimePeriod.forEach(function(c) {
-					//setTimeout(function() {
+					setTimeout(function() {
 						instance.createCreature(c);
-					//}, 50);
+					}, 50);
 				});	
 			},
 			
