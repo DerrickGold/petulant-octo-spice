@@ -45,11 +45,13 @@ var SpeciesMap = (function() {
 			svgDisplay: null,
 			svgBG: null,
 			svgFG: null,
+			svgCreature: null,
 			svgPopup: null,
 			
 			continents: null,
 			
 			creaturesInstanced: false,
+			creatureCache: null,
 			
 			clusterScale: d3.scale.linear().clamp(true),
 			clusterPerSpecie: 10,
@@ -261,37 +263,13 @@ var SpeciesMap = (function() {
 			redraw: function() {
 				this.draw(this.zoomHandler.offset, this.zoomHandler.zoom);	
 			},
-			
-			/*Makes an svg object of a specified resolution
-			that can be scaled up or down nicely.
-			Width and height refer to its maximum limits.
-			Content that exceed this width and height within
-			the SVG will be scaled down to fit.
-			*/
-			createScaledSvg: function(svgSrc, width, height) {
-				svgSrc.append("svg").attr("class", "scaledData")
-					  .attr("viewBox" , "0 0 " + width + " " + height)
-					  .style("display", "block");
-				
-				//Return the source so we can chain this function
-				return svgSrc;
-			},
-			
+
 		/*=====================================================
 		Draw
 		=====================================================*/
 			draw: function(translation, scale) {
 				var self = this;
 				instance.chartScaler.scale(scale);
-
-				//redraw axis
-				/*d3.select("#xaxis").attr("transform", "translate(" +
-					translation[0] + ", " + parseFloat(self.chartScaler.yScale(0) + translation[1]) + ")")
-					.call(self.chartScaler.xAxis);
-
-				d3.select("#yaxis").attr("transform", "translate(" +
-					parseFloat(self.chartScaler.xScale(0) + translation[0]) + "," + translation[1] + ")")
-					.call(self.chartScaler.yAxis);*/
 				
 				instance.svgBG.selectAll(".scaledData")
 					.attr('x', function(d) {
@@ -300,19 +278,16 @@ var SpeciesMap = (function() {
 					.attr('y', function(d) {
 						return instance.chartScaler.yScale(d.drawY) + translation[1];
 					})
-					.attr("width", function(d) { return instance.chartScaler.ContinentScaleLon(d.drawWd); })
+					.attr("width", function(d) { return instance.chartScaler.ContinentScaleLon(d.drawWd) + "px";})
 
-					.attr("height", function(d) { return instance.chartScaler.ContinentScaleLat(d.drawHt); })
+					.attr("height", function(d) { return instance.chartScaler.ContinentScaleLat(d.drawHt) + "px"; })
 					.attr("transform", function(d) {return d.drawRot; });
-					/*.each(function(d) {		
-						addContinent(this, d);
-						//var rotation = "rotate(" + d.Rotation + " "	+ (d.width/2) + " " + (d.height/2) + ")";
-						//var img = d3.select(this).select("image").attr("transform", rotation);
-					});*/
 
-				
 				//loop through all the species
-				instance.svgBG.selectAll(".creature")
+				if(!instance.creatureCache)
+					instance.creatureCache = instance.svgCreature.selectAll(".creature");
+				
+				instance.creatureCache
 					.attr('x', function(d) {
 						d.drawX = instance.chartScaler.xScale(d.x) + translation[0];
 						return d.drawX;
@@ -331,7 +306,7 @@ var SpeciesMap = (function() {
 					dataset = dataset.data;
 					instance.continentData = dataset;
 					
-					instance.continents = instance.svgBG.selectAll(".scaledData")
+					instance.continents = instance.svgBG.selectAll()
 						.data(dataset).enter().append("svg")
 						.attr("class", "scaledData")
 					  	.attr("display", "block")
@@ -341,35 +316,21 @@ var SpeciesMap = (function() {
 							d.drawY = d.y[0];
 							d.drawWd = d.width[0];
 							d.drawHt = d.height[0];
-						//var rotation = "rotate(" + d.Rotation + " "	+ (d.width/2) + " " + (d.height/2) + ")";
-						//var img = d3.select(this).select("image").attr("transform", rotation);
-                
-							//Transform all our long/lat positions in the continents.json to screen pixels
 						})
-						.on('click', function(d) { 
+						/*.on('click', function(d) { 
 							currentSelection = this;
 							currentSelectionObject = d;
-						})
-						.attr("width", function(d) { return instance.chartScaler.ContinentScaleLon(d.width[0]); })
-						.attr("height", function(d) { return instance.chartScaler.ContinentScaleLat(d.height[0]);})
+						})*/
+						.attr("width", function(d) { return instance.chartScaler.ContinentScaleLon(d.width[0]) + "px"; })
+						.attr("height", function(d) { return instance.chartScaler.ContinentScaleLat(d.height[0]) + "px";})
 						.attr("preserveAspectRatio", "none")
-                        .on('click', function(d) { 
-                            currentSelection = this;
-                            currentSelectionObject = d;
-                        })
-						.attr("transform", function(d) { return d.rotation; });
-						//.attr("transform", "rotate(-45 0 0)");
-					
-					instance.continents
+						.attr("transform", function(d) { return d.rotation; })
 						.append("image")
 						.attr("xlink:href", function(d){
 							return path + '/' + d.continent;
 						})
 						.attr("width", "100%")
 						.attr("height", "100%")
-						.each(function(d) {
-							d.rotation = "rotate(0 0 0)"; 
-					 	})
 						.attr("preserveAspectRatio", "none");
 					
 					instance.draw(instance.zoomHandler.offset, instance.zoomHandler.zoom);
@@ -406,7 +367,7 @@ var SpeciesMap = (function() {
 				var clusterNum = parseInt(instance.clusterScale(instance.zoomHandler.zoom));
 				
 				var idNum = 0;
-				var creatures = instance.svgBG.selectAll("creature")
+				var creatures = instance.svgCreature.selectAll()
 					.data(specie.clusters[clusterNum]).enter().append("svg")
 					.attr("class", function(d) {
 						return "creature " + specie.name.replace(' ', '');
@@ -429,7 +390,6 @@ var SpeciesMap = (function() {
                     .on('click', function(d) { 
 						currentSelection = this;
 						currentSelectionObject = d;
-                        //console.log(this);
 						console.log(d.continent);
 					})
 					//link the image up to the creature
@@ -443,17 +403,19 @@ var SpeciesMap = (function() {
 			},
 			
 			clearCreatures: function(d) {
-				instance.svgBG.selectAll(".creature").on('click', null).remove();
+				if(!instance.creatureCache) return;
+				instance.creatureCache.remove();
+				instance.creatureCache = null;
 			},
 			
 			instanceAllCreatures: function (cb) {
 				if (!instance.creaturesInstanced) {
 					instance.creaturesInstanced = true;
-					//setTimeout(function(){
+					setTimeout(function(){
 						instance.updateCreatures(currentSliderVal);
 						instance.creaturesInstanced = false;
 						if(cb) cb();	
-					//}, 10);	
+					}, 10);	
 				}
 			},
 			
@@ -562,18 +524,14 @@ var SpeciesMap = (function() {
 					var height = CalculateSliderPosition(sliderPosOne, sliderPosTwo, currentSliderVal, continentObject.height[firstIndex], continentObject.height[secondIndex]);
 					var width = CalculateSliderPosition(sliderPosOne, sliderPosTwo, currentSliderVal, continentObject.width[firstIndex], continentObject.width[secondIndex]);
 					
-					/*d3.select(continent).attr('x', instance.chartScaler.xScale(xPos) + instance.zoomHandler.offset[0]);
-					d3.select(continent).attr('y', instance.chartScaler.yScale(yPos) + instance.zoomHandler.offset[1]);
-					var rotation = "rotate(" + newRot + " " + rotationX + " " + rotationY + ")";
-					d3.select(continent).attr("transform", rotation);
-					d3.select(continent).attr("width", function(d) { return instance.chartScaler.ContinentScaleLon(width); });
-					d3.select(continent).attr("height", function(d) { return instance.chartScaler.ContinentScaleLat(height); });*/
-					d3.select(continent).each(function(d) {
+
+					d3.select(continent).attr("p", function(d) {
 						d.drawX = xPos;
 						d.drawY = yPos;
 						d.drawWd = width;
 						d.drawHt = height;
 						d.drawRot = "rotate(" + newRot + " " + rotationX + " " + rotationY + ")";
+						return null;
 					});
 				}
 
@@ -751,6 +709,8 @@ Initialization
 									.attr("id", "svgBG");
 
 				instance.svgFG = instance.svgDisplay.append("svg");
+				
+				instance.svgCreature = instance.svgDisplay.append("svg");
 
 				
 				instance.zoomHandler.startZoom(function(e) {
@@ -764,7 +724,10 @@ Initialization
 				});
 
 				instance.zoomHandler.onZoom(function(e) {
-					instance.draw(e.offset, e.zoom);
+					
+					//setTimeout(function() {
+						instance.draw(e.offset, e.zoom);
+					//}, 10);
 				});
 				
 				var temp = d3.select("#svgSurface").node().getBoundingClientRect();
