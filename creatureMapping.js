@@ -164,12 +164,13 @@ var SpeciesMap = (function() {
 				instance.chartScaler.scale(scale);
 				
 				//this handles panning and zooming
-				instance.svgLayers["background"]
+				/*instance.svgLayers["background"]
 					.attr("x", translation[0]/scale)
 					.attr("y", translation[1]/scale)
 					.attr("transform", function() {
 						return "scale(" + scale + ")";
 					});
+				*/
 					/*.attr("width", function() {
 						return 100 * scale + "%";
 					})	
@@ -181,10 +182,10 @@ var SpeciesMap = (function() {
 				instance.svgLayers["background"].selectAll(".scaledData")
 					.attr('x', function(d) {
 					
-						return instance.chartScaler.xScale(d.drawX);
+						return instance.chartScaler.xScale(d.drawX) + translation[0];
 					})
 					.attr('y', function(d) {
-						return instance.chartScaler.yScale(d.drawY);
+						return instance.chartScaler.yScale(d.drawY) + translation[1];
 					})
 					.attr("width", function(d) { return instance.chartScaler.ContinentScaleLon(d.drawWd) + "px";})
 
@@ -208,6 +209,7 @@ var SpeciesMap = (function() {
 						return d.drawY;
 					});
 			},
+			
 		/*=====================================================
 		Load data
 		=====================================================*/

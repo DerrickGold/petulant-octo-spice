@@ -129,11 +129,11 @@ var ChartScaler = (function() {
 			specieYDomain: [0, 100],
 			
             scale: function(s) {
-                var newXRange = [instance.xRange[0], instance.xRange[1]];
-                var newYRange = [instance.yRange[0], instance.yRange[1]];
+                var newXRange = [instance.xRange[0], instance.xRange[1] * s];
+                var newYRange = [instance.yRange[0], instance.yRange[1] * s];
 				
-				var newCLatRange = [instance.cLatRange[0], instance.cLatRange[1]];
-				var newCLonRange = [instance.cLonRange[0], instance.cLonRange[1]];
+				var newCLatRange = [instance.cLatRange[0], instance.cLatRange[1] * s];
+				var newCLonRange = [instance.cLonRange[0], instance.cLonRange[1] * s];
 				
 				
                 instance.xScale.domain(instance.xDomain).range(newXRange);
@@ -147,8 +147,6 @@ var ChartScaler = (function() {
                 newYRange = [instance.specieYRange[0], instance.specieYRange[1] * s];
 				instance.specieYScale.domain(instance.specieYDomain).range(newYRange);
 				instance.specieXScale.domain(instance.specieXDomain).range(newXRange);
-				//instance.xAxis.scale(instance.xScale);
-                //instance.yAxis.scale(instance.yScale);
             }
         }
     }
