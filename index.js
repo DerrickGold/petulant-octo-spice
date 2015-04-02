@@ -120,12 +120,20 @@ var ChartScaler = (function() {
 			cLonRange: [0, 360],
 			cLonDomain: [0, 360],
 			
+			specieXScale: d3.scale.linear(),
+			specieXRange: [0, 0],
+			specieXDomain: [0, 100],
+			
+			specieYScale: d3.scale.linear(),
+			specieYRange: [0, 0],
+			specieYDomain: [0, 100],
+			
             scale: function(s) {
-                var newXRange = [instance.xRange[0], instance.xRange[1] * s];
-                var newYRange = [instance.yRange[0], instance.yRange[1] * s];
+                var newXRange = [instance.xRange[0], instance.xRange[1]];
+                var newYRange = [instance.yRange[0], instance.yRange[1]];
 				
-				var newCLatRange = [instance.cLatRange[0], instance.cLatRange[1] * s];
-				var newCLonRange = [instance.cLonRange[0], instance.cLonRange[1] * s];
+				var newCLatRange = [instance.cLatRange[0], instance.cLatRange[1]];
+				var newCLonRange = [instance.cLonRange[0], instance.cLonRange[1]];
 				
 				
                 instance.xScale.domain(instance.xDomain).range(newXRange);
@@ -133,7 +141,12 @@ var ChartScaler = (function() {
 
 				instance.ContinentScaleLat.domain(instance.cLatDomain).range(newCLatRange);
 				instance.ContinentScaleLon.domain(instance.cLonDomain).range(newCLonRange);
-
+				
+				
+				newXRange = [instance.specieXRange[0], instance.specieXRange[1] * s];
+                newYRange = [instance.specieYRange[0], instance.specieYRange[1] * s];
+				instance.specieYScale.domain(instance.specieYDomain).range(newYRange);
+				instance.specieXScale.domain(instance.specieXDomain).range(newXRange);
 				//instance.xAxis.scale(instance.xScale);
                 //instance.yAxis.scale(instance.yScale);
             }

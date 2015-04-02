@@ -35,6 +35,7 @@ var SpeciesMap = (function() {
 			
 			colorScheme: null,
     		zoomHandler: ZoomHandler.init(),
+			dbAccessor: DataBaseAPI.init(),
     		chartScaler: null,
 			
 			cullMax: 300,
@@ -43,13 +44,10 @@ var SpeciesMap = (function() {
 			
 			//SVG surfaces
 			svgDisplay: null,
-			svgBG: null,
-			svgFG: null,
-			svgCreature: null,
-			svgPopup: null,
+			svgLayers: null,
 			
 			continents: null,
-			
+		
 			creaturesInstanced: false,
 			creatureCache: null,
 			
@@ -66,6 +64,7 @@ var SpeciesMap = (function() {
 			//our main initial species list from file
 			speciesList: {},
 			
+		
 			clusterPoints: function(inLocations, radius) {
 				//all locations start off ungrouped
 				var unGrouped = inLocations.slice();
@@ -89,157 +88,7 @@ var SpeciesMap = (function() {
 				});
 				return groups;
 			},
-			//Searches EOL database for the years a specie
-			//was alive between
-			eolGetSpecieYears: function (specie, doneCB) {
-				var url = eolTraits.replace(urlPlaceHolder, specie.id);
-				//console.log(url);
-				$.ajax({
-					url: url,
-					dataType: "jsonp",
-					success: function (data) {	
-						//first grab the traits that actually has the year values
-						var dates = data["@graph"].filter(function(d) {
-							var param = d["dwc:measurementValue"];
-							return  param && typeof(param) == 'string';
-						});
 
-						//get years in which creature existed  
-						var first = d3.max(dates, function(d) {
-							return parseFloat(d["dwc:measurementValue"]);
-						});
-
-						var last = d3.min(dates, function(d) {
-							return parseFloat(d["dwc:measurementValue"]); 
-						});
-						//store the dates back to the species
-						//var oldFirst = first;
-						//first = Math.max(first, last);
-						//last = Math.min(oldFirst, last);
-						
-						specie.dates = [first, last];				
-						if(doneCB) doneCB(specie);
-						
-					}	
-				});
-			},
-			
-			//get the scientific name for a specie from the GBIF database
-			gbifGetScientificName: function(specie, doneCB) {
-				//then we need to look up the scientific name for the species
-				var url = gbifSpecies.replace(urlPlaceHolder, specie.name);
-				//console.log(url);
-				$.ajax({
-					url: url,
-					dataType: "json",
-					success: function(data) {	
-						specie.scientificName = data.results[0].canonicalName;
-						if(doneCB)doneCB(specie);
-					}
-				});
-			},
-			
-			//gets the location for all the occurances of remains in 
-			gbifGetOccurances: function(specie, offset, limit, doneCB) {
-				var url = gbifOccurance.replace(urlPlaceHolder, specie.scientificName) + "&limit=" + limit + "&offset=" + offset;
-				//console.log(url);
-				//and here we'll grab the location data
-				$.ajax({
-					url: url,
-					dataType: "json",
-					success: function(data) {
-						var locations = data.results.map(function(loc) {
-								var newData = {
-									"x": loc.decimalLongitude,
-									"y": loc.decimalLatitude,
-									"continent": null
-								};
-								var continent = instance.continentData.filter(function(c) {
-									var continentScreenX = instance.chartScaler.xScale(c.x[0]),
-										continentWidth = instance.chartScaler.ContinentScaleLon(c.width[0]);
-									
-									var continentScreenY = instance.chartScaler.yScale(c.y[0]),
-										continentHeight = instance.chartScaler.ContinentScaleLat(c.height[0]);								
-									
-									
-									var creatureX = instance.chartScaler.xScale(newData.x),
-										creatureY = instance.chartScaler.yScale(newData.y);
-									
-									
-									
-									return (creatureX >= continentScreenX && creatureX <= continentScreenX + continentWidth &&
-											creatureY >= continentScreenY && creatureY <= continentScreenY + continentHeight);
-									
-									
-								});
-							
-									
-								newData.continent = {
-									all: continent,
-									closest: continent[0],
-								};		
-								
-								return newData;
-						});
-						
-						locations = locations.filter(function(loc) {
-							return (loc.x && loc.y);
-						});
-						
-
-						
-						
-
-						//add all locations to the species	
-						if (!specie.locations) specie.locations = [];
-						specie.locations = specie.locations.concat(locations);
-						if(doneCB) {
-							doneCB(specie, data.count, offset, limit);
-						}
-							
-					}
-				});					
-			},
-			
-			fetchCreatureData: function(specie) {
-				var offset = 0, limit = 300;
-				
-				function getOccurances(s, o, l) {
-					
-					instance.gbifGetOccurances(s, o, l, function(z, count, curOffset, curLimit){
-						//we are on the last page
-						if(curOffset + curLimit >= count) {
-							specie.clusters = [instance.clusterPoints(s.locations, 10),
-											   instance.clusterPoints(s.locations, 9),
-											   instance.clusterPoints(s.locations, 8),
-											   instance.clusterPoints(s.locations, 7),
-											   instance.clusterPoints(s.locations, 6),
-											   instance.clusterPoints(s.locations, 5),
-											   instance.clusterPoints(s.locations, 4),
-											   instance.clusterPoints(s.locations, 3),
-											   instance.clusterPoints(s.locations, 2),
-											   instance.clusterPoints(s.locations, 1),
-											   instance.clusterPoints(s.locations, 0.7)
-											  ];
-							
-							//console.log(specie);
-							return;
-						} else {
-							//otherwise, lets keep going
-							curOffset += curLimit;
-							getOccurances(s, curOffset, curLimit);
-						}
-					});	
-				}
-				
-				(function(z) {
-					instance.eolGetSpecieYears(z, function(){
-						instance.gbifGetScientificName(z, function(){
-							getOccurances(z, 0, 300);	
-						});
-					});
-				})(specie);
-			},
 			
 			resize: function(wd, ht) {
 				this.chartScaler.xRange = [this.xPadding, wd - this.xPadding];
@@ -271,12 +120,25 @@ var SpeciesMap = (function() {
 				var self = this;
 				instance.chartScaler.scale(scale);
 				
-				instance.svgBG.selectAll(".scaledData")
+				//this handles panning and zooming
+				instance.svgLayers["background"]
+					.attr("x", translation[0]/scale)
+					.attr("y", translation[1]/scale)
+					.attr("transform", function() {
+						return "scale(" + scale + ")";
+					});
+				/*instance.svgLayers["creatures"]
+					.attr("x", translation[0]/scale)
+					.attr("y", translation[1]/scale)
+					.attr("transform", function() {
+						return "scale(" + scale + ")";
+					});*/
+				instance.svgLayers["background"].selectAll(".scaledData")
 					.attr('x', function(d) {
-						return instance.chartScaler.xScale(d.drawX) + translation[0];
+						return instance.chartScaler.xScale(d.drawX);
 					})
 					.attr('y', function(d) {
-						return instance.chartScaler.yScale(d.drawY) + translation[1];
+						return instance.chartScaler.yScale(d.drawY);
 					})
 					.attr("width", function(d) { return instance.chartScaler.ContinentScaleLon(d.drawWd) + "px";})
 
@@ -285,15 +147,15 @@ var SpeciesMap = (function() {
 
 				//loop through all the species
 				if(!instance.creatureCache)
-					instance.creatureCache = instance.svgCreature.selectAll(".creature");
-				
+					instance.creatureCache = instance.svgLayers["creatures"].selectAll(".creature");
+				if(!instance.creatureCache) return;
 				instance.creatureCache
 					.attr('x', function(d) {
-						d.drawX = instance.chartScaler.xScale(d.x) + translation[0];
+						d.drawX = instance.chartScaler.specieXScale(d.x) + translation[0];
 						return d.drawX;
 					})
 					.attr('y', function(d) {
-						d.drawY = instance.chartScaler.yScale(d.y) + translation[1];
+						d.drawY = instance.chartScaler.specieYScale(d.y) + translation[1];
 						return d.drawY;
 					});
 			},
@@ -306,8 +168,10 @@ var SpeciesMap = (function() {
 					dataset = dataset.data;
 					instance.continentData = dataset;
 					
-					instance.continents = instance.svgBG.selectAll()
-						.data(dataset).enter().append("svg")
+					instance.continents = instance.svgLayers["background"].selectAll()
+						.data(dataset).enter()
+						.append("g").attr("transform", "translate(0 0) rotate(0 0 0)")
+						.append("svg")
 						.attr("class", "scaledData")
 					  	.attr("display", "block")
 					 	.each(function(d) {		
@@ -325,6 +189,7 @@ var SpeciesMap = (function() {
 						.attr("height", function(d) { return instance.chartScaler.ContinentScaleLat(d.height[0]) + "px";})
 						.attr("preserveAspectRatio", "none")
 						.attr("transform", function(d) { return d.rotation; })
+						.attr("primitiveUnits", "userSpaceOnUse")
 						.append("image")
 						.attr("xlink:href", function(d){
 							return path + '/' + d.continent;
@@ -332,6 +197,8 @@ var SpeciesMap = (function() {
 						.attr("width", "100%")
 						.attr("height", "100%")
 						.attr("preserveAspectRatio", "none");
+					
+					
 					
 					instance.draw(instance.zoomHandler.offset, instance.zoomHandler.zoom);
 				});
@@ -345,7 +212,23 @@ var SpeciesMap = (function() {
 					instance.speciesList.data.forEach(function(d) {
 						//Go through all species and get the data from the gbif api
 						(function(specie) {
-							instance.fetchCreatureData(specie);
+							instance.dbAccessor.fetchCreatureData(specie, function(s){
+								
+								s.clusters = [instance.clusterPoints(s.locations, 10),
+											   instance.clusterPoints(s.locations, 9),
+											   instance.clusterPoints(s.locations, 8),
+											   instance.clusterPoints(s.locations, 7),
+											   instance.clusterPoints(s.locations, 6),
+											   instance.clusterPoints(s.locations, 5),
+											   instance.clusterPoints(s.locations, 4),
+											   instance.clusterPoints(s.locations, 3),
+											   instance.clusterPoints(s.locations, 2),
+											   instance.clusterPoints(s.locations, 1),
+											   instance.clusterPoints(s.locations, 0.7)
+											  ];
+
+								//console.log(specie);
+							});
 						})(d);
 					});
 					
@@ -367,8 +250,9 @@ var SpeciesMap = (function() {
 				var clusterNum = parseInt(instance.clusterScale(instance.zoomHandler.zoom));
 				
 				var idNum = 0;
-				var creatures = instance.svgCreature.selectAll()
-					.data(specie.clusters[clusterNum]).enter().append("svg")
+				var creatures = instance.svgLayers["creatures"].selectAll()
+					.data(specie.clusters[clusterNum]).enter()
+					.append("svg")
 					.attr("class", function(d) {
 						return "creature " + specie.name.replace(' ', '');
 					})
@@ -382,10 +266,10 @@ var SpeciesMap = (function() {
 						d.height = 50;
 					})
 					.attr('x', function(d) {
-						return instance.chartScaler.xScale(d.x) + translation[0];
+						return instance.chartScaler.specieXScale(d.x) + translation[0];
 					})
 					.attr('y', function(d) {
-						return instance.chartScaler.yScale(d.y) + translation[1];
+						return instance.chartScaler.specieYScale(d.y) + translation[1];
 					})
                     .on('click', function(d) { 
 						currentSelection = this;
@@ -531,6 +415,7 @@ var SpeciesMap = (function() {
 						d.drawWd = width;
 						d.drawHt = height;
 						d.drawRot = "rotate(" + newRot + " " + rotationX + " " + rotationY + ")";
+									
 						return null;
 					});
 				}
@@ -702,21 +587,19 @@ Initialization
 						instance.zoomHandler.offset[0] += d3.event.dx;
 						instance.zoomHandler.offset[1] += d3.event.dy;
 						instance.zoomHandler.z.translate(instance.zoomHandler.offset);
+
 						instance.draw(instance.zoomHandler.offset, instance.zoomHandler.zoom);
 					}));
 				//Create background and add axis to it
-				instance.svgBG = instance.svgDisplay.append("svg")
-									.attr("id", "svgBG");
-
-				instance.svgFG = instance.svgDisplay.append("svg");
+				instance.svgLayers = {
+					"background": instance.svgDisplay.append("svg").attr("id", "svgBG"),
+					"creatures": instance.svgDisplay.append("svg"),
+					"foreground": instance.svgDisplay.append("svg")
+				};
 				
-				instance.svgCreature = instance.svgDisplay.append("svg");
 
-				
+
 				instance.zoomHandler.startZoom(function(e) {
-					instance.svgFG.select(".popup").remove();
-					instance.svgBG.selectAll("text")
-						.attr("display", "none");
 				});
 
 				instance.zoomHandler.endZoom(function(e) {
@@ -724,9 +607,8 @@ Initialization
 				});
 
 				instance.zoomHandler.onZoom(function(e) {
-					
 					//setTimeout(function() {
-						instance.draw(e.offset, e.zoom);
+					instance.draw(e.offset, e.zoom);
 					//}, 10);
 				});
 				
@@ -736,10 +618,17 @@ Initialization
         			yRange: [0, temp.height],
 					xDomain: [-179, 179],
 					yDomain: [90, -90],
+					
 					cLatDomain:[0, 180],
 					cLonDomain:[0, 360],
 					cLatRange:[0, temp.height],
-					cLonRange:[0,temp.width]
+					cLonRange:[0,temp.width],
+					
+					specieXRange:[0, temp.width],
+					specieYRange:[0, temp.height],
+					specieXDomain: [-179,179],
+					specieYDomain: [90, -90]
+					
     			});
 				
 				
