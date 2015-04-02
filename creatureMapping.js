@@ -169,18 +169,18 @@ var SpeciesMap = (function() {
 					.attr("y", translation[1]/scale)
 					.attr("transform", function() {
 						return "scale(" + scale + ")";
-					})
-					.style("-webkit-transform", function() {
-						return "scale(" + scale + ", " + scale + ")";
 					});
-				/*instance.svgLayers["creatures"]
-					.attr("x", translation[0]/scale)
-					.attr("y", translation[1]/scale)
-					.attr("transform", function() {
-						return "scale(" + scale + ")";
+					/*.attr("width", function() {
+						return 100 * scale + "%";
+					})	
+					.attr("height", function() {
+						return 100 * scale + "%";
 					});*/
+				
+				
 				instance.svgLayers["background"].selectAll(".scaledData")
 					.attr('x', function(d) {
+					
 						return instance.chartScaler.xScale(d.drawX);
 					})
 					.attr('y', function(d) {
@@ -194,6 +194,7 @@ var SpeciesMap = (function() {
 				//loop through all the species
 				if(!instance.creatureCache)
 					instance.creatureCache = instance.svgLayers["creatures"].selectAll(".creature");
+				
 				if(!instance.creatureCache) return;
 				instance.creatureCache
 					.attr('x', function(d) {
@@ -218,7 +219,6 @@ var SpeciesMap = (function() {
 					
 					instance.continents = instance.svgLayers["background"].selectAll()
 						.data(dataset).enter()
-						.append("g").attr("transform", "translate(0 0) rotate(0 0 0)")
 						.append("svg")
 						.attr("class", "scaledData")
 					  	.attr("display", "block")
@@ -314,10 +314,12 @@ var SpeciesMap = (function() {
 						d.height = 50;
 					})
 					.attr('x', function(d) {
-						return instance.chartScaler.specieXScale(d.x) + translation[0];
+						var anchoredX = d.continent.anchorX + d.continent.cData.drawX;
+						return instance.chartScaler.specieXScale(anchoredX) + translation[0];
 					})
 					.attr('y', function(d) {
-						return instance.chartScaler.specieYScale(d.y) + translation[1];
+						var anchoredY = d.continent.anchorY + d.continent.cData.drawY;
+						return instance.chartScaler.specieYScale(anchoredY) + translation[1];
 					})
                     .on('click', function(d) { 
 						console.log(d);

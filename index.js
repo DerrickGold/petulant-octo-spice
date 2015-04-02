@@ -209,8 +209,8 @@ function StartApp() {
 		divSelector: ".chartContainer",
 		xPadding: 0,
 		yPadding: 0,
-		width: "100%",
-		height: "100%"
+		width: d3.select(".chartContainer").node().getBoundingClientRect().width,
+		height: d3.select(".chartContainer").node().getBoundingClientRect().height
 	});
 	
 	//Create the list on the left to hold all the species
