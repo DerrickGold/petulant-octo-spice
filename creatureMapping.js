@@ -64,7 +64,45 @@ var SpeciesMap = (function() {
 			//our main initial species list from file
 			speciesList: {},
 			
-		
+			//finds an anchor point for a cluster to a specific continent
+			findContinentAnchor: function(specieCluster) {
+				
+				var continent = instance.continentData.map(function(c) {
+					var continentScreenX = instance.chartScaler.xScale(c.x[0]),
+						continentWidth = instance.chartScaler.ContinentScaleLon(c.width[0]);
+
+					var continentScreenY = instance.chartScaler.yScale(c.y[0]),
+						continentHeight = instance.chartScaler.ContinentScaleLat(c.height[0]);								
+
+
+					var creatureX = instance.chartScaler.xScale(specieCluster.x),
+						creatureY = instance.chartScaler.yScale(specieCluster.y);
+
+					
+					var x2 = continentScreenX + (continentWidth/2);
+					var y2 = continentScreenY + (continentHeight/2);
+					
+					var distance = Math.pow(creatureX - x2, 2) + Math.pow(creatureY - y2, 2);
+
+
+					/*return (creatureX >= continentScreenX && creatureX <= continentScreenX + continentWidth &&
+							creatureY >= continentScreenY && creatureY <= continentScreenY + continentHeight);*/
+					return {
+						dist: distance,
+						name: c.continent,
+						anchorX: specieCluster.x - c.x[0],
+						anchorY: specieCluster.y - c.y[0],
+						cData: c
+						
+					}
+
+				});
+				
+				return continent.sort(function(a, b) {
+					return a.dist - b.dist;	
+				})[0];
+	
+			},
 			clusterPoints: function(inLocations, radius) {
 				//all locations start off ungrouped
 				var unGrouped = inLocations.slice();
@@ -82,8 +120,13 @@ var SpeciesMap = (function() {
 						canGroup[0].data.push(unGroup);
 						
 					} else {
+						
+						//for the group, find the anchor point
+						var anchor = instance.findContinentAnchor(unGroup);
+						
+
 						//otherwise, make a new group
-						groups.push({start: unGroup, data: [], continent: unGroup.continent});
+						groups.push({start: unGroup, data: [], continent: anchor});
 					}
 				});
 				return groups;
@@ -126,6 +169,9 @@ var SpeciesMap = (function() {
 					.attr("y", translation[1]/scale)
 					.attr("transform", function() {
 						return "scale(" + scale + ")";
+					})
+					.style("-webkit-transform", function() {
+						return "scale(" + scale + ", " + scale + ")";
 					});
 				/*instance.svgLayers["creatures"]
 					.attr("x", translation[0]/scale)
@@ -151,11 +197,13 @@ var SpeciesMap = (function() {
 				if(!instance.creatureCache) return;
 				instance.creatureCache
 					.attr('x', function(d) {
-						d.drawX = instance.chartScaler.specieXScale(d.x) + translation[0];
+						var anchoredX = d.continent.anchorX + d.continent.cData.drawX;
+						d.drawX = instance.chartScaler.specieXScale(anchoredX) + translation[0];
 						return d.drawX;
 					})
 					.attr('y', function(d) {
-						d.drawY = instance.chartScaler.specieYScale(d.y) + translation[1];
+						var anchoredY = d.continent.anchorY + d.continent.cData.drawY;
+						d.drawY = instance.chartScaler.specieYScale(anchoredY) + translation[1];
 						return d.drawY;
 					});
 			},
@@ -272,9 +320,7 @@ var SpeciesMap = (function() {
 						return instance.chartScaler.specieYScale(d.y) + translation[1];
 					})
                     .on('click', function(d) { 
-						currentSelection = this;
-						currentSelectionObject = d;
-						console.log(d.continent);
+						console.log(d);
 					})
 					//link the image up to the creature
 					.append("image")
