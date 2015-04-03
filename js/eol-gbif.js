@@ -1,37 +1,17 @@
+var urlPlaceHolder = "###";
+var gbifSpecies = "http://api.gbif.org/v1/species/search?q=" + urlPlaceHolder;
+var gbifOccurance = "http://api.gbif.org/v1/occurrence/search?scientificname=" + urlPlaceHolder + "&hasCoordinate=true";
+var eolIDLookup =  "http://eol.org/api/search/1.0.json?q=" + urlPlaceHolder + "&page=1&exact=true&filter_by_taxon_concept_id=&filter_by_hierarchy_entry_id=&filter_by_string=&cache_ttl=";
+//with this api, we are mostly just grabbing year of appearance for a given species
+var eolTraits = "http://www.eol.org/api/traits/" + urlPlaceHolder + '/';
+
+
+
 var DataBaseAPI = (function() {
 	var instance;
 	
-/*
-								var continent = instance.continentData.filter(function(c) {
-									var continentScreenX = instance.chartScaler.xScale(c.x[0]),
-										continentWidth = instance.chartScaler.ContinentScaleLon(c.width[0]);
-									
-									var continentScreenY = instance.chartScaler.yScale(c.y[0]),
-										continentHeight = instance.chartScaler.ContinentScaleLat(c.height[0]);								
-									
-									
-									var creatureX = instance.chartScaler.xScale(newData.x),
-										creatureY = instance.chartScaler.yScale(newData.y);
-									
-									
-									
-									return (creatureX >= continentScreenX && creatureX <= continentScreenX + continentWidth &&
-											creatureY >= continentScreenY && creatureY <= continentScreenY + continentHeight);
-									
-									
-								});
-
-
-
-*/
-	
-	
-	
 	function _init() {
-		return {
-			
-			
-			
+		return {	
 			//Searches EOL database for the years a specie
 			//was alive between
 			eolGetSpecieYears: function (specie, doneCB) {

@@ -4,7 +4,7 @@ var slider;
 var currentSliderVal = 0, previousSliderVal = 0, count = 0;
 
 
-var iconFolder = "creatureIcons";
+
 /*=============================================================================
 ZoomHandler:
 	A zoom behaviour that works independent of d3's drag events allowing for
@@ -197,55 +197,5 @@ function CalculateSliderPosition(maxSliderVal, minSliderVal, sliderVal, valOne, 
 	return largestCoord - coordAmount;
 }
 
-/*=============================================================================
-Program Start
-	Script won't start until the page has finished loading.
-=============================================================================*/
-function StartApp() {
-	
-	var chart = SpeciesMap.init({
-		divSelector: ".chartContainer",
-		xPadding: 0,
-		yPadding: 0,
-		width: d3.select(".chartContainer").node().getBoundingClientRect().width,
-		height: d3.select(".chartContainer").node().getBoundingClientRect().height
-	});
-	
-	//Create the list on the left to hold all the species
-	var ul = d3.select(".CreaturesList");
-	var i = 0;
-	for( i = 0; i < 40; i++) {
-		ul.append("li").append("p").text("random");
-	}
 
-	//Tick formatter
-	var formatter = d3.format(",.0f");
-	//Initialize slider
-	slider = d3.slider()
-					.min(-250)
-					.max(0)
-					//.ticks(227)
-					.tickValues([-250, -205, -180, -159, -144, -98, -65, 0])
-					//.stepValues([-250, -240, -230, -220, -210, -200, -190, -180, -170, -160, -150, -140, -130, -120, -110, -100, -90, -80, -70, -60, -50, -40, -30, -20, -10, -9, -8, -7, -6, -5, -4, -3, -2, -1, 0])
-					.showRange(false)
-					.value(0)
-					.tickFormat(function(d) {
-						return -formatter(d) + "mya";
-					});
-	//Render the slider into the div
-	d3.select("#slider").call(slider);
-
-	//Set the current and previous slider values
-	currentSliderVal = -slider.value();
-	previousSliderVal = -slider.value();
-
-	/*var dragBehaviour = d3.behavior.drag();
-	dragBehaviour.on("drag", function(){
-		chart.fuck();
-	});
-	d3.select("#slider").call(dragBehaviour);*/
-
-	chart.loadData();
-	setChart(chart);
-};
 

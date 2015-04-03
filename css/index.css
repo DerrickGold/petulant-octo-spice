@@ -3,11 +3,13 @@ html, body {
 	height: 100%;
 	padding: 0;
 	margin: 0;
+	white-space:nowrap;
 	overflow: hidden;
 }
 
 #titleBox {
-	padding: 0.005em;
+	padding: 0;
+	height: 80px;
 	margin-left: auto;
 	margin-right: auto;
 	background-color: green;
@@ -18,36 +20,52 @@ html, body {
 #titleBox p {
 	font-size: 150%;
 	color: white;
+	padding: 0;
+	margin: 0;
 }
 
 .PageContent {
-	width: inherit;
-	height: 93%;
+	display: table;
+	width: 100%;
+	height: 80%;
+	/*height: 93%;*/
 }
 
 .CreaturesBox {
-	width: 20.3%;
+	min-width: 300px;
+	display: table-cell;
 	background: white;
-	height: 80%;
+	height: inherit;
 	border: solid 1px black;
 	overflow: scroll;
-	display: inline-block;
 	position: relative;
 	margin: 0;
+	padding: 0;
+	vertical-align: top;
 }
 
 .CreaturesList {
 	margin: 0;
+	padding: 0;
 	width: 100%;
-	height: inherit;
+	height: 100%;
+	white-space:nowrap;
 }
 
 .chartContainer {
-	display: inline-block;
-	float: right;
-	width: 79.5%;
-	height: 80%;
+	width: inherit;
+	display: table-cell;
+	height: inherit;
 	background: #368caf;
 	padding: 0;
 	margin: 0;
 }
+
+.HiddenInfoBox {
+	display: none;
+}
+
+.CreatureListOff {
+	text-decoration: line-through;
+}
+

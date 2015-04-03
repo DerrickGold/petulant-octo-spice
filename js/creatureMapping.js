@@ -5,17 +5,8 @@
 Species Map:
 	Creates a chart that plots species on the world through time.
 =============================================================================*/
-var urlPlaceHolder = "###";
-var gbifSpecies = "http://api.gbif.org/v1/species/search?q=" + urlPlaceHolder;
-
-var gbifOccurance = "http://api.gbif.org/v1/occurrence/search?scientificname=" + urlPlaceHolder + "&hasCoordinate=true";
-
-var eolIDLookup =  "http://eol.org/api/search/1.0.json?q=" + urlPlaceHolder + "&page=1&exact=true&filter_by_taxon_concept_id=&filter_by_hierarchy_entry_id=&filter_by_string=&cache_ttl=";
-
-//with this api, we are mostly just grabbing year of appearance for a given species
-var eolTraits = "http://www.eol.org/api/traits/" + urlPlaceHolder + '/';
-
-
+var iconFolder = "creatureIcons/";
+var dataFolder = "data/"
 var SpeciesMap = (function() {
 	var instance;
 	
@@ -55,6 +46,13 @@ var SpeciesMap = (function() {
 			clusterPerSpecie: 10,
 			clusterRange: [0, 10],
 			clusterDomain: [0, 100],
+			
+			__creatureClick: null,
+			creatureClick: function(v) {
+				instance.__creatureClick = function(e, s) {
+					v(e, s);	
+				}
+			},
 			
 			//a list of all species (from SpeciesList.data)
 			//for the current time period.
@@ -117,7 +115,7 @@ var SpeciesMap = (function() {
 					
 					//a group exists for this ungrouped element
 					if(canGroup.length > 0) {
-						canGroup[0].data.push(unGroup);
+						canGroup[0].inCluster.push(unGroup);
 						
 					} else {
 						
@@ -126,7 +124,7 @@ var SpeciesMap = (function() {
 						
 
 						//otherwise, make a new group
-						groups.push({start: unGroup, data: [], continent: anchor});
+						groups.push({start: unGroup, inCluster: [], continent: anchor});
 					}
 				});
 				return groups;
@@ -176,12 +174,9 @@ var SpeciesMap = (function() {
 					})	
 					.attr("height", function() {
 						return 100 * scale + "%";
-					});*/
-				
-				
+					});*/				
 				instance.svgLayers["background"].selectAll(".scaledData")
 					.attr('x', function(d) {
-					
 						return instance.chartScaler.xScale(d.drawX) + translation[0];
 					})
 					.attr('y', function(d) {
@@ -214,7 +209,7 @@ var SpeciesMap = (function() {
 		Load data
 		=====================================================*/
 			loadData: function(fn) {
-				d3.json("continents/continents.json", function(e, dataset) {
+				d3.json(dataFolder + "continents.json", function(e, dataset) {
 					var path = dataset.path;
 					dataset = dataset.data;
 					instance.continentData = dataset;
@@ -225,7 +220,7 @@ var SpeciesMap = (function() {
 						.attr("class", "scaledData")
 					  	.attr("display", "block")
 					 	.each(function(d) {		
-						      addContinent(this, d);
+						     addContinent(this, d);
 							d.drawX = d.x[0];
 							d.drawY = d.y[0];
 							d.drawWd = d.width[0];
@@ -254,7 +249,7 @@ var SpeciesMap = (function() {
 				});
 				
 				
-				d3.json("species.json", function(e, species) {
+				d3.json(dataFolder + "species.json", function(e, species) {
 					//console.log(e);
 				//Runs through all our species in our list
 				//and fetches the data online.
@@ -307,6 +302,8 @@ var SpeciesMap = (function() {
 						return "creature " + specie.name.replace(' ', '');
 					})
 					.each(function(d) {
+						d.eolID = specie.id;
+						d.clusterNum = clusterNum;
 						d.this = d3.select(this);
 						d.name = specie.name;
 						d.x = parseFloat(d.start.x);
@@ -323,13 +320,16 @@ var SpeciesMap = (function() {
 						var anchoredY = d.continent.anchorY + d.continent.cData.drawY;
 						return instance.chartScaler.specieYScale(anchoredY) + translation[1];
 					})
-                    .on('click', function(d) { 
-						console.log(d);
+                    .on('click', function(d, e) { 
+						//console.log(d);
+						if(instance.__creatureClick){
+							instance.__creatureClick(e, d);
+						}
 					})
 					//link the image up to the creature
 					.append("image")
 					.attr("xlink:href", function(d){
-						return iconFolder + '/' + specie.name.replace(' ', '') + '.png';
+						return iconFolder + specie.name.replace(' ', '') + '.png';
 					})
 					.attr("width", "50px")
 					.attr("height", "50px")
@@ -346,6 +346,7 @@ var SpeciesMap = (function() {
 				if (!instance.creaturesInstanced) {
 					instance.creaturesInstanced = true;
 					setTimeout(function(){
+						$(".CreaturesList").empty();
 						instance.updateCreatures(currentSliderVal);
 						instance.creaturesInstanced = false;
 						if(cb) cb();	
@@ -373,7 +374,13 @@ var SpeciesMap = (function() {
 				//and re-create new ones
 				instance.currentTimePeriod.forEach(function(c) {
 					//setTimeout(function() {
-						instance.createCreature(c);
+					var nameEntry = $(document.createElement("li")).attr("data-filter-name", function() { 
+						return c.name.replace(' ', '');
+					})
+					.text(c.name);
+					
+					$(".CreaturesList").append(nameEntry);
+					instance.createCreature(c);
 					//}, 50);
 				});	
 			},
