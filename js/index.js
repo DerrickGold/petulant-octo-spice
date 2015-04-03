@@ -1,5 +1,6 @@
 var currentSelection = null;
 var currentSelectionObject = null;
+var firstIndex = 0, secondIndex = 0, sliderPosFirst = 0, sliderPosSecond = 0;
 var slider;
 var currentSliderVal = 0, previousSliderVal = 0, count = 0;
 
@@ -196,6 +197,3 @@ function CalculateSliderPosition(maxSliderVal, minSliderVal, sliderVal, valOne, 
 		return smallestCoord + coordAmount;
 	return largestCoord - coordAmount;
 }
-
-
-
