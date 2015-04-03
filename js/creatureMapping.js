@@ -178,12 +178,10 @@ var SpeciesMap = (function() {
 				
 				//this handles panning and zooming for background
 				instance.svgLayers["background"]
-					.attr("x", translation[0]/scale)
-					.attr("y", translation[1]/scale)
-					.attr("transform", function() {
-						return "scale(" + scale + ")";
+					.attr("viewBox", function() {
+						return (-translation[0]/scale) + " " + (-translation[1]/scale)
+								 + " " + (instance.width /scale) + " " + (instance.height / scale);
 					});
-				
 
 				CalculateIndexes();
 				var currentSliderVal = -slider.value();
@@ -205,12 +203,16 @@ var SpeciesMap = (function() {
 						d.newHeight = CalculateSliderPosition(sliderPosFirst, sliderPosSecond, currentSliderVal, d.height[firstIndex], d.height[secondIndex]);
 						return instance.chartScaler.ContinentScaleLat(d.newHeight) + "px";
 					})
-					.attr("transform", function(d) {
-						var posX = instance.chartScaler.xScale(d.xPos);
-						var posY = instance.chartScaler.yScale(d.yPos);
-						var newRot = CalculateSliderPosition(sliderPosFirst, sliderPosSecond, currentSliderVal, d.rot[firstIndex], d.rot[secondIndex]);
-						var rotation = "rotate(" + newRot + " "	+ (posX + d.newWidth) + " " + (posY + d.newHeight) + ")";
-						return rotation;
+					.each(function(d) {
+						var img = d3.select(this).select("image");
+							img.attr("transform", function(d) {
+							var posX = instance.chartScaler.xScale(d.xPos);
+							var posY = instance.chartScaler.yScale(d.yPos);
+							var newRot = CalculateSliderPosition(sliderPosFirst, sliderPosSecond, currentSliderVal, d.rot[firstIndex], d.rot[secondIndex]);
+							var rotation = "rotate(" + newRot  +")";
+							return rotation;
+						});
+					
 					});
 
 				//loop through all the species
@@ -244,7 +246,8 @@ var SpeciesMap = (function() {
 						.data(dataset).enter()
 						.append("svg")
 						.attr("class", "scaledData")
-					  	.attr("display", "block")
+					  	.attr("display", "inline-block")
+						.attr("overflow", "visible")
 					 	.each(function(d) {		
 						     addContinent(this, d);
 							d.xPos = d.x[0];
@@ -264,7 +267,7 @@ var SpeciesMap = (function() {
 						.attr("primitiveUnits", "userSpaceOnUse")
 					
 					instance.continents
-						.append("image")
+						.append("g").append("image")
 						.attr("xlink:href", function(d){
 							return path + '/' + d.continent;
 						})
@@ -301,6 +304,11 @@ var SpeciesMap = (function() {
 											   instance.clusterPoints(s.locations, 0.7)
 											  ];
 
+								setTimeout(function() {
+									specie.dataFetched = true;
+									$(instance.divSelector).trigger("NewCreatureReady", [specie]);
+								}, 10);
+								
 								//console.log(specie);
 							});
 						})(d);
@@ -398,7 +406,7 @@ var SpeciesMap = (function() {
 				});	
 			},			
 			
-			instatiateAllCreatures: function (cb) {
+			instantiateAllCreatures: function (cb) {
 				if (!instance.creaturesInstanced) {
 					instance.creaturesInstanced = true;
 					setTimeout(function(){
@@ -419,7 +427,7 @@ var SpeciesMap = (function() {
 				instance.currentTimePeriod = instance.speciesList.data.filter(function(c) {
 					
 					var id = String(c.id);
-					if(c.dates && year < c.dates[0] && year > c.dates[1]) {
+					if(c.dataFetched  && c.dates && year < c.dates[0] && year > c.dates[1]) {
 						//only recreate creatures as their timeline shifts
 						if(!instance.creatureInstantiatedList[id]) {
 							if(instance._onCreatureUpdate) instance._onCreatureUpdate(true, c);
@@ -646,7 +654,7 @@ Initialization
 				});
 
 				instance.zoomHandler.endZoom(function(e) {
-					instance.instatiateAllCreatures();
+					instance.instantiateAllCreatures();
 				});
 
 				instance.zoomHandler.onZoom(function(e) {
@@ -678,6 +686,12 @@ Initialization
 				instance.clusterDomain = [instance.zoomHandler.minZoom, instance.zoomHandler.maxZoom];
 				instance.clusterScale.domain(instance.clusterDomain).range(instance.clusterRange);
 			}
+			
+			$(instance.divSelector).on("NewCreatureReady", function(e, specie) {
+				console.log("trigger new creature!");
+				console.log(specie);
+				instance.updateCreatureListing(-slider.value());
+			});
 			return instance;
 		}
 	}

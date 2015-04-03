@@ -72,7 +72,9 @@
 			//update creature listing as creatures are instantiated
 			chart.onCreatureUpdate(function(append, c) {
 				if(append) {
-					var nameEntry = $(document.createElement("p")).attr("data-filter-id", c.id)
+					var nameEntry = $(document.createElement("p"))
+						.attr("class", "creatureFilter")
+						.attr("data-filter-id", c.id)
 						.attr("sort", c.name).text(c.name);
 
 					$(".CreaturesList").append(nameEntry);
@@ -118,7 +120,8 @@
 			setChart(chart);
 			
 			//set listener to filter stuff
-			$('.CreaturesList').on('click', 'li', function() {
+			$('.CreaturesList').on('click', '.creatureFilter', function() {
+				console.log("click");
 				$(this).toggleClass('CreatureListOff');
 				chart.toggleSpecie($(this).attr('data-filter-id'));
 			});
