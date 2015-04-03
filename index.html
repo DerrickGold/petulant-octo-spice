@@ -21,6 +21,10 @@
 			var leftOffset = parseInt($(".CreaturesBox").css("min-width").replace("px", ''));
 			var topOffset = parseInt($("#titleBox").css("height").replace("px", ''));
 			
+			$(".chartContainer").css("width", function() {
+				return window.innerWidth - leftOffset + "px";
+			});
+			
 			
 			var myLightBox = LightBox.init();
 			var popUpHeight = parseInt($("#lightBox .lightBoxContent").css("height").replace("px", ''));
@@ -62,17 +66,28 @@
 			
 			//clear creatures list when new creatures are to be instantiated
 			chart.onCreatureStartUpdate(function(e, s) {
-				$(".CreaturesList").empty();
+				//$(".CreaturesList").empty();
 			});
 			
 			//update creature listing as creatures are instantiated
-			chart.onCreatureUpdate(function(e, c) {
-				var nameEntry = $(document.createElement("li")).attr("data-filter-id", function() { 
-					return c.id;
-				})
-				.text(c.name);
+			chart.onCreatureUpdate(function(append, c) {
+				if(append) {
+					var nameEntry = $(document.createElement("p")).attr("data-filter-id", c.id)
+						.attr("sort", c.name).text(c.name);
 
-				$(".CreaturesList").append(nameEntry);
+					$(".CreaturesList").append(nameEntry);
+					
+					/* $(".CreaturesList").sort(function (a, b) {
+
+						  var contentA =parseInt( $(a).attr("sort"));
+						  var contentB =parseInt( $(b).attr("sort"));
+						  return (contentA < contentB) ? -1 : (contentA > contentB) ? 1 : 0;
+					   })	*/				
+					
+					
+				} else {
+					$('[data-filter-id="' + c.id + '"]').remove();
+				}
 			});
 			
 			
@@ -119,7 +134,7 @@
 
 		<div class="PageContent">
 			<div class="CreaturesBox">
-				<ul class="CreaturesList"></ul>
+				<div class="CreaturesList"></div>
 			</div>
 
 			<div class="chartContainer"></div>

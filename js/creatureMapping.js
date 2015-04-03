@@ -187,7 +187,8 @@ var SpeciesMap = (function() {
 
 				CalculateIndexes();
 				var currentSliderVal = -slider.value();
-				instance.svgLayers["background"].selectAll(".scaledData")
+				//instance.svgLayers["background"].selectAll(".scaledData")
+				instance.continents
 					.attr('x', function(d) {
 						d.xPos = CalculateSliderPosition(sliderPosFirst, sliderPosSecond, currentSliderVal, d.x[firstIndex], d.x[secondIndex]);
 						return instance.chartScaler.xScale(d.xPos);
@@ -216,7 +217,6 @@ var SpeciesMap = (function() {
 				if(!instance.creatureCache)
 					instance.creatureCache = instance.svgLayers["creatures"].selectAll(".creature");
 				
-				if(!instance.creatureCache) return;
 				instance.creatureCache
 					.attr('x', function(d) {
 						var anchoredX = d.continent.anchorX + d.continent.cData.xPos;
@@ -228,6 +228,7 @@ var SpeciesMap = (function() {
 						d.drawY = instance.chartScaler.specieYScale(anchoredY) + translation[1];
 						return d.drawY;
 					});
+				
 			},
 			
 		/*=====================================================
@@ -261,6 +262,8 @@ var SpeciesMap = (function() {
 						.attr("preserveAspectRatio", "none")
 						.attr("transform", function(d) { return d.rotation; })
 						.attr("primitiveUnits", "userSpaceOnUse")
+					
+					instance.continents
 						.append("image")
 						.attr("xlink:href", function(d){
 							return path + '/' + d.continent;
@@ -315,7 +318,6 @@ var SpeciesMap = (function() {
 				array.
 			*/
 			createCreature: function(specie) {
-				console.log("Creating creatures!");
 				if(!specie.clusters) return;
 				
 				var translation = instance.zoomHandler.offset;
@@ -365,6 +367,8 @@ var SpeciesMap = (function() {
 					.attr("width", "50px")
 					.attr("height", "50px")
 					.attr("preserveAspectRatio", "none");	
+				
+				return creatures;
 			},
 			
 			clearCreatures: function(d) {
@@ -413,24 +417,28 @@ var SpeciesMap = (function() {
 				
 				//instance.creatureInstantiatedList
 				instance.currentTimePeriod = instance.speciesList.data.filter(function(c) {
+					
+					var id = String(c.id);
 					if(c.dates && year < c.dates[0] && year > c.dates[1]) {
-						if(instance._onCreatureUpdate) instance._onCreatureUpdate(null, c);
 						//only recreate creatures as their timeline shifts
-						if(!instance.creatureInstantiatedList[String(c.id)]) {
-							instance.creatureInstantiatedList[String(c.id)] = c;
-							instance.createCreature(c);
+						if(!instance.creatureInstantiatedList[id]) {
+							if(instance._onCreatureUpdate) instance._onCreatureUpdate(true, c);
+							instance.creatureInstantiatedList[id] = c;
+							var newCreatures = instance.createCreature(c);
+							instance.creatureCache = null;
 						}
 						
 						
 						return true;
 					} else {
 						//only remove creatures that should no longer exist
-						if(instance.creatureInstantiatedList[String(c.id)]) {
-							delete instance.creatureInstantiatedList[String(c.id)];
+						if(instance.creatureInstantiatedList[id]) {
+							instance.creatureInstantiatedList[id] = false;
 							d3.selectAll("." + c.name.replace(' ', '')).remove();
 							instance.creatureCache = null;
-						}						   
-							   
+						}
+						if(instance._onCreatureUpdate) instance._onCreatureUpdate(false, c);
+						c.hide = false;  
 					}
 				});			
 				
@@ -439,6 +447,9 @@ var SpeciesMap = (function() {
 
 			moveContinent: function(continent, continentObject) {
 				instance.updateCreatureListing(-slider.value());
+				setTimeout(function() {
+					instance.redraw();
+				}, 250);
 			},
 			
 			toggleSpecie: function(specieID) {
