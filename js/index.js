@@ -130,11 +130,11 @@ var ChartScaler = (function() {
 			specieYDomain: [0, 100],
 			
             scale: function(s) {
-                var newXRange = [instance.xRange[0], instance.xRange[1] * s];
-                var newYRange = [instance.yRange[0], instance.yRange[1] * s];
+                var newXRange = [instance.xRange[0], instance.xRange[1]];
+                var newYRange = [instance.yRange[0], instance.yRange[1]];
 				
-				var newCLatRange = [instance.cLatRange[0], instance.cLatRange[1] * s];
-				var newCLonRange = [instance.cLonRange[0], instance.cLonRange[1] * s];
+				var newCLatRange = [instance.cLatRange[0], instance.cLatRange[1]];
+				var newCLonRange = [instance.cLonRange[0], instance.cLonRange[1]];
 				
 				
                 instance.xScale.domain(instance.xDomain).range(newXRange);

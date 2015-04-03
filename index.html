@@ -33,8 +33,8 @@
 				height: d3.select(".chartContainer").node().getBoundingClientRect().height
 			});
 
-
-			chart.creatureClick(function(e, creature) {
+			//set up callbacks for chart actions
+			chart.onCreatureClick(function(e, creature) {
 				
 				console.log(creature);				
 				var boxX = parseInt(creature.drawX + creature.width) + leftOffset;
@@ -58,10 +58,24 @@
 				$(infoBox).find("#eolURL").attr("href", "http://eol.org/pages/###/overview".replace("###", creature.eolID));
 			
 				myLightBox.show($(infoBox).html());	
-				
-				
-				
 			});
+			
+			//clear creatures list when new creatures are to be instantiated
+			chart.onCreatureStartUpdate(function(e, s) {
+				$(".CreaturesList").empty();
+			});
+			
+			//update creature listing as creatures are instantiated
+			chart.onCreatureUpdate(function(e, c) {
+				var nameEntry = $(document.createElement("li")).attr("data-filter-name", function() { 
+					return c.name.replace(' ', '');
+				})
+				.text(c.name);
+
+				$(".CreaturesList").append(nameEntry);
+			});
+			
+			
 			
 			//Tick formatter
 			var formatter = d3.format(",.0f");

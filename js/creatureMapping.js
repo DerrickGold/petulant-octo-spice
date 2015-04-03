@@ -47,12 +47,31 @@ var SpeciesMap = (function() {
 			clusterRange: [0, 10],
 			clusterDomain: [0, 100],
 			
-			__creatureClick: null,
-			creatureClick: function(v) {
-				instance.__creatureClick = function(e, s) {
+			//set up callback system for creature clicking
+			_onCreatureClick: null,
+			onCreatureClick: function(v) {
+				instance._onCreatureClick = function(e, s) {
 					v(e, s);	
 				}
 			},
+			
+			//set up callback system for when creatures are
+			//instantiating
+			_onCreatureStartUpdate: null,
+			onCreatureStartUpdate: function(v) {
+				instance._onCreatureStartUpdate = function(e, s) {
+					v(e, s);
+				}
+			},
+			//set up callback for when a creature is instantiated
+			_onCreatureUpdate: null,
+			onCreatureUpdate: function(v) {
+				instance._onCreatureUpdate = function(e, s) {
+					v(e, s);
+				}
+			},				
+			
+			
 			
 			//a list of all species (from SpeciesList.data)
 			//for the current time period.
@@ -66,15 +85,15 @@ var SpeciesMap = (function() {
 			findContinentAnchor: function(specieCluster) {
 				
 				var continent = instance.continentData.map(function(c) {
-					var continentScreenX = instance.chartScaler.xScale(c.x[0]),
-						continentWidth = instance.chartScaler.ContinentScaleLon(c.width[0]);
+					var continentScreenX = parseInt(instance.chartScaler.xScale(c.x[0])),
+						continentWidth = parseInt(instance.chartScaler.ContinentScaleLon(c.width[0]));
 
-					var continentScreenY = instance.chartScaler.yScale(c.y[0]),
-						continentHeight = instance.chartScaler.ContinentScaleLat(c.height[0]);								
+					var continentScreenY = parseInt(instance.chartScaler.yScale(c.y[0])),
+						continentHeight = parseInt(instance.chartScaler.ContinentScaleLat(c.height[0]));								
 
 
-					var creatureX = instance.chartScaler.xScale(specieCluster.x),
-						creatureY = instance.chartScaler.yScale(specieCluster.y);
+					var creatureX = parseInt(instance.chartScaler.xScale(specieCluster.x)),
+						creatureY = parseInt(instance.chartScaler.yScale(specieCluster.y));
 
 					
 					var x2 = continentScreenX + (continentWidth/2);
@@ -82,20 +101,16 @@ var SpeciesMap = (function() {
 					
 					var distance = Math.pow(creatureX - x2, 2) + Math.pow(creatureY - y2, 2);
 
-
-					/*return (creatureX >= continentScreenX && creatureX <= continentScreenX + continentWidth &&
-							creatureY >= continentScreenY && creatureY <= continentScreenY + continentHeight);*/
 					return {
 						dist: distance,
 						name: c.continent,
 						anchorX: specieCluster.x - c.x[0],
 						anchorY: specieCluster.y - c.y[0],
-						cData: c
-						
+						cData: c			
 					}
 
 				});
-				
+				//return the closest continent
 				return continent.sort(function(a, b) {
 					return a.dist - b.dist;	
 				})[0];
@@ -121,7 +136,6 @@ var SpeciesMap = (function() {
 						
 						//for the group, find the anchor point
 						var anchor = instance.findContinentAnchor(unGroup);
-						
 
 						//otherwise, make a new group
 						groups.push({start: unGroup, inCluster: [], continent: anchor});
@@ -161,30 +175,25 @@ var SpeciesMap = (function() {
 				var self = this;
 				instance.chartScaler.scale(scale);
 				
-				//this handles panning and zooming
-				/*instance.svgLayers["background"]
+				//this handles panning and zooming for background
+				instance.svgLayers["background"]
 					.attr("x", translation[0]/scale)
 					.attr("y", translation[1]/scale)
 					.attr("transform", function() {
 						return "scale(" + scale + ")";
 					});
-				*/
-					/*.attr("width", function() {
-						return 100 * scale + "%";
-					})	
-					.attr("height", function() {
-						return 100 * scale + "%";
-					});*/
+				
 
 				CalculateIndexes();
+				var currentSliderVal = -slider.value();
 				instance.svgLayers["background"].selectAll(".scaledData")
 					.attr('x', function(d) {
 						d.xPos = CalculateSliderPosition(sliderPosFirst, sliderPosSecond, currentSliderVal, d.x[firstIndex], d.x[secondIndex]);
-						return instance.chartScaler.xScale(d.xPos) + translation[0];
+						return instance.chartScaler.xScale(d.xPos);
 					})
 					.attr('y', function(d) {
 						d.yPos = CalculateSliderPosition(sliderPosFirst, sliderPosSecond, currentSliderVal, d.y[firstIndex], d.y[secondIndex]);
-						return instance.chartScaler.yScale(d.yPos) + translation[1];
+						return instance.chartScaler.yScale(d.yPos);
 					})
 					.attr("width", function(d) {
 						d.newWidth = CalculateSliderPosition(sliderPosFirst, sliderPosSecond, currentSliderVal, d.width[firstIndex], d.width[secondIndex]);
@@ -195,8 +204,8 @@ var SpeciesMap = (function() {
 						return instance.chartScaler.ContinentScaleLat(d.newHeight) + "px";
 					})
 					.attr("transform", function(d) {
-						var posX = instance.chartScaler.xScale(d.xPos) + instance.zoomHandler.offset[0];
-						var posY = instance.chartScaler.yScale(d.yPos) + instance.zoomHandler.offset[1];
+						var posX = instance.chartScaler.xScale(d.xPos);
+						var posY = instance.chartScaler.yScale(d.yPos);
 						var newRot = CalculateSliderPosition(sliderPosFirst, sliderPosSecond, currentSliderVal, d.rot[firstIndex], d.rot[secondIndex]);
 						var rotation = "rotate(" + newRot + " "	+ (posX + d.newWidth) + " " + (posY + d.newHeight) + ")";
 						return rotation;
@@ -236,8 +245,8 @@ var SpeciesMap = (function() {
 					  	.attr("display", "block")
 					 	.each(function(d) {		
 						     addContinent(this, d);
-							d.drawX = d.x[0];
-							d.drawY = d.y[0];
+							d.xPos = d.x[0];
+							d.xPos = d.y[0];
 							d.drawWd = d.width[0];
 							d.drawHt = d.height[0];
 						})
@@ -329,17 +338,17 @@ var SpeciesMap = (function() {
 						d.height = 50;
 					})
 					.attr('x', function(d) {
-						var anchoredX = d.continent.anchorX + d.continent.cData.drawX;
+						var anchoredX = d.continent.anchorX + d.continent.cData.xPos;
 						return instance.chartScaler.specieXScale(anchoredX) + translation[0];
 					})
 					.attr('y', function(d) {
-						var anchoredY = d.continent.anchorY + d.continent.cData.drawY;
+						var anchoredY = d.continent.anchorY + d.continent.cData.yPos;
 						return instance.chartScaler.specieYScale(anchoredY) + translation[1];
 					})
                     .on('click', function(d, e) { 
 						//console.log(d);
-						if(instance.__creatureClick){
-							instance.__creatureClick(e, d);
+						if(instance._onCreatureClick){
+							instance._onCreatureClick(e, d);
 						}
 					})
 					//link the image up to the creature
@@ -362,8 +371,10 @@ var SpeciesMap = (function() {
 				if (!instance.creaturesInstanced) {
 					instance.creaturesInstanced = true;
 					setTimeout(function(){
-						$(".CreaturesList").empty();
-						instance.updateCreatures(currentSliderVal);
+						if(instance._onCreatureStartUpdate)
+							instance._onCreatureStartUpdate(null, null);
+						
+						instance.updateCreatures(-slider.value());
 						instance.creaturesInstanced = false;
 						if(cb) cb();	
 					}, 10);	
@@ -390,54 +401,17 @@ var SpeciesMap = (function() {
 				//and re-create new ones
 				instance.currentTimePeriod.forEach(function(c) {
 					//setTimeout(function() {
-					var nameEntry = $(document.createElement("li")).attr("data-filter-name", function() { 
-						return c.name.replace(' ', '');
-					})
-					.text(c.name);
-					
-					$(".CreaturesList").append(nameEntry);
 					instance.createCreature(c);
+					if(instance._onCreatureUpdate) instance._onCreatureUpdate(null, c);
 					//}, 50);
 				});	
 			},
 			
 
 			moveContinent: function(continent, continentObject) {
-				//Get the current value of the slider
-				currentSliderVal = -slider.value();
 				instance.instanceAllCreatures(function(){
 					instance.redraw();
 				});
-
-				//Only update the continent positions if the slider has changed by a value of 1 million years
-				if (currentSliderVal != previousSliderVal) {
-					if (count == 10) {
-						previousSliderVal = currentSliderVal;
-						count = 0;
-					}
-					else
-						count++;
-
-					CalculateIndexes();
-
-					var xPos = CalculateSliderPosition(sliderPosFirst, sliderPosSecond, currentSliderVal, continentObject.x[firstIndex], continentObject.x[secondIndex]);
-					var yPos = CalculateSliderPosition(sliderPosFirst, sliderPosSecond, currentSliderVal, continentObject.y[firstIndex], continentObject.y[secondIndex]);
-					var newRot = CalculateSliderPosition(sliderPosFirst, sliderPosSecond, currentSliderVal, continentObject.rot[firstIndex], continentObject.rot[secondIndex]);
-					//var rotationX = instance.chartScaler.xScale(xPos) + instance.zoomHandler.offset[0];
-					//var rotationY = instance.chartScaler.yScale(yPos) + instance.zoomHandler.offset[1];
-					var height = CalculateSliderPosition(sliderPosFirst, sliderPosSecond, currentSliderVal, continentObject.height[firstIndex], continentObject.height[secondIndex]);
-					var width = CalculateSliderPosition(sliderPosFirst, sliderPosSecond, currentSliderVal, continentObject.width[firstIndex], continentObject.width[secondIndex]);
-
-					var posX = instance.chartScaler.xScale(xPos) + instance.zoomHandler.offset[0];
-					var posY = instance.chartScaler.yScale(yPos) + instance.zoomHandler.offset[1];
-					d3.select(continent).attr('x', posX);
-					d3.select(continent).attr('y', posY);
-					var rotation = "rotate(" + newRot + " "	+ (posX + width) + " " + (posY + height) + ")";
-					d3.select(continent).attr("transform", rotation);
-					d3.select(continent).attr("width", function(d) { return instance.chartScaler.ContinentScaleLon(width); });
-					d3.select(continent).attr("height", function(d) { return instance.chartScaler.ContinentScaleLat(height); });
-				}
-
 			}
 		}
 	}
@@ -448,7 +422,7 @@ var SpeciesMap = (function() {
 	 */
 	window.addEventListener("keydown", function(e) {
 		CalculateIndexes();
-
+		var currentSliderVal = -slider.value();
 		switch (e.key){
 			case ("w"):
 				currentSelectionObject.y[8] += 1;
@@ -510,6 +484,7 @@ var SpeciesMap = (function() {
 	});
 
 	function debugPrintContinent(sliderPosOne, sliderPosTwo, indexOne, indexTwo) {
+		var currentSliderVal = -slider.value();
 		console.log("Continent: " + currentSelectionObject.continent +
 					"\nX: " + CalculateSliderPosition(sliderPosOne, sliderPosTwo, currentSliderVal, currentSelectionObject.x[8], currentSelectionObject.x[8]) +
 					"\nY: " + CalculateSliderPosition(sliderPosOne, sliderPosTwo, currentSliderVal, currentSelectionObject.y[8], currentSelectionObject.y[8]) +
@@ -519,6 +494,7 @@ var SpeciesMap = (function() {
 	}
 
 	function debugMoveContinent() {
+		
 		var posX = instance.chartScaler.xScale(currentSelectionObject.x[8]) + instance.zoomHandler.offset[0];
 		var posY = instance.chartScaler.yScale(currentSelectionObject.y[8]) + instance.zoomHandler.offset[1];
 		d3.select(currentSelection).attr('x', posX);
