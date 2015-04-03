@@ -40,6 +40,7 @@ var SpeciesMap = (function() {
 			continents: null,
 		
 			creaturesInstanced: false,
+			creatureInstantiatedList: [],
 			creatureCache: null,
 			
 			clusterScale: d3.scale.linear().clamp(true),
@@ -314,6 +315,7 @@ var SpeciesMap = (function() {
 				array.
 			*/
 			createCreature: function(specie) {
+				console.log("Creating creatures!");
 				if(!specie.clusters) return;
 				
 				var translation = instance.zoomHandler.offset;
@@ -327,7 +329,7 @@ var SpeciesMap = (function() {
 						return "creature " + specie.name.replace(' ', '');
 					})
 					.each(function(d) {
-						d.eolID = specie.id;
+						d.id = specie.id;
 						d.clusterNum = clusterNum;
 						d.this = d3.select(this);
 						d.name = specie.name;
@@ -351,6 +353,10 @@ var SpeciesMap = (function() {
 							instance._onCreatureClick(e, d);
 						}
 					})
+					.attr("display", function() {
+						if(specie.hide) return "none";
+						return "block";
+					})
 					//link the image up to the creature
 					.append("image")
 					.attr("xlink:href", function(d){
@@ -367,19 +373,6 @@ var SpeciesMap = (function() {
 				instance.creatureCache = null;
 			},
 			
-			instanceAllCreatures: function (cb) {
-				if (!instance.creaturesInstanced) {
-					instance.creaturesInstanced = true;
-					setTimeout(function(){
-						if(instance._onCreatureStartUpdate)
-							instance._onCreatureStartUpdate(null, null);
-						
-						instance.updateCreatures(-slider.value());
-						instance.creaturesInstanced = false;
-						if(cb) cb();	
-					}, 10);	
-				}
-			},
 			
 			/*
 				Updates which creatures to draw for a given year.
@@ -393,25 +386,71 @@ var SpeciesMap = (function() {
 				is created for it.
 			*/
 			updateCreatures: function(year) {
-				instance.currentTimePeriod = instance.speciesList.data.filter(function(c) {
-					if(c.dates)return (year < c.dates[0] && year > c.dates[1]);
-				});
-
+				if(!instance.currentTimePeriod) return;
 				instance.clearCreatures();
 				//and re-create new ones
 				instance.currentTimePeriod.forEach(function(c) {
-					//setTimeout(function() {
 					instance.createCreature(c);
-					if(instance._onCreatureUpdate) instance._onCreatureUpdate(null, c);
-					//}, 50);
 				});	
+			},			
+			
+			instatiateAllCreatures: function (cb) {
+				if (!instance.creaturesInstanced) {
+					instance.creaturesInstanced = true;
+					setTimeout(function(){
+						instance.updateCreatures(-slider.value());
+						instance.creaturesInstanced = false;
+						if(cb) cb();	
+					}, 10);	
+				}
+			},
+			
+
+			updateCreatureListing: function(year) {
+				if(instance._onCreatureStartUpdate)
+					instance._onCreatureStartUpdate(null, null);
+				
+				
+				//instance.creatureInstantiatedList
+				instance.currentTimePeriod = instance.speciesList.data.filter(function(c) {
+					if(c.dates && year < c.dates[0] && year > c.dates[1]) {
+						if(instance._onCreatureUpdate) instance._onCreatureUpdate(null, c);
+						//only recreate creatures as their timeline shifts
+						if(!instance.creatureInstantiatedList[String(c.id)]) {
+							instance.creatureInstantiatedList[String(c.id)] = c;
+							instance.createCreature(c);
+						}
+						
+						
+						return true;
+					} else {
+						//only remove creatures that should no longer exist
+						if(instance.creatureInstantiatedList[String(c.id)]) {
+							delete instance.creatureInstantiatedList[String(c.id)];
+							d3.selectAll("." + c.name.replace(' ', '')).remove();
+							instance.creatureCache = null;
+						}						   
+							   
+					}
+				});			
+				
 			},
 			
 
 			moveContinent: function(continent, continentObject) {
-				instance.instanceAllCreatures(function(){
-					instance.redraw();
-				});
+				instance.updateCreatureListing(-slider.value());
+			},
+			
+			toggleSpecie: function(specieID) {
+				if(instance.creatureInstantiatedList[String(specieID)]) {
+					var specie = instance.creatureInstantiatedList[String(specieID)];
+					specie.hide = !specie.hide;
+					
+					d3.selectAll('.' + specie.name.replace(' ' , '')).attr("display", function(){ 
+						if(specie.hide) return "none";
+						return "block";
+					});
+				}
 			}
 		}
 	}
@@ -596,7 +635,7 @@ Initialization
 				});
 
 				instance.zoomHandler.endZoom(function(e) {
-					instance.instanceAllCreatures();
+					instance.instatiateAllCreatures();
 				});
 
 				instance.zoomHandler.onZoom(function(e) {

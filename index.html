@@ -55,7 +55,7 @@
 					return 	numCreatures + " remains";	
 				});
 				
-				$(infoBox).find("#eolURL").attr("href", "http://eol.org/pages/###/overview".replace("###", creature.eolID));
+				$(infoBox).find("#eolURL").attr("href", "http://eol.org/pages/###/overview".replace("###", creature.id));
 			
 				myLightBox.show($(infoBox).html());	
 			});
@@ -67,8 +67,8 @@
 			
 			//update creature listing as creatures are instantiated
 			chart.onCreatureUpdate(function(e, c) {
-				var nameEntry = $(document.createElement("li")).attr("data-filter-name", function() { 
-					return c.name.replace(' ', '');
+				var nameEntry = $(document.createElement("li")).attr("data-filter-id", function() { 
+					return c.id;
 				})
 				.text(c.name);
 
@@ -104,9 +104,8 @@
 			
 			//set listener to filter stuff
 			$('.CreaturesList').on('click', 'li', function() {
-				var filter = $(this).attr('data-filter-name');
-				$('.' + filter).toggle();
 				$(this).toggleClass('CreatureListOff');
+				chart.toggleSpecie($(this).attr('data-filter-id'));
 			});
 			
 			
