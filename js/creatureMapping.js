@@ -179,30 +179,26 @@ var SpeciesMap = (function() {
 				CalculateIndexes();
 				instance.svgLayers["background"].selectAll(".scaledData")
 					.attr('x', function(d) {
-						var xPos = CalculateSliderPosition(sliderPosFirst, sliderPosSecond, currentSliderVal, d.x[firstIndex], d.x[secondIndex]);
-						return instance.chartScaler.xScale(xPos) + translation[0];
+						d.xPos = CalculateSliderPosition(sliderPosFirst, sliderPosSecond, currentSliderVal, d.x[firstIndex], d.x[secondIndex]);
+						return instance.chartScaler.xScale(d.xPos) + translation[0];
 					})
 					.attr('y', function(d) {
-						var yPos = CalculateSliderPosition(sliderPosFirst, sliderPosSecond, currentSliderVal, d.y[firstIndex], d.y[secondIndex]);
-						return instance.chartScaler.yScale(yPos) + translation[1];
+						d.yPos = CalculateSliderPosition(sliderPosFirst, sliderPosSecond, currentSliderVal, d.y[firstIndex], d.y[secondIndex]);
+						return instance.chartScaler.yScale(d.yPos) + translation[1];
 					})
 					.attr("width", function(d) {
-						var width = CalculateSliderPosition(sliderPosFirst, sliderPosSecond, currentSliderVal, d.width[firstIndex], d.width[secondIndex]);
-						return instance.chartScaler.ContinentScaleLon(width) + "px";
+						d.newWidth = CalculateSliderPosition(sliderPosFirst, sliderPosSecond, currentSliderVal, d.width[firstIndex], d.width[secondIndex]);
+						return instance.chartScaler.ContinentScaleLon(d.newWidth) + "px";
 					})
 					.attr("height", function(d) {
-						var height = CalculateSliderPosition(sliderPosFirst, sliderPosSecond, currentSliderVal, d.height[firstIndex], d.height[secondIndex]);
-						return instance.chartScaler.ContinentScaleLat(height) + "px";
+						d.newHeight = CalculateSliderPosition(sliderPosFirst, sliderPosSecond, currentSliderVal, d.height[firstIndex], d.height[secondIndex]);
+						return instance.chartScaler.ContinentScaleLat(d.newHeight) + "px";
 					})
 					.attr("transform", function(d) {
-						var xPos = CalculateSliderPosition(sliderPosFirst, sliderPosSecond, currentSliderVal, d.x[firstIndex], d.x[secondIndex]);
-						var yPos = CalculateSliderPosition(sliderPosFirst, sliderPosSecond, currentSliderVal, d.y[firstIndex], d.y[secondIndex]);
-						var posX = instance.chartScaler.xScale(xPos) + instance.zoomHandler.offset[0];
-						var posY = instance.chartScaler.yScale(yPos) + instance.zoomHandler.offset[1];
-						var width = CalculateSliderPosition(sliderPosFirst, sliderPosSecond, currentSliderVal, d.width[firstIndex], d.width[secondIndex]);
-						var height = CalculateSliderPosition(sliderPosFirst, sliderPosSecond, currentSliderVal, d.height[firstIndex], d.height[secondIndex]);
+						var posX = instance.chartScaler.xScale(d.xPos) + instance.zoomHandler.offset[0];
+						var posY = instance.chartScaler.yScale(d.yPos) + instance.zoomHandler.offset[1];
 						var newRot = CalculateSliderPosition(sliderPosFirst, sliderPosSecond, currentSliderVal, d.rot[firstIndex], d.rot[secondIndex]);
-						var rotation = "rotate(" + newRot + " "	+ (posX + width) + " " + (posY + height) + ")";
+						var rotation = "rotate(" + newRot + " "	+ (posX + d.newWidth) + " " + (posY + d.newHeight) + ")";
 						return rotation;
 					});
 
@@ -213,12 +209,12 @@ var SpeciesMap = (function() {
 				if(!instance.creatureCache) return;
 				instance.creatureCache
 					.attr('x', function(d) {
-						var anchoredX = d.continent.anchorX + d.continent.cData.drawX;
+						var anchoredX = d.continent.anchorX + d.continent.cData.xPos;
 						d.drawX = instance.chartScaler.specieXScale(anchoredX) + translation[0];
 						return d.drawX;
 					})
 					.attr('y', function(d) {
-						var anchoredY = d.continent.anchorY + d.continent.cData.drawY;
+						var anchoredY = d.continent.anchorY + d.continent.cData.yPos;
 						d.drawY = instance.chartScaler.specieYScale(anchoredY) + translation[1];
 						return d.drawY;
 					});
