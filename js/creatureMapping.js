@@ -474,10 +474,12 @@ var SpeciesMap = (function() {
 		}
 	}
 
-	/* 
-	 * This is for debugging purposes only
-	 * Allows us to move, rotate and scale the continents using WASD, QE and ZC respectively
-	 */
+	/****************************************************************************************************
+	 * Description: This is for debugging purposes only. Allows us to move, rotate and scale the 		*
+	 *				continents using WASD, QE and ZC respectively.										*
+	 *				REMOVE THIS UPON COMPLETION OF THE PROJECT											*
+	 * Syntax: --- (Automatically called when key is pressed on keyboard)								*
+	 ****************************************************************************************************/
 	window.addEventListener("keydown", function(e) {
 		CalculateIndexes();
 		var currentSliderVal = -slider.value();
@@ -524,41 +526,70 @@ var SpeciesMap = (function() {
 				debugMoveContinent();
 				break;
 			case ("r"):
-				currentSelectionObject.x[8] = CalculateSliderPosition(sliderPosFirst, sliderPosSecond, currentSliderVal, currentSelectionObject.x[firstIndex], currentSelectionObject.x[secondIndex]);
-				currentSelectionObject.y[8] = CalculateSliderPosition(sliderPosFirst, sliderPosSecond, currentSliderVal, currentSelectionObject.y[firstIndex], currentSelectionObject.y[secondIndex]);
-				currentSelectionObject.height[8] = CalculateSliderPosition(sliderPosFirst, sliderPosSecond, currentSliderVal, currentSelectionObject.height[firstIndex], currentSelectionObject.height[secondIndex]);
-				currentSelectionObject.width[8] = CalculateSliderPosition(sliderPosFirst, sliderPosSecond, currentSliderVal, currentSelectionObject.width[firstIndex], currentSelectionObject.width[secondIndex]);
-				currentSelectionObject.rot[8] = CalculateSliderPosition(sliderPosFirst, sliderPosSecond, currentSliderVal, currentSelectionObject.rot[firstIndex], currentSelectionObject.rot[secondIndex]);
-				console.log("Recorded X: " + currentSelectionObject.x[8]);
-				console.log("Recorded Y: " + currentSelectionObject.y[8]);
-				console.log("Recorded Height: " + currentSelectionObject.height[8]);
-				console.log("Recorded Width: " + currentSelectionObject.width[8]);
-				console.log("Recorded Rotation: " + currentSelectionObject.rot[8]);
+				var allContinentObjects = debugGetContinentObjects();
+				for (var i = 0; i < allContinentObjects.length; i++) {
+					allContinentObjects[i].x[8] = CalculateSliderPosition(sliderPosFirst, sliderPosSecond, currentSliderVal, allContinentObjects[i].x[firstIndex], allContinentObjects[i].x[secondIndex]);
+					allContinentObjects[i].y[8] = CalculateSliderPosition(sliderPosFirst, sliderPosSecond, currentSliderVal, allContinentObjects[i].y[firstIndex], allContinentObjects[i].y[secondIndex]);
+					allContinentObjects[i].height[8] = CalculateSliderPosition(sliderPosFirst, sliderPosSecond, currentSliderVal, allContinentObjects[i].height[firstIndex], allContinentObjects[i].height[secondIndex]);
+					allContinentObjects[i].width[8] = CalculateSliderPosition(sliderPosFirst, sliderPosSecond, currentSliderVal, allContinentObjects[i].width[firstIndex], allContinentObjects[i].width[secondIndex]);
+					allContinentObjects[i].rot[8] = CalculateSliderPosition(sliderPosFirst, sliderPosSecond, currentSliderVal, allContinentObjects[i].rot[firstIndex], allContinentObjects[i].rot[secondIndex]);
+				}
 				break;
 			case ("p"):
 				debugPrintContinent(sliderPosFirst, sliderPosSecond, firstIndex, secondIndex);
 				break;
+			case ("o"):
+				debugPrintAllContinents(sliderPosFirst, sliderPosSecond, firstIndex, secondIndex);
+				break;
 		}
 	});
 
+	/****************************************************************************************************
+	 * Description: This is a helper function that simply prints out the details of the selected 		*
+	 *				continent.																			*
+	 *				REMOVE THIS FUNCTION UPON COMPLETION OF THE PROJECT									*
+	 * Syntax: debugPrintContinent(sliderPosOne, sliderPosTwo, leftIndex, rightIndex);					*
+	 ****************************************************************************************************/
 	function debugPrintContinent(sliderPosOne, sliderPosTwo, indexOne, indexTwo) {
 		var currentSliderVal = -slider.value();
 		console.log("Continent: " + currentSelectionObject.continent +
 					"\nX: " + CalculateSliderPosition(sliderPosOne, sliderPosTwo, currentSliderVal, currentSelectionObject.x[8], currentSelectionObject.x[8]) +
 					"\nY: " + CalculateSliderPosition(sliderPosOne, sliderPosTwo, currentSliderVal, currentSelectionObject.y[8], currentSelectionObject.y[8]) +
-					"\nHeight: " + CalculateSliderPosition(sliderPosOne, sliderPosTwo, currentSliderVal, currentSelectionObject.height[8], currentSelectionObject.height[8]) +
 					"\nWidth: " + CalculateSliderPosition(sliderPosOne, sliderPosTwo, currentSliderVal, currentSelectionObject.width[8], currentSelectionObject.width[8]) +
+					"\nHeight: " + CalculateSliderPosition(sliderPosOne, sliderPosTwo, currentSliderVal, currentSelectionObject.height[8], currentSelectionObject.height[8]) +
 					"\nRotation: " + CalculateSliderPosition(sliderPosOne, sliderPosTwo, currentSliderVal, currentSelectionObject.rot[8], currentSelectionObject.rot[8]));
 	}
 
+	/****************************************************************************************************
+	 * Description: This is a helper function that simply prints out the details of all continents.		*
+	 *				REMOVE THIS FUNCTION UPON COMPLETION OF THE PROJECT									*
+	 * Syntax: debugPrintAllContinents(sliderPosOne, sliderPosTwo, leftIndex, rightIndex);				*
+	 ****************************************************************************************************/
+	function debugPrintAllContinents(sliderPosOne, sliderPosTwo, indexOne, indexTwo) {
+		var currentSliderVal = -slider.value();
+		var allContinentObjects = debugGetContinentObjects();
+		for (var i = 0; i < allContinentObjects.length; i++) {
+			console.log("Continent: " + allContinentObjects[i].continent +
+						"\nX: " + CalculateSliderPosition(sliderPosOne, sliderPosTwo, currentSliderVal, allContinentObjects[i].x[8], allContinentObjects[i].x[8]) +
+						"\nY: " + CalculateSliderPosition(sliderPosOne, sliderPosTwo, currentSliderVal, allContinentObjects[i].y[8], allContinentObjects[i].y[8]) +
+						"\nWidth: " + CalculateSliderPosition(sliderPosOne, sliderPosTwo, currentSliderVal, allContinentObjects[i].width[8], allContinentObjects[i].width[8]) +
+						"\nHeight: " + CalculateSliderPosition(sliderPosOne, sliderPosTwo, currentSliderVal, allContinentObjects[i].height[8], allContinentObjects[i].height[8]) +
+						"\nRotation: " + CalculateSliderPosition(sliderPosOne, sliderPosTwo, currentSliderVal, allContinentObjects[i].rot[8], allContinentObjects[i].rot[8]));
+		}
+	}
+
+	/****************************************************************************************************
+	 * Description: This is a helper function that simply moves each continent per key press.			*
+	 *				REMOVE THIS FUNCTION UPON COMPLETION OF THE PROJECT									*
+	 * Syntax: debugPrintContinent();																	*
+	 ****************************************************************************************************/
 	function debugMoveContinent() {
-		
-		var posX = instance.chartScaler.xScale(currentSelectionObject.x[8]) + instance.zoomHandler.offset[0];
-		var posY = instance.chartScaler.yScale(currentSelectionObject.y[8]) + instance.zoomHandler.offset[1];
+		var posX = instance.chartScaler.xScale(currentSelectionObject.x[8]);// + instance.zoomHandler.offset[0];
+		var posY = instance.chartScaler.yScale(currentSelectionObject.y[8]);// + instance.zoomHandler.offset[1];
 		d3.select(currentSelection).attr('x', posX);
 		d3.select(currentSelection).attr('y', posY);
-		var rotation = "rotate(" + currentSelectionObject.rot[8] + " "	+ (posX + (currentSelectionObject.width[8])) + " " + (posY + (currentSelectionObject.height[8])) + ")";
-		d3.select(currentSelection).attr("transform", rotation);
+		var rotation = "rotate(" + currentSelectionObject.rot[8] + ")";
+		d3.select(currentSelection).select("image").attr("transform", rotation);
 		d3.select(currentSelection).attr("width", function(d) { return instance.chartScaler.ContinentScaleLon(currentSelectionObject.width[8]); });
 		d3.select(currentSelection).attr("height", function(d) { return instance.chartScaler.ContinentScaleLat(currentSelectionObject.height[8]); });
 	}
@@ -688,8 +719,8 @@ Initialization
 			}
 			
 			$(instance.divSelector).on("NewCreatureReady", function(e, specie) {
-				console.log("trigger new creature!");
-				console.log(specie);
+				//console.log("trigger new creature!");
+				//console.log(specie);
 				instance.updateCreatureListing(-slider.value());
 			});
 			return instance;

@@ -17,6 +17,15 @@ function moveContinents() {
     }
 }
 
+/****************************************************************************************************
+ * Description: This function is used only for moving continents using the built in debugger.       *
+ *              REMOVE THIS FUNCTION UPON COMPLETION OF THE PROJECT                                 *
+ * Syntax: debugGetContinentObjects();                                                              *
+ ****************************************************************************************************/
+function debugGetContinentObjects() {
+  return continentObjects;
+}
+
 d3.slider = function module() {
   "use strict";
 
