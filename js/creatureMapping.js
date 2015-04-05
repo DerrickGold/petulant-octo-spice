@@ -1,6 +1,3 @@
-//Domain = input
-//range = output
-
 /*=============================================================================
 Species Map:
 	Creates a chart that plots species on the world through time.
@@ -48,6 +45,11 @@ var SpeciesMap = (function() {
 			clusterRange: [0, 10],
 			clusterDomain: [0, 100],
 			
+			//keeps track of the largest count of locations
+			//for a given specie
+			//this is used for statistics and graphing
+			mostLocations: 0,
+			
 			//set up callback system for creature clicking
 			_onCreatureClick: null,
 			onCreatureClick: function(v) {
@@ -70,9 +72,16 @@ var SpeciesMap = (function() {
 				instance._onCreatureUpdate = function(e, s) {
 					v(e, s);
 				}
-			},				
+			},		
+			//set up callback for when a creature is instantiated
+			_onStatisticsUpdate: null,
+			onStatisticsUpdate: function(v) {
+				instance._onStatisticsUpdate = function(e, s) {
+					v(e, s);
+				}
+			},			
 			
-			
+				
 			
 			//a list of all species (from SpeciesList.data)
 			//for the current time period.
@@ -81,6 +90,17 @@ var SpeciesMap = (function() {
 			
 			//our main initial species list from file
 			speciesList: {},
+			
+			
+			
+			//generate an object with overall statistics for the visualization
+			getStatistics: function() {
+				return {
+					maxRemains: instance.mostLocations
+				};
+			},
+			
+			
 			
 			//finds an anchor point for a cluster to a specific continent
 			findContinentAnchor: function(specieCluster) {
@@ -289,7 +309,16 @@ var SpeciesMap = (function() {
 					instance.speciesList.data.forEach(function(d) {
 						//Go through all species and get the data from the gbif api
 						(function(specie) {
+									
 							instance.dbAccessor.fetchCreatureData(specie, function(s){
+	
+								//keep track of the max number of locations for a species
+								if(specie.locations.length > instance.mostLocations) {
+									instance.mostLocations = specie.locations.length;
+									var statistics = instance.getStatistics();
+									if(instance._onStatisticsUpdate) 
+										instance._onStatisticsUpdate(null, statistics);
+								}							
 								
 								s.clusters = [instance.clusterPoints(s.locations, 10),
 											   instance.clusterPoints(s.locations, 9),
@@ -655,10 +684,14 @@ Initialization
                 }
 				instance.zoomHandler.zoomScale(1, 16);
 				
+				instance.width = d3.select(instance.divSelector).node().getBoundingClientRect().width;
+				instance.height =d3.select(instance.divSelector).node().getBoundingClientRect().height;
+				
+				
 				instance.svgDisplay = d3.select(instance.divSelector).append("svg")
 					.attr("id", "svgSurface")
-					.attr("width", instance.width)
-					.attr("height", instance.height)
+					.attr("width", instance.width + "px")
+					.attr("height", instance.height + "px")
 					.attr("y", 0).attr("x", 0)
 					.call(instance.zoomHandler.z)
 					 //Disable d3's zoom drag to override with my own
@@ -723,6 +756,9 @@ Initialization
 				//console.log(specie);
 				instance.updateCreatureListing(-slider.value());
 			});
+			
+	
+			
 			return instance;
 		}
 	}

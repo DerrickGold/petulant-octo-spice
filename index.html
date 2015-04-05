@@ -9,6 +9,7 @@
 		<script type="text/javascript" src="js/eol-gbif.js"></script>
 		<script type="text/javascript" src="js/creatureMapping.js"></script>
 		<script type="text/javascript" src="js/lightbox.js"></script>
+		<script type="text/javascript" src="js/interface.js"></script>
 		<link rel="stylesheet" type="text/css" href="css/index.css"/>
 		<link rel="stylesheet" type="text/css" href="css/lightbox.css"/>
 		<link rel="stylesheet" type="text/css" href="css/d3.slider.css" media="screen"/>
@@ -21,10 +22,10 @@
 			var leftOffset = parseInt($(".CreaturesBox").css("min-width").replace("px", ''));
 			var topOffset = parseInt($("#titleBox").css("height").replace("px", ''));
 			
-			$(".chartContainer").css("width", function() {
+			/*$(".chartContainer").css("width", function() {
 				return window.innerWidth - leftOffset + "px";
 			});
-			
+			*/
 			
 			var myLightBox = LightBox.init();
 			var popUpHeight = parseInt($("#lightBox .lightBoxContent").css("height").replace("px", ''));
@@ -33,101 +34,13 @@
 				divSelector: ".chartContainer",
 				xPadding: 0,
 				yPadding: 0,
-				width: d3.select(".chartContainer").node().getBoundingClientRect().width,
-				height: d3.select(".chartContainer").node().getBoundingClientRect().height
+				width: 600,
+				height: 500
 			});
 
-			//set up callbacks for chart actions
-			chart.onCreatureClick(function(e, creature) {
-				
-				console.log(creature);				
-				var boxX = parseInt(creature.drawX + creature.width) + leftOffset;
-				var boxY = parseInt(creature.drawY + creature.height) + topOffset;
-				
-				if(boxY + popUpHeight > window.innerHeight) boxY -= popUpHeight;
-				
-				myLightBox.xPos(boxX);
-				myLightBox.yPos(boxY);
-				
-				var infoBox = $(".InfoBox");
-				
-				//add name
-				$(infoBox).find("#nameBox").text(creature.name);
-				//add cluster details
-				$(infoBox).find("#clusterInfo").text(function() {
-					var numCreatures = creature.inCluster.length + 1;
-					return 	numCreatures + " remains";	
-				});
-				
-				$(infoBox).find("#eolURL").attr("href", "http://eol.org/pages/###/overview".replace("###", creature.id));
 			
-				myLightBox.show($(infoBox).html());	
-			});
+			initCallBacks(chart);
 			
-			//clear creatures list when new creatures are to be instantiated
-			chart.onCreatureStartUpdate(function(e, s) {
-				//$(".CreaturesList").empty();
-			});
-			
-			//update creature listing as creatures are instantiated
-			chart.onCreatureUpdate(function(append, c) {
-				if(append) {
-					var nameEntry = $(document.createElement("p"))
-						.attr("class", "creatureFilter")
-						.attr("data-filter-id", c.id)
-						.attr("sort", c.name).text(c.name);
-
-
-					//if list is empty, just add the creature
-					if (!$(".creatureFilter").length) {
-						console.log("empty list!");
-						$(".CreaturesList").append(nameEntry);
-						return; 
-					}
-					
-					//otherwise, do binary search to find insertion point
-					//code taken from 
-					//http://stackoverflow.com/questions/14495400/jquery-insert-div-at-right-place-in-list-of-divs
-					//cause I'm lazy
-					var sortval = c.name;
-					var $first = $(".creatureFilter:first");
-					if (sortval <= $first.attr('sort')) {
-					   	nameEntry.insertBefore($first);
-						return;
-					}
-
-					var $last = $(".creatureFilter:last");
-					if (sortval >= $last.attr('sort')) {
-					   nameEntry.insertAfter($last);
-						return;
-					}
-
-					var count = 0;
-					var $div = $(".creatureFilter");
-					do {
-					   var index = parseInt($div.length / 2)
-					   var $compare = $div.eq(index);
-					   var compare = $compare.attr('sort');
-					   if (sortval == compare) {
-						  break;
-					   }
-					   else if (sortval < compare) {
-						  $div = $div.slice(index, $div.length);
-					   }
-					   else {
-						  $div = $div.slice(0, index);
-					   }
-					}
-					while ($div.length > 1);
-					
-					if (sortval <= compare) { nameEntry.insertBefore($compare); }
-					else { nameEntry.insertAfter($compare); }
-					
-					
-				} else {
-					$('[data-filter-id="' + c.id + '"]').remove();
-				}
-			});
 			
 			
 			
@@ -156,15 +69,6 @@
 			chart.loadData();
 			setChart(chart);
 			
-			//set listener to filter stuff
-			$('.CreaturesList').on('click', '.creatureFilter', function() {
-				console.log("click");
-				$(this).toggleClass('CreatureListOff');
-				chart.toggleSpecie($(this).attr('data-filter-id'));
-			});
-			
-			
-			
 		});
 		</script>
 
@@ -178,8 +82,9 @@
 			</div>
 
 			<div class="chartContainer"></div>
+			<div id="slider"></div>
 		</div>
-		<div id="slider"></div>
+		
 		
 		
 		<!--HTML for our dinosaur popup-->

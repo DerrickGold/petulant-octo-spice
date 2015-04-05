@@ -4,6 +4,8 @@ var firstIndex = 0, secondIndex = 0, sliderPosFirst = 0, sliderPosSecond = 0;
 var slider;
 var currentSliderVal = 0, previousSliderVal = 0, count = 0;
 
+//Domain = input
+//range = output
 
 
 /*=============================================================================
@@ -96,23 +98,16 @@ var ChartScaler = (function() {
         return {
 			//Convert screen points into longitude and latitude pixels
             xAxis: d3.svg.axis(),
-            xTickCount: 36,
-            xTicks: function(e) {
-                return instance.xAxis.ticks(e);
-            },
             xScale: d3.scale.linear(),
             xRange: [0, 0],
             xDomain: [0, 100],
 
             yAxis: d3.svg.axis().orient("left"),
-            yTickCount: 36,
-            yTicks: function(e) {
-                return instance.yAxis.ticks(e);
-            },
             yScale: d3.scale.linear(),
             yRange: [0, 0],
             yDomain: [0, 100],
 			
+			//scale the size and width for continents relative to the world (in degrees)
 			ContinentScaleLat: d3.scale.linear(),
 			cLatRange: [0, 180],
 			cLatDomain: [0, 180],
@@ -121,6 +116,8 @@ var ChartScaler = (function() {
 			cLonRange: [0, 360],
 			cLonDomain: [0, 360],
 			
+			//scale for x and y positioning of species on map
+			//this scale dynamically changes on zoom
 			specieXScale: d3.scale.linear(),
 			specieXRange: [0, 0],
 			specieXDomain: [0, 100],
@@ -162,9 +159,6 @@ var ChartScaler = (function() {
                     if (values.hasOwnProperty(key))
                         instance[key] = values[key];
                 }
-				
-				instance.xTicks(instance.xTickCount);
-				instance.yTicks(instance.yTickCount);
             }
             return instance;
         }
@@ -197,3 +191,6 @@ function CalculateSliderPosition(maxSliderVal, minSliderVal, sliderVal, valOne, 
 		return smallestCoord + coordAmount;
 	return largestCoord - coordAmount;
 }
+
+
+
