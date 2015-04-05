@@ -4,25 +4,30 @@ html, body {
 	padding: 0;
 	margin: 0;
 	white-space:nowrap;
+	background-color: rgba(0,0,0, 0.40);
 	/*overflow: hidden;*/
 }
 
 #titleBox {
 	padding: 0;
-	height: 80px;
+	height: 120px;
 	width: 1024px;
 	margin-left: auto;
 	margin-right: auto;
-	background-color: green;
 	text-align: center;
-	border: none;
+	background-image:url(/images/banner.jpg);
+	background-size: cover;
+	background-position: center;
+	vertical-align: middle;
 }
 
-#titleBox p {
+#titleBox div {
 	font-size: 150%;
+	line-height: 120px;
 	color: white;
 	padding: 0;
 	margin: 0;
+	background-color: rgba(0,0,0,0.5);
 }
 
 .PageContent {
@@ -46,6 +51,12 @@ html, body {
 	padding: 0;
 	vertical-align: top;
 	overflow-x:hidden;
+}
+
+#CreaturesBoxTitle {
+	text-decoration: underline;
+	text-align: center;
+	
 }
 
 .CreaturesList {
@@ -73,6 +84,8 @@ html, body {
 
 .CreatureListOff {
 	text-decoration: line-through;
+	margin: 0;
+	padding: 0;
 }
 
 .creatureFilter:hover {
