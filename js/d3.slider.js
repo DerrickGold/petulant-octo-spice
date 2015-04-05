@@ -157,6 +157,8 @@ d3.slider = function module() {
   slider.click = function() {
     var pos = d3.event.offsetX || d3.event.layerX;
     slider.move(pos);
+
+    moveContinents();
   }
 
   slider.drag = function() {
