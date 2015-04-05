@@ -1,6 +1,9 @@
 .d3slider {
-  z-index: 2;
-  background: none;
+	z-index: 2;
+	background-color: rgba(0,0,0, 0.8);
+	padding:0;
+	margin: 0;
+	height: 70px;
 }
 
 .d3slider-rect-range {
@@ -34,14 +37,17 @@
 
 .d3slider text {
   font: 10px sans-serif;
+	fill: white;
 }
 
 .tick.minor text {
-  display: none;
+  	display: none;
+	fill: white;
 }
 
 .tick line {
-  stroke-width: 1;
+  	stroke-width: 1;
+	stroke: white;
 }
 .tick.minor line {
   stroke-width: 1;

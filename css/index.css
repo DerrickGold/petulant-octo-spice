@@ -4,8 +4,9 @@ html, body {
 	padding: 0;
 	margin: 0;
 	white-space:nowrap;
-	background-color: rgba(0,0,0, 0.40);
-	/*overflow: hidden;*/
+	background-image:url(/images/dinobg.jpg);
+	background-size:cover;
+	overflow: hidden;
 }
 
 #titleBox {
@@ -15,19 +16,20 @@ html, body {
 	margin-left: auto;
 	margin-right: auto;
 	text-align: center;
-	background-image:url(/images/banner.jpg);
+	
 	background-size: cover;
 	background-position: center;
 	vertical-align: middle;
+	line-height: 120px;
+	padding-bottom: 5px;
 }
 
 #titleBox div {
 	font-size: 150%;
-	line-height: 120px;
 	color: white;
 	padding: 0;
 	margin: 0;
-	background-color: rgba(0,0,0,0.5);
+	background-color: rgba(0,0,0,0.8);
 }
 
 .PageContent {
@@ -42,7 +44,7 @@ html, body {
 .CreaturesBox {
 	min-width: 250px;
 	float: left;
-	background: lightgrey;
+	background: rgba(128,128,128, 0.85);
 	height: 100%;
 	max-height:100%;
 	
@@ -90,5 +92,9 @@ html, body {
 
 .creatureFilter:hover {
 	cursor:pointer;
+}
+
+#sliderContent {
+	padding-top: 5px;
 }
 
