@@ -77,14 +77,51 @@
 						.attr("data-filter-id", c.id)
 						.attr("sort", c.name).text(c.name);
 
-					$(".CreaturesList").append(nameEntry);
-					
-					/* $(".CreaturesList").sort(function (a, b) {
 
-						  var contentA =parseInt( $(a).attr("sort"));
-						  var contentB =parseInt( $(b).attr("sort"));
-						  return (contentA < contentB) ? -1 : (contentA > contentB) ? 1 : 0;
-					   })	*/				
+					//if list is empty, just add the creature
+					if (!$(".creatureFilter").length) {
+						console.log("empty list!");
+						$(".CreaturesList").append(nameEntry);
+						return; 
+					}
+					
+					//otherwise, do binary search to find insertion point
+					//code taken from 
+					//http://stackoverflow.com/questions/14495400/jquery-insert-div-at-right-place-in-list-of-divs
+					//cause I'm lazy
+					var sortval = c.name;
+					var $first = $(".creatureFilter:first");
+					if (sortval <= $first.attr('sort')) {
+					   	nameEntry.insertBefore($first);
+						return;
+					}
+
+					var $last = $(".creatureFilter:last");
+					if (sortval >= $last.attr('sort')) {
+					   nameEntry.insertAfter($last);
+						return;
+					}
+
+					var count = 0;
+					var $div = $(".creatureFilter");
+					do {
+					   var index = parseInt($div.length / 2)
+					   var $compare = $div.eq(index);
+					   var compare = $compare.attr('sort');
+					   if (sortval == compare) {
+						  break;
+					   }
+					   else if (sortval < compare) {
+						  $div = $div.slice(index, $div.length);
+					   }
+					   else {
+						  $div = $div.slice(0, index);
+					   }
+					}
+					while ($div.length > 1);
+					
+					if (sortval <= compare) { nameEntry.insertBefore($compare); }
+					else { nameEntry.insertAfter($compare); }
 					
 					
 				} else {
