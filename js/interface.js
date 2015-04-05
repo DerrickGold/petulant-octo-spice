@@ -4,6 +4,12 @@ Initialize all callbacks that update the html interface from the data changes
 in the d3 application side.
 =============================================================================*/
 function initCallBacks(chart) {
+	var leftOffset = parseInt($(".CreaturesBox").css("min-width").replace("px", ''));
+	var topOffset = parseInt($("#titleBox").css("height").replace("px", ''));
+			
+	var myLightBox = LightBox.init();
+	var popUpHeight = parseInt($("#lightBox .lightBoxContent").css("height").replace("px", ''));
+	
 	//scale for graphing the number of remains a specie has
 	var remainsScale = d3.scale.linear();
 	var remainsDomain = [0, 0];

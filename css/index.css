@@ -75,3 +75,7 @@ html, body {
 	text-decoration: line-through;
 }
 
+.creatureFilter:hover {
+	cursor:pointer;
+}
+

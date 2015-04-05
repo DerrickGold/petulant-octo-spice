@@ -19,16 +19,12 @@
     <body>
 		<script>
 		$(document).ready(function(){
-			var leftOffset = parseInt($(".CreaturesBox").css("min-width").replace("px", ''));
-			var topOffset = parseInt($("#titleBox").css("height").replace("px", ''));
-			
 			/*$(".chartContainer").css("width", function() {
 				return window.innerWidth - leftOffset + "px";
 			});
 			*/
 			
-			var myLightBox = LightBox.init();
-			var popUpHeight = parseInt($("#lightBox .lightBoxContent").css("height").replace("px", ''));
+
 			
 			var chart = SpeciesMap.init({
 				divSelector: ".chartContainer",
