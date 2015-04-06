@@ -353,11 +353,11 @@ var SpeciesMap = (function() {
 						d.drawWd = d.width[0];
 						d.drawHt = d.height[0];
 					})
-					//Do not comment this out for now - this is used to be able to click on continents and manually move them around
+					/*Do not comment this out for now - this is used to be able to click on continents and manually move them around
 					.on('click', function(d) { 
 						currentSelection = this;
 						currentSelectionObject = d;
-					})
+					})*/
 					.attr("width", function(d) { return instance.chartScaler.ContinentScaleLon(d.width[0]) + "px"; })
 					.attr("height", function(d) { return instance.chartScaler.ContinentScaleLat(d.height[0]) + "px";})
 					.attr("preserveAspectRatio", "none")
@@ -478,6 +478,7 @@ var SpeciesMap = (function() {
 					})
 					.attr("width", "50px")
 					.attr("height", "50px")
+					.attr("overflow", "visible")
                     .on('click', function(d, e) { 
 						//console.log(d);
 						if(instance._onCreatureClick){
@@ -495,9 +496,10 @@ var SpeciesMap = (function() {
 					})
 					.attr("width", "50px")
 					.attr("height", "50px")
+					.attr('x', "-25px")
+					.attr('y', "-25px")
 					.attr("preserveAspectRatio", "none")
 					.attr("title", specie.name);
-				
 				return creatures;
 			},
 			
@@ -578,9 +580,6 @@ var SpeciesMap = (function() {
 				});			
 				
 			},
-			
-			
-			
 
 			moveContinent: function(continent, continentObject) {
 				if(instance._movingContinents) return;
@@ -655,7 +654,7 @@ var SpeciesMap = (function() {
 	 *				REMOVE THIS UPON COMPLETION OF THE PROJECT											*
 	 * Syntax: --- (Automatically called when key is pressed on keyboard)								*
 	 ****************************************************************************************************/
-	window.addEventListener("keydown", function(e) {
+	/*window.addEventListener("keydown", function(e) {
 		CalculateIndexes();
 		var currentSliderVal = -slider.value();
 		switch (e.key){
@@ -717,7 +716,7 @@ var SpeciesMap = (function() {
 				debugPrintAllContinents(sliderPosFirst, sliderPosSecond, firstIndex, secondIndex);
 				break;
 		}
-	});
+	});*/
 
 	/****************************************************************************************************
 	 * Description: This is a helper function that simply prints out the details of the selected 		*
@@ -725,7 +724,7 @@ var SpeciesMap = (function() {
 	 *				REMOVE THIS FUNCTION UPON COMPLETION OF THE PROJECT									*
 	 * Syntax: debugPrintContinent(sliderPosOne, sliderPosTwo, leftIndex, rightIndex);					*
 	 ****************************************************************************************************/
-	function debugPrintContinent(sliderPosOne, sliderPosTwo, indexOne, indexTwo) {
+	/*function debugPrintContinent(sliderPosOne, sliderPosTwo, indexOne, indexTwo) {
 		var currentSliderVal = -slider.value();
 		console.log("Continent: " + currentSelectionObject.continent +
 					"\nX: " + CalculateSliderPosition(sliderPosOne, sliderPosTwo, currentSliderVal, currentSelectionObject.x[8], currentSelectionObject.x[8]) +
@@ -733,14 +732,14 @@ var SpeciesMap = (function() {
 					"\nWidth: " + CalculateSliderPosition(sliderPosOne, sliderPosTwo, currentSliderVal, currentSelectionObject.width[8], currentSelectionObject.width[8]) +
 					"\nHeight: " + CalculateSliderPosition(sliderPosOne, sliderPosTwo, currentSliderVal, currentSelectionObject.height[8], currentSelectionObject.height[8]) +
 					"\nRotation: " + CalculateSliderPosition(sliderPosOne, sliderPosTwo, currentSliderVal, currentSelectionObject.rot[8], currentSelectionObject.rot[8]));
-	}
+	}*/
 
 	/****************************************************************************************************
 	 * Description: This is a helper function that simply prints out the details of all continents.		*
 	 *				REMOVE THIS FUNCTION UPON COMPLETION OF THE PROJECT									*
 	 * Syntax: debugPrintAllContinents(sliderPosOne, sliderPosTwo, leftIndex, rightIndex);				*
 	 ****************************************************************************************************/
-	function debugPrintAllContinents(sliderPosOne, sliderPosTwo, indexOne, indexTwo) {
+	/*function debugPrintAllContinents(sliderPosOne, sliderPosTwo, indexOne, indexTwo) {
 		var currentSliderVal = -slider.value();
 		var allContinentObjects = debugGetContinentObjects();
 		for (var i = 0; i < allContinentObjects.length; i++) {
@@ -751,14 +750,14 @@ var SpeciesMap = (function() {
 						"\nHeight: " + CalculateSliderPosition(sliderPosOne, sliderPosTwo, currentSliderVal, allContinentObjects[i].height[8], allContinentObjects[i].height[8]) +
 						"\nRotation: " + CalculateSliderPosition(sliderPosOne, sliderPosTwo, currentSliderVal, allContinentObjects[i].rot[8], allContinentObjects[i].rot[8]));
 		}
-	}
+	}*/
 
 	/****************************************************************************************************
 	 * Description: This is a helper function that simply moves each continent per key press.			*
 	 *				REMOVE THIS FUNCTION UPON COMPLETION OF THE PROJECT									*
 	 * Syntax: debugPrintContinent();																	*
 	 ****************************************************************************************************/
-	function debugMoveContinent() {
+	/*function debugMoveContinent() {
 		var posX = instance.chartScaler.xScale(currentSelectionObject.x[8]);// + instance.zoomHandler.offset[0];
 		var posY = instance.chartScaler.yScale(currentSelectionObject.y[8]);// + instance.zoomHandler.offset[1];
 		d3.select(currentSelection).attr('x', posX);
@@ -767,7 +766,7 @@ var SpeciesMap = (function() {
 		d3.select(currentSelection).select("image").attr("transform", rotation);
 		d3.select(currentSelection).attr("width", function(d) { return instance.chartScaler.ContinentScaleLon(currentSelectionObject.width[8]); });
 		d3.select(currentSelection).attr("height", function(d) { return instance.chartScaler.ContinentScaleLat(currentSelectionObject.height[8]); });
-	}
+	}*/
 
 	function CalculateIndexes() {
 	    var currentSliderVal = -slider.value();
@@ -833,7 +832,6 @@ Initialization
 				instance.width = d3.select(instance.divSelector).node().getBoundingClientRect().width;
 				instance.height =d3.select(instance.divSelector).node().getBoundingClientRect().height;
 				
-				
 				instance.svgDisplay = d3.select(instance.divSelector).append("svg")
 					.attr("id", "svgSurface")
 					.attr("width", instance.width + "px")
@@ -861,8 +859,7 @@ Initialization
 					"minimap": instance.svgDisplay.append("svg")
 				};
 				
-				
-				//set up the minimap
+				//Set up the minimap
 				var scale = 0.2;
 				var xPos = instance.width - (instance.width * scale);
 				var yPos = instance.height - (instance.height * scale);
@@ -876,10 +873,6 @@ Initialization
 					.attr("overflow", "hidden")
 					.append("rect").attr("width", "100%").attr("height", "100%").attr("fill", "black");
 							
-				
-				
-				
-				
 				instance.zoomHandler.startZoom(function(e) {
 				});
 
@@ -911,8 +904,8 @@ Initialization
 					specieYDomain: [90, -90]
 					
     			});
-				
-				//fix up clustering for species
+
+				//Fix up clustering for species
 				instance.clusterDomain = [instance.zoomHandler.minZoom, instance.zoomHandler.maxZoom];
 				instance.clusterScale.domain(instance.clusterDomain).range(instance.clusterRange);
 			}
@@ -923,7 +916,6 @@ Initialization
 				instance.updateCreatureListing(-slider.value());
 			});
 			
-	
 			if(instance._onYearChanged) instance._onYearChanged(null, -slider.value());
 			return instance;
 		}
