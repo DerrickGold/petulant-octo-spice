@@ -39,6 +39,18 @@ var SpeciesMap = (function() {
 			creaturesInstanced: false,
 			creatureInstantiatedList: [],
 			creatureCache: null,
+				
+			
+			//a list of all species (from SpeciesList.data)
+			//for the current time period.
+			//this is the list of species to draw on screen
+			currentTimePeriod: null,
+			
+			//our main initial species list from file
+			speciesList: {},
+			customSpeciesList: [],
+			
+			
 			
 			clusterScale: d3.scale.linear().clamp(true),
 			clusterPerSpecie: 10,
@@ -80,17 +92,15 @@ var SpeciesMap = (function() {
 					v(e, s);
 				}
 			},			
-			
-				
-			
-			//a list of all species (from SpeciesList.data)
-			//for the current time period.
-			//this is the list of species to draw on screen
-			currentTimePeriod: null,
-			
-			//our main initial species list from file
-			speciesList: {},
-			
+			//set up callback system for when creatures are
+			//instantiating
+			_onSpecieFetched: null,
+			onSpecieFetched: function(v) {
+				instance._onSpecieFetched = function(e, s) {
+					v(e, s);
+				}
+			},			
+
 			
 			
 			//generate an object with overall statistics for the visualization
@@ -333,6 +343,10 @@ var SpeciesMap = (function() {
 											   instance.clusterPoints(s.locations, 0.7)
 											  ];
 
+								
+								if(instance._onSpecieFetched)
+									instance._onSpecieFetched(null, specie);
+								
 								setTimeout(function() {
 									specie.dataFetched = true;
 									$(instance.divSelector).trigger("NewCreatureReady", [specie]);
@@ -451,12 +465,17 @@ var SpeciesMap = (function() {
 				if(instance._onCreatureStartUpdate)
 					instance._onCreatureStartUpdate(null, null);
 				
+				var list = null;
+				if(!instance.customSpeciesList.length) 
+					list = instance.speciesList.data;
+				else
+					list = instance.customSpeciesList;
 				
 				//instance.creatureInstantiatedList
-				instance.currentTimePeriod = instance.speciesList.data.filter(function(c) {
+				instance.currentTimePeriod = list.filter(function(c) {
 					
 					var id = String(c.id);
-					if(c.dataFetched  && c.dates && year < c.dates[0] && year > c.dates[1]) {
+					if(c.dataFetched  && ((c.dates && year < c.dates[0] && year > c.dates[1]) || instance.customSpeciesList.length)) {
 						//only recreate creatures as their timeline shifts
 						if(!instance.creatureInstantiatedList[id]) {
 							if(instance._onCreatureUpdate) instance._onCreatureUpdate(true, c);
@@ -499,6 +518,37 @@ var SpeciesMap = (function() {
 						return "block";
 					});
 				}
+			},
+			
+			makeCustomSpecieList: function(specieID) {
+				console.log(specieID);
+				var specie = instance.speciesList.data.filter(function(c) {
+					return parseInt(c.id) == parseInt(specieID);
+				})[0];
+				
+				instance.customSpeciesList.push(specie);
+			},
+			
+			clearCustomSpecieList: function() {
+				instance.customSpeciesList = [];
+				instance.updateCreatureListing(-slider.value());	
+				instance.instantiateAllCreatures();
+			},
+			
+			//with a custom list, we are displaying species regardless of their year
+			//as well as 
+			displayCustomList: function() {
+				//reset all currently instantiated creatures
+				instance.creatureInstantiatedList.forEach(function(i) {
+					if(instance._onCreatureUpdate) instance._onCreatureUpdate(false, i);
+					
+					i.hide = false;
+					instance.creatureInstantiatedList[String(i.id)] = false;
+				});
+				d3.selectAll(".creature").remove();
+				instance.updateCreatureListing(0);	
+				instance.instantiateAllCreatures();
+				
 			}
 		}
 	}

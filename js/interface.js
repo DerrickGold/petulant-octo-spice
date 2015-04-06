@@ -14,10 +14,37 @@ function initCallBacks(chart) {
 	var remainsScale = d3.scale.linear();
 	var remainsDomain = [0, 0];
 	//want the output to match the width of our creature listing box
-	var remainsRange = [2, 250];
+	var remainsRange = [2, leftOffset];
 	remainsScale.range(remainsRange);
 
+	var autoCompleteSource = [];
+			
+	$('#autocomplete').autocomplete({
+		source: [],
+		select: function(e, o) {
+			e.preventDefault();
+			chart.makeCustomSpecieList(o.item.value);
+			chart.displayCustomList();
+		}
+	});
+	
 
+	$('#clearButton').on('click', function() {
+		
+		chart.clearCustomSpecieList();
+	});
+	
+	
+	chart.onSpecieFetched(function(e, specie) {
+		
+		if(!autoCompleteSource)
+			autoCompleteSource = [];
+		
+		autoCompleteSource.push({label: specie.name, value: specie.id});
+		
+		$('#autocomplete').autocomplete("option", "source", autoCompleteSource);	
+		console.log("updating auto complete");
+	});
 
 	//set up callbacks for chart actions
 	chart.onCreatureClick(function(e, creature) {
@@ -64,13 +91,13 @@ function initCallBacks(chart) {
 						.attr("count", c.locations.length)
 						.css("width", remainsScale(c.locations.length))
 						.css("height", "20")
-						.css("background-color", "red")
-						.css("overflow", "visible");
+						.css("background-color", "red");
+						//.css("overflow", "visible");
 
 
 
 
-			var name = $(document.createElement("p")).text(c.name).appendTo(bar);
+			var name = $(document.createElement("div")).text(c.name).appendTo(bar);
 			nameEntry.append(bar);
 
 			//if list is empty, just add the creature

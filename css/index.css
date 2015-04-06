@@ -11,64 +11,108 @@ html, body {
 
 #titleBox {
 	padding: 0;
-	height: 120px;
-	width: 1024px;
-	margin-left: auto;
-	margin-right: auto;
+	height: 80px;
 	text-align: center;
-	
 	background-size: cover;
 	background-position: center;
 	vertical-align: middle;
-	line-height: 120px;
-	padding-bottom: 5px;
+	
+	
 }
 
-#titleBox div {
-	font-size: 150%;
+#titleText {
+	background-color: rgba(0,0,0,0.8);
+	line-height: 80px;
+	width: 1024px;
+	font-size: 200%;
 	color: white;
 	padding: 0;
 	margin: 0;
+	
+}
+
+#navBar {
+	padding: 0;
+	margin-top: 0;
+	margin-bottom: 0;
+	height: 40px;
+	width: 1024px;
+	color: white;
+	vertical-align: middle;
 	background-color: rgba(0,0,0,0.8);
 }
 
-.PageContent {
-	width: 1024px;
-	height: 500px;
+#navBar ul {
+	padding: 0;
+	
+	list-style-type: none;
+	margin: 0;
+	display: inline;
+	float: left;
+	width: auto;
+}
+
+#navBar li {
+	display: inline;
+	padding:0;
+	margin: 0;
+	margin-left: 25px;
+	line-height: 40px;
+	text-decoration: underline;
+}
+
+#searchBar {
+	float: right;
+	display: inline;
+	line-height: 40px;
+	margin-right: 25px;
+}
+
+
+
+.CeneteredContent {
 	margin-left: auto;
 	margin-right: auto;
+	width: 1024px;
+}
+
+
+.PageContent {
+	padding-top: 5px;
+	height: 500px;
 	white-space:nowrap;
-	/*height: 93%;*/
 }
 
 .CreaturesBox {
-	min-width: 250px;
+	min-width: 245px;
 	float: left;
-	background: rgba(128,128,128, 0.85);
 	height: 100%;
 	max-height:100%;
-	
 	position: relative;
 	margin: 0;
-	padding: 0;
 	vertical-align: top;
-	overflow-x:hidden;
+	overflow:hidden;
+	padding-right: 5px;
 }
 
 #CreaturesBoxTitle {
-	text-decoration: underline;
 	text-align: center;
+	background: rgba(0,0,0,0.8);
+	color: white;
 	
 }
 
 .CreaturesList {
+	background: rgba(128,128,128, 0.85);
 	margin: 0;
 	padding: 0;
-	width: 100%;
+	width: 260;
 	height: 100%;
+	overflow-x: hidden;
 	overflow-y: auto;
 
 }
+
 
 .chartContainer {
 	width: 774px;
@@ -94,7 +138,13 @@ html, body {
 	cursor:pointer;
 }
 
+.creatureFilter {
+	padding: 0;
+	margin: 0;
+}
+
 #sliderContent {
 	padding-top: 5px;
 }
+
 

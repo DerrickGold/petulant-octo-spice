@@ -13,6 +13,10 @@
 		<link rel="stylesheet" type="text/css" href="css/index.css"/>
 		<link rel="stylesheet" type="text/css" href="css/lightbox.css"/>
 		<link rel="stylesheet" type="text/css" href="css/d3.slider.css" media="screen"/>
+		
+		<!--add jquery ui for auto complete box-->
+		<link rel="stylesheet" href="//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">
+		  <script src="//code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
     </head>
 
 		
@@ -35,9 +39,9 @@
 			});
 
 			
-			initCallBacks(chart);
-			
-			
+			initCallBacks(chart);		
+				
+
 			
 			
 			//Tick formatter
@@ -64,15 +68,25 @@
 
 			chart.loadData();
 			setChart(chart);
-			
+
 		});
 		</script>
-
-		<div id="titleBox">
-			<div>Map of Species</div>
+		<div class="CeneteredContent" id="titleBox">
+			<div id="titleText">Map of Species</div>
+		</div>
+		
+		<div class="CeneteredContent" id="navBar">
+			<ul>
+				<li id="aboutButton">About</li>
+			</ul>
+			<form id="searchBar">
+				<label for="search">Search for specie:</label>
+				<input name="search" type="text" id="autocomplete">
+				<button name="clear" type="button" id="clearButton">Clear</button>
+			</form>
 		</div>
 
-		<div class="PageContent">
+		<div class="CeneteredContent PageContent">
 			<div class="CreaturesBox">
 				<div id="CreaturesBoxTitle">Species</div>
 				<div class="CreaturesList"></div>
@@ -81,7 +95,7 @@
 			<div class="chartContainer"></div>
 		</div>
 		
-		<div class="PageContent" id="sliderContent">
+		<div class="CeneteredContent" id="sliderContent">
 			<div id="slider"></div>
 		</div>
 		
