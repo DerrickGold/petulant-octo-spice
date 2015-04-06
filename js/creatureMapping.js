@@ -258,7 +258,7 @@ var SpeciesMap = (function() {
 							.attr("fill", "none");
 						
 					} else {
-						instance.viewPortMM.remove();
+						if(instance.viewPortMM) instance.viewPortMM.remove();
 						instance.viewPortMM = null;
 					}
 				}, 800);
@@ -377,15 +377,7 @@ var SpeciesMap = (function() {
 					instance.continentData = dataset;
 					
 					instance.continents = instance.createContinents("background", path, dataset);
-					
-
-					
-					
-				
 					instance.continentMM = 	instance.createContinents("minimap", path, dataset);
-					
-					
-					//instance.continents = instance.createContinents("background", dataset);
 					instance.draw(instance.zoomHandler.offset, instance.zoomHandler.zoom);
 				});
 				

@@ -4,21 +4,46 @@ this restablishes that time information when comparing species of different time
 by drawing their relation to the time slider
 
 */
+
 function mapSpecieToSlider(slider, specie) {
-	console.log(specie);
-	var position = slider.getValuePos(specie.dates[0]);
+	var position = getPixelCount(specie.dates[0]) + 25;
 	
-	console.log(position);
+	var timeLineMapSVG = d3.select(".d3slider-axis");
+
+	var creature = timeLineMapSVG.append("svg")
+		.attr("class", function() {
+			return "SpecieTime";
+		})
+		.attr('x', position - 25)
+		.attr('y', 75)
+		.attr("width", "50px").attr("heigth", "50px")
+		//link the image up to the creature
+		.append("image")
+		.attr("xlink:href", function(d){
+			return  "creatureIcons/" + specie.name.replace(' ', '') + ".png";
+		})
+		.attr("width", "50px").attr("height", "50px");
 	
-	var container = $(document.createElement("div")).addClass("SpecieTimeIcon").css("left", position);
 	
 	
-		container.append($(document.createElement("img")).attr("src", "creatureIcons/" + specie.name.replace(' ', '') + ".png")
-				.css("width", "100%").css("height", "auto"));
 	
-	
-	$("#sliderContent").append(container);
+	var y1 = 0;
+	var y2 = 75;
+	//now create line to draw ontop of the slider
+	timeLineMapSVG.append("line").attr("id", "sliderMappingLine")
+					.attr("x1", position).attr("x2", position)
+					.attr("y1", y1).attr("y2", y2);
+					
 }
+
+function clearSpecieSliderMap() {
+	d3.selectAll("#sliderMappingLine").remove();
+	d3.selectAll(".SpecieTime").remove();
+}
+
+
+
+
 /*=============================================================================
 Initialize all callbacks that update the html interface from the data changes
 in the d3 application side.
@@ -51,8 +76,8 @@ function initCallBacks(slider, chart) {
 	
 
 	$('#clearButton').on('click', function() {
-		
 		chart.clearCustomSpecieList();
+		clearSpecieSliderMap();
 	});
 	
 	
