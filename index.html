@@ -23,13 +23,7 @@
     <body>
 		<script>
 		$(document).ready(function(){
-			/*$(".chartContainer").css("width", function() {
-				return window.innerWidth - leftOffset + "px";
-			});
-			*/
-			
 
-			
 			var chart = SpeciesMap.init({
 				divSelector: ".chartContainer",
 				xPadding: 0,
@@ -38,12 +32,6 @@
 				height: 500
 			});
 
-			
-			
-				
-
-			
-			
 			//Tick formatter
 			var formatter = d3.format(",.0f");
 			//Initialize slider
@@ -60,6 +48,11 @@
 							});
 			//Render the slider into the div
 			d3.select("#slider").call(slider);
+			/*d3.select("#slider").on("mousemove", function(d, i) {
+				var beginning
+				console.log((d3.mouse(this)[0] - 23));
+				//console.log(976 - (100 * 3.904));
+			});*/
 
 	
 			//Set the current and previous slider values
@@ -72,7 +65,6 @@
 			
 			chart.loadData();
 			setChart(chart);
-
 		});
 		</script>
 		<div class="CeneteredContent" id="titleBox">
