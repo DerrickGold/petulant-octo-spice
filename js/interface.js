@@ -19,21 +19,74 @@ function mapSpecieToSlider(slider, specie) {
 
 	
 	var maxDisplay = 10;//space out lines for best drawing of 10 elements
+	var specieNum = chart.customSpeciesList.length;
+	var speciePosScale = d3.scale.linear().domain([0, maxDisplay]).range([position, position2]);
+	
+	var speciePos = speciePosScale(specieNum);
 	
 	var y1 = 25;//offset of where the top of the sliderbar starts
 	var y2 = 90;//offset of where to draw specie icons
 	var base = 50;//offset of the bottom of the year text is drawn on the time slider
 	//y position to draw the horizontal line between the two dates of a given specie
-	var newY = ((chart.customSpeciesList.length/maxDisplay) * (y2 - base)) + base;
+	var newY = ((specieNum/maxDisplay) * (y2 - base)) + base;
 	
+	
+	var className = ".sliderMappingLine mapLine" + specie.name.replace(' ', '');
+
+	
+	
+	var colors = lineColors,
+		col =  colors(specieNum);
+	
+	var defWidth = 2;
+
+	//first date line
+	var lines = [	timeLineMapSVG.append("line").attr("class", className)
+						.attr("x1", position).attr("x2", position)
+						.attr("y1", y1).attr("y2", newY)
+						.attr("stroke", col).attr("stroke-width", defWidth),
+	
+					//horizontal line
+					timeLineMapSVG.append("line").attr("class", className)
+						.attr("x1", position).attr("x2", position2)
+						.attr("y1", newY).attr("y2", newY)
+						.attr("stroke", col).attr("stroke-width", defWidth),
+
+					//end date line
+					timeLineMapSVG.append("line").attr("class", className)
+						.attr("x1", position2).attr("x2", position2)
+						.attr("y1", y1).attr("y2", newY)
+						.attr("stroke", col).attr("stroke-width", defWidth),
+
+	
+					//line to creature
+					timeLineMapSVG.append("line").attr("class", className)
+						.attr("x1", speciePos).attr("x2", speciePos)
+						.attr("y1", newY).attr("y2", y2)
+						.attr("stroke", col).attr("stroke-width", defWidth)
+				];
+
 	
 	var creature = timeLineMapSVG.append("svg")
 		.attr("class", function() {
 			return "SpecieTime";
 		})
-		.attr('x', position - 25)
+		.attr('x', speciePos - 25)
 		.attr('y', y2)
-		.attr("width", "50px").attr("heigth", "50px")
+		.attr("width", "50px").attr("height", "50px")
+		.on("mouseenter", function() {
+			console.log("clicked");
+			//d3.selectAll(className).attr("stroke", "white");	
+			lines.forEach(function(line) {
+				line.attr("stroke", "white");
+			});
+		})
+		.on("mouseleave", function() {
+			lines.forEach(function(line) {
+				line.attr("stroke", col).style("stroke-width", 2);
+			});
+		})	
+	
 		//link the image up to the creature
 		.append("image")
 		.attr("xlink:href", function(d){
@@ -43,30 +96,6 @@ function mapSpecieToSlider(slider, specie) {
 			return specie.name + ": " + specie.dates[0] + "mya - " + specie.dates[1] + "mya";	
 		})
 		.attr("width", "50px").attr("height", "50px");
-	
-	
-		var colors = lineColors,
-			col =  colors(chart.customSpeciesList.length);
-	
-	
-
-	//now create line to draw ontop of the slider
-	timeLineMapSVG.append("line").attr("class", "sliderMappingLine")
-					.attr("x1", position).attr("x2", position)
-					.attr("y1", y1).attr("y2", y2)
-					.attr("stroke", col);
-	
-	timeLineMapSVG.append("line").attr("class", "sliderMappingLine")
-				.attr("x1", position).attr("x2", position2)
-				.attr("y1", newY).attr("y2", newY)
-				.attr("stroke", col);
-	
-		//now create line to draw ontop of the slider
-	timeLineMapSVG.append("line").attr("class", "sliderMappingLine")
-					.attr("x1", position2).attr("x2", position2)
-					.attr("y1", y1).attr("y2", newY)
-					.attr("stroke", col);
-
 }
 
 function clearSpecieSliderMap() {
@@ -75,7 +104,27 @@ function clearSpecieSliderMap() {
 }
 
 
+function activateUserSpeciesMode() {
+	
+	if(!$("#clearButton").length) {
+		$("#CreaturesBoxTitle").text("Your Selected Species").addClass("active");
+		
+		
+		var button = $(document.createElement("button"))
+							.attr("type", "button").attr("id", "clearButton")
+							.text("Clear Selected Species");
 
+		button.on('click', function() {
+			chart.clearCustomSpecieList();
+			clearSpecieSliderMap();
+			$("#CreatureBoxListClip").css("height", "480px");
+			$(this).remove();
+		});
+
+		$("#CreatureBoxListClip").css("height", "460px");
+		$(".CreaturesBoxControls").append(button);
+	}		
+}
 
 /*=============================================================================
 Initialize all callbacks that update the html interface from the data changes
@@ -107,25 +156,7 @@ function initCallBacks(slider, chart) {
 				chart.displayCustomList();
 				mapSpecieToSlider(slider, s);				
 			});
-			$("#CreaturesBoxTitle").text("Your Selected Species").addClass("active");
-			
-			//<button name="clear" type="button" id="clearButton">Clear</button>
-			if(!$("#clearButton").length) {
-				var button = $(document.createElement("button"))
-									.attr("type", "button").attr("id", "clearButton")
-									.text("Clear Selected Species");
-				
-				button.on('click', function() {
-					chart.clearCustomSpecieList();
-					clearSpecieSliderMap();
-					$("#CreatureBoxListClip").css("height", "480px");
-					$(this).remove();
-				});
-				
-				$("#CreatureBoxListClip").css("height", "460px");
-				$(".CreaturesBoxControls").append(button);
-				//$(".CreaturesBoxControls").append(button);
-			}
+			activateUserSpeciesMode();
 		}
 	});
 	
@@ -196,9 +227,7 @@ function initCallBacks(slider, chart) {
 
 			var bar = $(document.createElement("div")).addClass("remainsChart")
 						.attr("count", c.locations.length)
-						.css("width", remainsScale(c.locations.length))
-						.css("height", "20")
-						.css("background-color", "red");
+						.css("width", remainsScale(c.locations.length));
 						//.css("overflow", "visible");
 
 

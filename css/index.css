@@ -9,6 +9,14 @@ html, body {
 	overflow: hidden;
 }
 
+.HiddenInfoBox {
+	display: none;
+}
+/*=============================================================================
+Title Box, and Nav bar elements
+
+
+=============================================================================*/
 #titleBox {
 	padding: 0;
 	height: 80px;
@@ -70,12 +78,16 @@ html, body {
 
 
 
+/*=============================================================================
+Content sandwiched between the titlebox and the slider
+
+
+=============================================================================*/
 .CeneteredContent {
 	margin-left: auto;
 	margin-right: auto;
 	width: 1024px;
 }
-
 
 .PageContent {
 	padding-top: 5px;
@@ -83,6 +95,12 @@ html, body {
 	white-space:nowrap;
 }
 
+
+/*=============================================================================
+Species Box on the left
+
+
+=============================================================================*/
 .CreaturesBox {
 	min-width: 245px;
 	float: left;
@@ -123,21 +141,6 @@ html, body {
 
 }
 
-
-.chartContainer {
-	width: 774px;
-	height: 100%;
-	display: inline-block;
-	background: #368caf;
-	padding: 0;
-	margin: 0;
-	vertical-align: top; 
-}
-
-.HiddenInfoBox {
-	display: none;
-}
-
 .CreatureListOff {
 	text-decoration: line-through;
 	margin: 0;
@@ -164,10 +167,47 @@ html, body {
 	margin: 0;
 }
 
+
+/*
+	The chart that goes behind the species name
+*/
+.remainsChart {
+	background-color: lightblue;
+	height: 100%;
+}
+
+#clearButton {
+	position: relative;
+	height: 20px;
+	width: 100%;
+}
+
+
+/*=============================================================================
+Our Map Container
+
+
+=============================================================================*/
+
+.chartContainer {
+	width: 774px;
+	height: 100%;
+	display: inline-block;
+	background: #368caf;
+	padding: 0;
+	margin: 0;
+	vertical-align: top; 
+}
+
+
+
+/*=============================================================================
+The slider bar section
+
+=============================================================================*/
 #sliderContent {
 	padding-top: 5px;
 }
-
 
 .SpecieTimeIcon {
 	position: absolute;
@@ -176,9 +216,5 @@ html, body {
 	height: 50px;
 }
 
-#clearButton {
-	position: relative;
-	height: 20px;
-	width: 100%;
-	
-}
+
+
