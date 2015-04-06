@@ -260,10 +260,7 @@ var SpeciesMap = (function() {
 							.attr("width", instance.width/scale)
 							.attr("height", instance.height/scale)
 							.attr("x", -translation[0]/scale)
-							.attr("y", -translation[1]/scale)
-							.attr("stroke", "darkgreen")
-							.attr("stroke-width", 10)
-							.attr("fill", "none");
+							.attr("y", -translation[1]/scale);
 						
 					} else {
 						if(instance.viewPortMM) instance.viewPortMM.remove();

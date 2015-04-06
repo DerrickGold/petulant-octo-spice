@@ -200,7 +200,14 @@ Our Map Container
 	vertical-align: top; 
 }
 
-
+/*
+The screen representative box on the minimap
+*/
+#viewport {
+	stroke: red;
+	stroke-width: 10;
+	fill: none;
+}
 
 /*=============================================================================
 The slider bar section
