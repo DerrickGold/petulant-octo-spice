@@ -2,6 +2,18 @@ var continents = [];
 var continentObjects = [];
 var chart = null;
 
+/****************************************************************************************************
+ * Description: This is a helper function. Assuming a coordinate system that starts at (0, 0) based *
+ *              at the beginning of 250 MYA, this function gets how many pixels along the X-Axis it *
+ *              would take to draw a line to any year.                                              *
+ * Syntax: var pixelAmount = getPixelCount(year);                                                   *
+ * Values: year = The year you want to get the pixel count for along the X-Axis                     *
+ * Returns: How many pixels it will take to draw a line from 250 MYA to the passed in year.         *
+ ****************************************************************************************************/
+function getPixelCount(year) {
+  return (976 - (year * 3.904));
+}
+
 function addContinent(cont, obj) {
   continents.push(cont);
   continentObjects.push(obj);
