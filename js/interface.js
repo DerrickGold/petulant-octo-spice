@@ -4,40 +4,73 @@ this restablishes that time information when comparing species of different time
 by drawing their relation to the time slider
 
 */
+var lineColors = d3.scale.category20b();
 
 function mapSpecieToSlider(slider, specie) {
-	var position = getPixelCount(specie.dates[0]) + 25;
+	/*
+	
+		All the x positioning here will break if we ever
+		move the slider bar... oh well.
+	*/
+	var position = getPixelCount(specie.dates[0]) + 25,
+		position2 = getPixelCount(specie.dates[1]) + 25;
 	
 	var timeLineMapSVG = d3.select(".d3slider-axis");
 
+	
+	var maxDisplay = 10;//space out lines for best drawing of 10 elements
+	
+	var y1 = 25;//offset of where the top of the sliderbar starts
+	var y2 = 90;//offset of where to draw specie icons
+	var base = 50;//offset of the bottom of the year text is drawn on the time slider
+	//y position to draw the horizontal line between the two dates of a given specie
+	var newY = ((chart.customSpeciesList.length/maxDisplay) * (y2 - base)) + base;
+	
+	
 	var creature = timeLineMapSVG.append("svg")
 		.attr("class", function() {
 			return "SpecieTime";
 		})
 		.attr('x', position - 25)
-		.attr('y', 75)
+		.attr('y', y2)
 		.attr("width", "50px").attr("heigth", "50px")
 		//link the image up to the creature
 		.append("image")
 		.attr("xlink:href", function(d){
 			return  "creatureIcons/" + specie.name.replace(' ', '') + ".png";
 		})
+		.attr("title", function() {
+			return specie.name + ": " + specie.dates[0] + "mya - " + specie.dates[1] + "mya";	
+		})
 		.attr("width", "50px").attr("height", "50px");
 	
 	
+		var colors = lineColors,
+			col =  colors(chart.customSpeciesList.length);
 	
 	
-	var y1 = 0;
-	var y2 = 75;
+
 	//now create line to draw ontop of the slider
-	timeLineMapSVG.append("line").attr("id", "sliderMappingLine")
+	timeLineMapSVG.append("line").attr("class", "sliderMappingLine")
 					.attr("x1", position).attr("x2", position)
-					.attr("y1", y1).attr("y2", y2);
-					
+					.attr("y1", y1).attr("y2", y2)
+					.attr("stroke", col);
+	
+	timeLineMapSVG.append("line").attr("class", "sliderMappingLine")
+				.attr("x1", position).attr("x2", position2)
+				.attr("y1", newY).attr("y2", newY)
+				.attr("stroke", col);
+	
+		//now create line to draw ontop of the slider
+	timeLineMapSVG.append("line").attr("class", "sliderMappingLine")
+					.attr("x1", position2).attr("x2", position2)
+					.attr("y1", y1).attr("y2", newY)
+					.attr("stroke", col);
+
 }
 
 function clearSpecieSliderMap() {
-	d3.selectAll("#sliderMappingLine").remove();
+	d3.selectAll(".sliderMappingLine").remove();
 	d3.selectAll(".SpecieTime").remove();
 }
 
@@ -68,9 +101,13 @@ function initCallBacks(slider, chart) {
 		source: [],
 		select: function(e, o) {
 			e.preventDefault();
-			chart.makeCustomSpecieList(o.item.value.id);
-			chart.displayCustomList();
-			mapSpecieToSlider(slider, o.item.value);
+			
+			//check if specie is already selected
+			chart.addToCustomSpecieList(o.item.value.id, function(s) {
+				chart.displayCustomList();
+				mapSpecieToSlider(slider, s);				
+			});
+
 		}
 	});
 	

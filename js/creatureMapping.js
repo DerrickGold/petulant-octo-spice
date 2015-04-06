@@ -198,7 +198,7 @@ var SpeciesMap = (function() {
 			}, 
 			
 			redraw: function() {
-				this.draw(this.zoomHandler.offset, this.zoomHandler.zoom);	
+				instance.draw(this.zoomHandler.offset, this.zoomHandler.zoom);	
 			},
 
 			
@@ -253,8 +253,8 @@ var SpeciesMap = (function() {
 							.attr("height", instance.height/scale)
 							.attr("x", -translation[0]/scale)
 							.attr("y", -translation[1]/scale)
-							.attr("stroke", "red")
-							.attr("stroke-width", 5)
+							.attr("stroke", "darkgreen")
+							.attr("stroke-width", 10)
 							.attr("fill", "none");
 						
 					} else {
@@ -471,6 +471,8 @@ var SpeciesMap = (function() {
 						var anchoredY = d.continent.anchorY + d.continent.cData.yPos;
 						return instance.chartScaler.specieYScale(anchoredY) + translation[1];
 					})
+					.attr("width", "50px")
+					.attr("height", "50px")
                     .on('click', function(d, e) { 
 						//console.log(d);
 						if(instance._onCreatureClick){
@@ -488,7 +490,8 @@ var SpeciesMap = (function() {
 					})
 					.attr("width", "50px")
 					.attr("height", "50px")
-					.attr("preserveAspectRatio", "none");	
+					.attr("preserveAspectRatio", "none")
+					.attr("title", specie.name);
 				
 				return creatures;
 			},
@@ -591,13 +594,20 @@ var SpeciesMap = (function() {
 				}
 			},
 			
-			makeCustomSpecieList: function(specieID) {
-				console.log(specieID);
+			addToCustomSpecieList: function(specieID, cb) {
+				//check if specie is already in list
+				var check = instance.customSpeciesList.filter(function(c) {
+					return parseInt(c.id) == parseInt(specieID);
+				});
+				if(check.length) return;
+				
+				
 				var specie = instance.speciesList.data.filter(function(c) {
 					return parseInt(c.id) == parseInt(specieID);
 				})[0];
 				
 				instance.customSpeciesList.push(specie);
+				if(cb)cb(specie);
 			},
 			
 			clearCustomSpecieList: function() {
@@ -826,7 +836,7 @@ Initialization
 						instance.zoomHandler.offset[1] += d3.event.dy;
 						instance.zoomHandler.z.translate(instance.zoomHandler.offset);
 
-						instance.draw(instance.zoomHandler.offset, instance.zoomHandler.zoom);
+						instance.redraw();
 					}));
 				//Create background and add axis to it
 				instance.svgLayers = {

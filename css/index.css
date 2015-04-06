@@ -134,8 +134,13 @@ html, body {
 	padding: 0;
 }
 
-.creatureFilter:hover {
+.creatureFilter:hover, .creature:hover {
 	cursor:pointer;
+}
+
+.creature:hover {
+	width: 100px;
+	height: 100px;
 }
 
 .creatureFilter {

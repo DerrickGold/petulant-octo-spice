@@ -29,11 +29,7 @@
   shape-rendering: crispEdges;
 }
 
-.d3slider-axis line {
-    fill: none;
-    stroke: #000;
-    shape-rendering: crispEdges;
-}
+
 
 .d3slider text {
   font: 10px sans-serif;
@@ -86,8 +82,7 @@
   z-index: 1;
 }
 
-#sliderMappingLine {
-	stroke: white;
+.sliderMappingLine {
 	stroke-width: 2;
 }
 
