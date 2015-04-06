@@ -6,7 +6,8 @@ html, body {
 	white-space:nowrap;
 	background-image:url(../images/dinobg.jpg);
 	background-size:cover;
-	overflow: hidden;
+	overflow-x: hidden;
+	overflow-y: auto;
 }
 
 .HiddenInfoBox {
