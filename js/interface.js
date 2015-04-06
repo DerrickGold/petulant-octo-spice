@@ -39,7 +39,7 @@ function mapSpecieToSlider(slider, specie) {
 	var newY = ((specieNum/maxDisplay) * (y2 - base)) + base;
 	
 	
-	var className = ".sliderMappingLine mapLine" + specie.name.replace(' ', '');
+	var className = "sliderMappingLine";
 
 	
 	
