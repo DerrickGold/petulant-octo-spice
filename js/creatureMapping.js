@@ -230,11 +230,11 @@ var SpeciesMap = (function() {
 						})
 						.attr("width", function(d) {
 							d.newWidth = CalculateSliderPosition(sliderPosFirst, sliderPosSecond, currentSliderVal, d.width[firstIndex], d.width[secondIndex]);
-							return instance.chartScaler.ContinentScaleLon(d.newWidth) + "px";
+							return instance.chartScaler.ContinentScaleLon(Math.abs(d.newWidth)) + "px";
 						})
 						.attr("height", function(d) {
 							d.newHeight = CalculateSliderPosition(sliderPosFirst, sliderPosSecond, currentSliderVal, d.height[firstIndex], d.height[secondIndex]);
-							return instance.chartScaler.ContinentScaleLat(d.newHeight) + "px";
+							return instance.chartScaler.ContinentScaleLat(Math.abs(d.newHeight)) + "px";
 						})
 						.each(function(d) {
 							var img = d3.select(this).select("image");
@@ -269,7 +269,7 @@ var SpeciesMap = (function() {
 						if(instance.viewPortMM) instance.viewPortMM.remove();
 						instance.viewPortMM = null;
 					}
-				}, 800);
+				}, 20);
 			},
 			
 		/*=====================================================
@@ -869,12 +869,12 @@ Initialization
 				var scale = 0.2;
 				var xPos = instance.width - (instance.width * scale);
 				var yPos = instance.height - (instance.height * scale);
+				instance.svgLayers["minimap"] = instance.svgLayers["minimap"]
+					.attr("x", xPos)
+					.attr("y", yPos)
+					.append("g");
+				
 				instance.svgLayers["minimap"]
-					//.attr("width", "250")
-					//.attr("height", "250")
-					.attr("x", xPos / scale)
-					.attr("y", yPos / scale)
-					//.attr("viewBox", "0 0 " + instance.width + " " + instance.height)
 					.attr("transform", "scale(" + scale + ")")
 					.attr("overflow", "hidden")
 					.append("rect").attr("width", "100%").attr("height", "100%").attr("fill", "black");
