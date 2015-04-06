@@ -927,7 +927,7 @@ Initialization
 			});
 			
 	
-			
+			if(instance._onYearChanged) instance._onYearChanged(null, -slider.value());
 			return instance;
 		}
 	}

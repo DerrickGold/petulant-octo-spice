@@ -1,3 +1,11 @@
+function updateSpeciesBoxTitle(chart, year) {
+	if(!chart.isUsingCustomSpecieList()) {
+		$("#CreaturesBoxTitle")
+			.removeClass("active")
+			.text("Species " + parseFloat(year).toFixed(1) + " Million Years Ago");
+	}	
+}
+
 /*
 When a custom list of species are to be displayed, they lose their time information,
 this restablishes that time information when comparing species of different time periods
@@ -164,12 +172,8 @@ function initCallBacks(slider, chart) {
 
 	
 	
-	chart.onYearChanged(function(force, year) {
-		if(!chart.isUsingCustomSpecieList()) {
-			$("#CreaturesBoxTitle")
-				.removeClass("active")
-				.text("Species " + parseFloat(year).toFixed(1) + " Million Years Ago");
-		}
+	chart.onYearChanged(function(e, year) {
+		updateSpeciesBoxTitle(chart, year);
 	});
 	
 	
