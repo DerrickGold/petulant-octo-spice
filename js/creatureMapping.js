@@ -29,6 +29,7 @@ var SpeciesMap = (function() {
 			cullMax: 300,
 			
 			divSelector: null,
+			specieIconSelector: ".creature",
 			
 			//SVG surfaces
 			svgDisplay: null,
@@ -101,8 +102,15 @@ var SpeciesMap = (function() {
 				instance._onSpecieFetched = function(e, s) {
 					v(e, s);
 				}
-			},			
-
+			},	
+			
+			//set up callback system for when the year is changed
+			_onYearChanged: null,
+			onYearChanged: function(v) {
+				instance._onYearChanged = function(e, s) {
+					v(e, s);
+				}
+			},	
 			
 			
 			//generate an object with overall statistics for the visualization
@@ -314,7 +322,7 @@ var SpeciesMap = (function() {
 				instance.drawMiniMap(translation, scale);
 				//loop through all the species
 				if(!instance.creatureCache)
-					instance.creatureCache = instance.svgLayers["creatures"].selectAll(".creature");
+					instance.creatureCache = instance.svgLayers["creatures"].selectAll(instance.specieIconSelector);
 				
 				instance.creatureCache
 					.attr('x', function(d) {
@@ -574,12 +582,18 @@ var SpeciesMap = (function() {
 				
 			},
 			
+			
+			
 
 			moveContinent: function(continent, continentObject) {
-				instance.updateCreatureListing(-slider.value());
+				if(instance._movingContinents) return;
+				instance._movingContinents = true;
 				setTimeout(function() {
+					instance._movingContinents = false;
+					instance.updateCreatureListing(-slider.value());
+					if(instance._onYearChanged) instance._onYearChanged(null, -slider.value());
 					instance.redraw();
-				}, 250);
+				}, 30);
 			},
 			
 			toggleSpecie: function(specieID) {
@@ -614,6 +628,11 @@ var SpeciesMap = (function() {
 				instance.customSpeciesList = [];
 				instance.updateCreatureListing(-slider.value());	
 				instance.instantiateAllCreatures();
+				if(instance._onYearChanged) instance._onYearChanged(null, -slider.value());
+			},
+			
+			isUsingCustomSpecieList: function() {
+				return (instance.customSpeciesList.length > 0) ? true : false;	
 			},
 			
 			//with a custom list, we are displaying species regardless of their year
@@ -626,10 +645,9 @@ var SpeciesMap = (function() {
 					i.hide = false;
 					instance.creatureInstantiatedList[String(i.id)] = false;
 				});
-				d3.selectAll(".creature").remove();
+				d3.selectAll(instance.specieIconSelector).remove();
 				instance.updateCreatureListing(0);	
 				instance.instantiateAllCreatures();
-				
 			}
 		}
 	}

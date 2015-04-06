@@ -99,7 +99,17 @@ html, body {
 	text-align: center;
 	background: rgba(0,0,0,0.8);
 	color: white;
-	
+}
+
+#CreaturesBoxTitle.active {
+	text-align: center;
+	background: rgba(0,128,0,0.8);
+	color: white;	
+}
+
+#CreatureBoxListClip {
+	height: 480px;
+	overflow-y: hidden;
 }
 
 .CreaturesList {
@@ -138,6 +148,12 @@ html, body {
 	cursor:pointer;
 }
 
+.creatureFilter:hover {
+	font-size: 120%;
+	padding-bottom: 5px;
+	padding-top: 5px;
+}
+
 .creature:hover {
 	width: 100px;
 	height: 100px;
@@ -160,3 +176,9 @@ html, body {
 	height: 50px;
 }
 
+#clearButton {
+	position: relative;
+	height: 20px;
+	width: 100%;
+	
+}

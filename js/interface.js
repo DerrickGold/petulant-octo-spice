@@ -107,14 +107,38 @@ function initCallBacks(slider, chart) {
 				chart.displayCustomList();
 				mapSpecieToSlider(slider, s);				
 			});
-
+			$("#CreaturesBoxTitle").text("Your Selected Species").addClass("active");
+			
+			//<button name="clear" type="button" id="clearButton">Clear</button>
+			if(!$("#clearButton").length) {
+				var button = $(document.createElement("button"))
+									.attr("type", "button").attr("id", "clearButton")
+									.text("Clear Selected Species");
+				
+				button.on('click', function() {
+					chart.clearCustomSpecieList();
+					clearSpecieSliderMap();
+					$("#CreatureBoxListClip").css("height", "480px");
+					$(this).remove();
+				});
+				
+				$("#CreatureBoxListClip").css("height", "460px");
+				$(".CreaturesBoxControls").append(button);
+				//$(".CreaturesBoxControls").append(button);
+			}
 		}
 	});
 	
 
-	$('#clearButton').on('click', function() {
-		chart.clearCustomSpecieList();
-		clearSpecieSliderMap();
+
+	
+	
+	chart.onYearChanged(function(force, year) {
+		if(!chart.isUsingCustomSpecieList()) {
+			$("#CreaturesBoxTitle")
+				.removeClass("active")
+				.text("Species " + parseFloat(year).toFixed(1) + " Million Years Ago");
+		}
 	});
 	
 	
@@ -258,9 +282,4 @@ function initCallBacks(slider, chart) {
 		$(this).toggleClass('CreatureListOff');
 		chart.toggleSpecie($(this).attr('data-filter-id'));
 	});
-
-	
-	
-	
-	
 }
