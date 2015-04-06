@@ -39,7 +39,7 @@
 			});
 
 			
-			initCallBacks(chart);		
+			
 				
 
 			
@@ -61,11 +61,15 @@
 			//Render the slider into the div
 			d3.select("#slider").call(slider);
 
+	
 			//Set the current and previous slider values
 			currentSliderVal = -slider.value();
 			previousSliderVal = -slider.value();
 
 
+			initCallBacks(slider, chart);		
+			
+			
 			chart.loadData();
 			setChart(chart);
 

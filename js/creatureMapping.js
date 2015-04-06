@@ -35,6 +35,8 @@ var SpeciesMap = (function() {
 			svgLayers: null,
 			
 			continents: null,
+			continentMM: null, //minimap continents
+			viewPortMM: null, //viewport on minimap
 		
 			creaturesInstanced: false,
 			creatureInstantiatedList: [],
@@ -199,6 +201,69 @@ var SpeciesMap = (function() {
 				this.draw(this.zoomHandler.offset, this.zoomHandler.zoom);	
 			},
 
+			
+			drawMiniMap: function(translation, scale) {
+				CalculateIndexes();
+				var currentSliderVal = -slider.value();
+				//updating minimap is low importance, so just update every so often
+				if(instance._updateMinimap) return;
+				instance._updateMinimap = true;
+				
+				setTimeout(function() {
+					instance._updateMinimap = false;
+					instance.continentMM					
+						.attr('x', function(d) {
+							d.xPos = CalculateSliderPosition(sliderPosFirst, sliderPosSecond, currentSliderVal, d.x[firstIndex], d.x[secondIndex]);
+							return instance.chartScaler.xScale(d.xPos);
+						})
+						.attr('y', function(d) {
+							d.yPos = CalculateSliderPosition(sliderPosFirst, sliderPosSecond, currentSliderVal, d.y[firstIndex], d.y[secondIndex]);
+							return instance.chartScaler.yScale(d.yPos);
+						})
+						.attr("width", function(d) {
+							d.newWidth = CalculateSliderPosition(sliderPosFirst, sliderPosSecond, currentSliderVal, d.width[firstIndex], d.width[secondIndex]);
+							return instance.chartScaler.ContinentScaleLon(d.newWidth) + "px";
+						})
+						.attr("height", function(d) {
+							d.newHeight = CalculateSliderPosition(sliderPosFirst, sliderPosSecond, currentSliderVal, d.height[firstIndex], d.height[secondIndex]);
+							return instance.chartScaler.ContinentScaleLat(d.newHeight) + "px";
+						})
+						.each(function(d) {
+							var img = d3.select(this).select("image");
+								img.attr("transform", function(d) {
+								var posX = instance.chartScaler.xScale(d.xPos);
+								var posY = instance.chartScaler.yScale(d.yPos);
+								var newRot = CalculateSliderPosition(sliderPosFirst, sliderPosSecond, currentSliderVal, d.rot[firstIndex], d.rot[secondIndex]);
+								var rotation = "rotate(" + newRot  +")";
+								return rotation;
+							});
+
+						});	
+					
+					//once zoomed in, draw a square around the view port
+					if(scale > 1) {
+						if(!instance.viewPortMM) {
+							instance.viewPortMM = instance.svgLayers["minimap"].append("rect")
+														.attr("id", "viewport");
+						
+						}
+						
+						instance.viewPortMM
+							.attr("width", instance.width/scale)
+							.attr("height", instance.height/scale)
+							.attr("x", -translation[0]/scale)
+							.attr("y", -translation[1]/scale)
+							.attr("stroke", "red")
+							.attr("stroke-width", 5)
+							.attr("fill", "none");
+						
+					} else {
+						instance.viewPortMM.remove();
+						instance.viewPortMM = null;
+					}
+				}, 800);
+			},
+			
 		/*=====================================================
 		Draw
 		=====================================================*/
@@ -244,7 +309,9 @@ var SpeciesMap = (function() {
 						});
 					
 					});
+				
 
+				instance.drawMiniMap(translation, scale);
 				//loop through all the species
 				if(!instance.creatureCache)
 					instance.creatureCache = instance.svgLayers["creatures"].selectAll(".creature");
@@ -266,47 +333,59 @@ var SpeciesMap = (function() {
 		/*=====================================================
 		Load data
 		=====================================================*/
+			createContinents: function(layer, path, dataset) {
+				
+				var creature = instance.svgLayers[layer].selectAll()
+					.data(dataset).enter()
+					.append("svg")
+					.attr("class", "scaledData")
+					.attr("display", "inline-block")
+					.attr("overflow", "visible")
+					.each(function(d) {		
+						 addContinent(this, d);
+						d.xPos = d.x[0];
+						d.xPos = d.y[0];
+						d.drawWd = d.width[0];
+						d.drawHt = d.height[0];
+					})
+					//Do not comment this out for now - this is used to be able to click on continents and manually move them around
+					.on('click', function(d) { 
+						currentSelection = this;
+						currentSelectionObject = d;
+					})
+					.attr("width", function(d) { return instance.chartScaler.ContinentScaleLon(d.width[0]) + "px"; })
+					.attr("height", function(d) { return instance.chartScaler.ContinentScaleLat(d.height[0]) + "px";})
+					.attr("preserveAspectRatio", "none")
+					.attr("transform", function(d) { return d.rotation; })
+					.attr("primitiveUnits", "userSpaceOnUse")
+					
+				creature.append("g").append("image")
+					.attr("xlink:href", function(d){
+						return path + '/' + d.continent;
+					})
+					.attr("width", "100%")
+					.attr("height", "100%")
+					.attr("preserveAspectRatio", "none");
+				
+				return creature;
+			},
+			
 			loadData: function(fn) {
 				d3.json(dataFolder + "continents.json", function(e, dataset) {
 					var path = dataset.path;
 					dataset = dataset.data;
 					instance.continentData = dataset;
 					
-					instance.continents = instance.svgLayers["background"].selectAll()
-						.data(dataset).enter()
-						.append("svg")
-						.attr("class", "scaledData")
-					  	.attr("display", "inline-block")
-						.attr("overflow", "visible")
-					 	.each(function(d) {		
-						     addContinent(this, d);
-							d.xPos = d.x[0];
-							d.xPos = d.y[0];
-							d.drawWd = d.width[0];
-							d.drawHt = d.height[0];
-						})
-						//Do not comment this out for now - this is used to be able to click on continents and manually move them around
-						.on('click', function(d) { 
-							currentSelection = this;
-							currentSelectionObject = d;
-						})
-						.attr("width", function(d) { return instance.chartScaler.ContinentScaleLon(d.width[0]) + "px"; })
-						.attr("height", function(d) { return instance.chartScaler.ContinentScaleLat(d.height[0]) + "px";})
-						.attr("preserveAspectRatio", "none")
-						.attr("transform", function(d) { return d.rotation; })
-						.attr("primitiveUnits", "userSpaceOnUse")
+					instance.continents = instance.createContinents("background", path, dataset);
 					
-					instance.continents
-						.append("g").append("image")
-						.attr("xlink:href", function(d){
-							return path + '/' + d.continent;
-						})
-						.attr("width", "100%")
-						.attr("height", "100%")
-						.attr("preserveAspectRatio", "none");
+
 					
 					
+				
+					instance.continentMM = 	instance.createContinents("minimap", path, dataset);
 					
+					
+					//instance.continents = instance.createContinents("background", dataset);
 					instance.draw(instance.zoomHandler.offset, instance.zoomHandler.zoom);
 				});
 				
@@ -761,8 +840,28 @@ Initialization
 				instance.svgLayers = {
 					"background": instance.svgDisplay.append("svg").attr("id", "svgBG"),
 					"creatures": instance.svgDisplay.append("svg"),
-					"foreground": instance.svgDisplay.append("svg")
+					"foreground": instance.svgDisplay.append("svg"),
+					"minimap": instance.svgDisplay.append("svg")
 				};
+				
+				
+				//set up the minimap
+				var scale = 0.2;
+				var xPos = instance.width - (instance.width * scale);
+				var yPos = instance.height - (instance.height * scale);
+				instance.svgLayers["minimap"]
+					//.attr("width", "250")
+					//.attr("height", "250")
+					.attr("x", xPos / scale)
+					.attr("y", yPos / scale)
+					//.attr("viewBox", "0 0 " + instance.width + " " + instance.height)
+					.attr("transform", "scale(" + scale + ")")
+					.attr("overflow", "hidden")
+					.append("rect").attr("width", "100%").attr("height", "100%").attr("fill", "black");
+							
+				
+				
+				
 				
 				instance.zoomHandler.startZoom(function(e) {
 				});

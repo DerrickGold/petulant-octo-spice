@@ -1,9 +1,29 @@
+/*
+When a custom list of species are to be displayed, they lose their time information,
+this restablishes that time information when comparing species of different time periods
+by drawing their relation to the time slider
 
+*/
+function mapSpecieToSlider(slider, specie) {
+	console.log(specie);
+	var position = slider.getValuePos(specie.dates[0]);
+	
+	console.log(position);
+	
+	var container = $(document.createElement("div")).addClass("SpecieTimeIcon").css("left", position);
+	
+	
+		container.append($(document.createElement("img")).attr("src", "creatureIcons/" + specie.name.replace(' ', '') + ".png")
+				.css("width", "100%").css("height", "auto"));
+	
+	
+	$("#sliderContent").append(container);
+}
 /*=============================================================================
 Initialize all callbacks that update the html interface from the data changes
 in the d3 application side.
 =============================================================================*/
-function initCallBacks(chart) {
+function initCallBacks(slider, chart) {
 	var leftOffset = parseInt($(".CreaturesBox").css("min-width").replace("px", ''));
 	var topOffset = parseInt($("#titleBox").css("height").replace("px", ''));
 			
@@ -23,8 +43,9 @@ function initCallBacks(chart) {
 		source: [],
 		select: function(e, o) {
 			e.preventDefault();
-			chart.makeCustomSpecieList(o.item.value);
+			chart.makeCustomSpecieList(o.item.value.id);
 			chart.displayCustomList();
+			mapSpecieToSlider(slider, o.item.value);
 		}
 	});
 	
@@ -40,7 +61,7 @@ function initCallBacks(chart) {
 		if(!autoCompleteSource)
 			autoCompleteSource = [];
 		
-		autoCompleteSource.push({label: specie.name, value: specie.id});
+		autoCompleteSource.push({label: specie.name, value: specie});
 		
 		$('#autocomplete').autocomplete("option", "source", autoCompleteSource);	
 		console.log("updating auto complete");
@@ -175,5 +196,9 @@ function initCallBacks(chart) {
 		$(this).toggleClass('CreatureListOff');
 		chart.toggleSpecie($(this).attr('data-filter-id'));
 	});
-			
+
+	
+	
+	
+	
 }
