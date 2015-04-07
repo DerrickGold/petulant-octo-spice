@@ -83,7 +83,7 @@ function mapSpecieToSlider(slider, specie) {
 		.attr('y', y2)
 		.attr("width", "50px").attr("height", "50px")
 		.on("mouseenter", function() {
-			console.log("clicked");
+			//console.log("clicked");
 			//d3.selectAll(className).attr("stroke", "white");	
 			lines.forEach(function(line) {
 				line.attr("stroke", "white");
@@ -185,13 +185,13 @@ function initCallBacks(slider, chart) {
 		autoCompleteSource.push({label: specie.name, value: specie});
 		
 		$('#autocomplete').autocomplete("option", "source", autoCompleteSource);	
-		console.log("updating auto complete");
+		//console.log("updating auto complete");
 	});
 
 	//set up callbacks for chart actions
 	chart.onCreatureClick(function(e, creature) {
 
-		console.log(creature);				
+		//console.log(creature);				
 		var boxX = parseInt(creature.drawX + creature.width) + leftOffset;
 		var boxY = parseInt(creature.drawY + creature.height) + topOffset;
 
@@ -242,7 +242,7 @@ function initCallBacks(slider, chart) {
 
 			//if list is empty, just add the creature
 			if (!$(".creatureFilter").length) {
-				console.log("empty list!");
+				//console.log("empty list!");
 				$(".CreaturesList").append(nameEntry);
 				return; 
 			}
@@ -311,7 +311,7 @@ function initCallBacks(slider, chart) {
 	
 	//set listener to filter stuff
 	$('.CreaturesList').on('click', '.creatureFilter', function() {
-		console.log("click");
+		//console.log("click");
 		$(this).toggleClass('CreatureListOff');
 		chart.toggleSpecie($(this).attr('data-filter-id'));
 	});

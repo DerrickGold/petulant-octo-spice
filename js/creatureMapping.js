@@ -312,23 +312,20 @@ var SpeciesMap = (function() {
 				
 				instance.creatureCache
 					.attr('x', function(d) {
-						d.drawX = instance.chartScaler.specieXScale(d.continent.cData.xPos) + translation[0];
+						var anchoredX = d.continent.anchorX + d.continent.cData.xPos;
+						d.drawX = instance.chartScaler.specieXScale(anchoredX) + translation[0];
 						return d.drawX;
 					})
 					.attr('y', function(d) {
-						d.drawY = instance.chartScaler.specieYScale(d.continent.cData.yPos) + translation[1];
+						var anchoredY = d.continent.anchorY + d.continent.cData.yPos;
+						d.drawY = instance.chartScaler.specieYScale(anchoredY) + translation[1];
 						return d.drawY;
 					})
-					.select("image")
-					.attr('x', function(d) {
-						return d.continent.anchorX * 2;
-					})
-					.attr('y', function(d) {
-						return -d.continent.anchorY * 2;
-					})
 					.each(function(d) {
-						d3.select(this).attr("transform", function(d) {
-							var rotation = "rotate(" + d.continent.cData.continentRotation + ")";
+						d3.select(this).select("image").attr("transform", function(d) {
+							var rotAroundX = -d.continent.anchorX * 2;
+							var rotAroundY = d.continent.anchorY * 2;
+							var rotation = "rotate(" + d.continent.cData.continentRotation + ", " + rotAroundX + ", " + rotAroundY + ")";
 							return rotation;
 						});
 					});
@@ -457,12 +454,11 @@ var SpeciesMap = (function() {
 						d.height = 50;
 					})
 					.attr('x', function(d) {
-						console.log(d.continent);
-						var anchoredX = d.continent.cData.xPos;//d.continent.anchorX + d.continent.cData.xPos;
+						var anchoredX = d.continent.anchorX + d.continent.cData.xPos;
 						return instance.chartScaler.specieXScale(anchoredX) + translation[0];
 					})
 					.attr('y', function(d) {
-						var anchoredY = d.continent.cData.yPos;//d.continent.anchorY + d.continent.cData.yPos;
+						var anchoredY = d.continent.anchorY + d.continent.cData.yPos;
 						return instance.chartScaler.specieYScale(anchoredY) + translation[1];
 					})
 					.attr("width", "50px")
@@ -484,14 +480,19 @@ var SpeciesMap = (function() {
 					})
 					.attr("width", "50px")
 					.attr("height", "50px")
-					.attr('x', function(d) {
-						return d.continent.anchorX * 2;
-					})
-					.attr('y', function(d) {
-						return -d.continent.anchorY * 2;
-					})
+					.attr('x', "-25px")
+					.attr('y', "-25px")
 					.attr("preserveAspectRatio", "none")
-					.attr("title", specie.name);
+					.attr("title", specie.name)
+					.each(function(d) {
+						d3.select(this).attr("transform", function(d) {
+							var rotAroundX = -d.continent.anchorX * 2;
+							var rotAroundY = d.continent.anchorY * 2;
+
+							var rotation = "rotate(" + d.continent.cData.continentRotation + ", " + rotAroundX + ", " + rotAroundY + ")";
+							return rotation;
+						});
+					});
 				return creatures;
 			},
 			
