@@ -452,7 +452,8 @@ var SpeciesMap = (function() {
 						//console.log(d);
 						d.width = 50;
 						d.height = 50;
-						d.description = specie.description.description;
+						if(specie.description)
+							d.description = specie.description.description;
 					})
 					.attr('x', function(d) {
 						var anchoredX = d.continent.anchorX + d.continent.cData.xPos;
