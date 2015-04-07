@@ -179,7 +179,7 @@ var SpeciesMap = (function() {
 						var anchor = instance.findContinentAnchor(unGroup);
 
 						//otherwise, make a new group
-						groups.push({start: unGroup, inCluster: [], continent: anchor});
+						groups.push({start: unGroup, inCluster: [unGroup], continent: anchor});
 					}
 				});
 				return groups;
@@ -467,6 +467,7 @@ var SpeciesMap = (function() {
 						//console.log(d);
 						d.width = 50;
 						d.height = 50;
+						d.description = specie.description.description;
 					})
 					.attr('x', function(d) {
 						var anchoredX = d.continent.anchorX + d.continent.cData.xPos;

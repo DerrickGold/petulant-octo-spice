@@ -23,7 +23,6 @@
     <body>
 		<script>
 		$(document).ready(function(){
-
 			var chart = SpeciesMap.init({
 				divSelector: ".chartContainer",
 				xPadding: 0,
@@ -102,11 +101,22 @@
 		<!--HTML for our dinosaur popup-->
 		<div class="HiddenInfoBox">
 			<div class="InfoBox">
-				<div id="nameBox"></div>
-				<div id="picture"></div>
-				<div id="clusterInfo"></div>
-				<div id="specieInfo"></div>
-				<ul id="clusterList"></ul>
+				<div class="InfoBanner">
+					<div id="nameBox"></div>
+					
+					<div class="InfoBoxTabs">
+						<div id="specieInfo" class="infoTab">Description</div>
+						<div id="clusterInfo" class="infoTab"></div>
+						<div id="closeInfo" class="infoTab">Close</div>
+					</div>
+					
+				</div>
+				<div class="InfoContent">
+					<ul id="clusterList" class="resizeableTextBox"></ul>
+					<div id="aboutTextBox"class="resizeableTextBox"></div>	
+				</div>
+
+
 				<a href="#" id="eolURL" target="_blank">View Encyclopedia Page</a>
 			</div>
 		</div>
