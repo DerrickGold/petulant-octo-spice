@@ -1,5 +1,4 @@
 .d3slider {
-	z-index: 2;
 	background-color: rgba(0,0,0, 0.8);
 	padding:0;
 	margin: 0;
@@ -18,7 +17,6 @@
 
 .d3slider-axis {
   position: relative;
-  z-index: 1;
   cursor: pointer;
 }
 
@@ -53,7 +51,6 @@
 .dragger rect {
   fill: #71ACE3;
   stroke: none;
-  z-index: 3;
 }
 
 .dragger line {
@@ -79,7 +76,6 @@
 .overlay {
   fill: none;
   pointer-events: all;
-  z-index: 1;
 }
 
 .sliderMappingLine {
