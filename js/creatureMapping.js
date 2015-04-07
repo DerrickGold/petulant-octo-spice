@@ -323,8 +323,10 @@ var SpeciesMap = (function() {
 					})
 					.each(function(d) {
 						d3.select(this).select("image").attr("transform", function(d) {
-							var rotAroundX = (-d.continent.anchorX * 2 * scale);// * (d.continent.cData.newWidth / d.continent.cData.width[0]);
-							var rotAroundY = (d.continent.anchorY * 2 * scale);// * (d.continent.cData.newHeight / d.continent.cData.height[0]);
+							var rotAroundX = -(d.continent.anchorX * (d.continent.cData.newWidth / d.continent.cData.width[0])) * 2 * scale;
+								//(-d.continent.anchorX * 2 * scale);// * (d.continent.cData.newWidth / d.continent.cData.width[0]);
+							var rotAroundY = (d.continent.anchorY * (d.continent.cData.newHeight / d.continent.cData.height[0])) * 2 * scale;
+								//(d.continent.anchorY * 2 * scale);// * (d.continent.cData.newHeight / d.continent.cData.height[0]);
 							var rotation = "rotate(" + d.continent.cData.continentRotation + ", " + rotAroundX  + ", " + rotAroundY + ")";
 							return rotation;
 						});

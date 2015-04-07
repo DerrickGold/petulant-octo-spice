@@ -230,11 +230,59 @@ function initCallBacks(slider, chart) {
 			var numCreatures = creature.inCluster.length;
 			return 	"Locations (" + numCreatures + ")";	
 		});
-
+		
+		//var eolURL = "http://eol.org/pages/###/overview".replace("###", creature.id);
+		var eolURL = "http://eol.org/###?action=overview&controller=taxa".replace("###", creature.id);
 		//$(infoBox).find("#eolURL").attr("href", "http://eol.org/pages/###/overview".replace("###", creature.id));
 		
+		
+		
+		var pageIDURL = "http://en.wikipedia.org/w/api.php?action=query&titles=###&format=json&callback=?&redirects"
+						.replace("###", creature.name.replace(' ', "%20"));
+		
+		var wikiPageUrl = "http://en.wikipedia.org/w/api.php?action=parse&pageid=###&format=json&callback=?";
+		
+		var header = { 'Api-User-Agent': 'Mozilla/5.0 (Windows NT 6.3; rv:36.0) Gecko/20100101 Firefox/36.0' };
+		
+		
 		var aboutText = $(infoBox).find("#aboutTextBox.resizeableTextBox");
-		aboutText.text(creature.description);
+		
+		$.ajax({
+			url:  pageIDURL, data: {format:"json"},dataType: "jsonp", headers: header,
+			success: function(data) {
+				var id = Object.keys(data.query.pages)[0];
+				var _url = wikiPageUrl.replace('###', id);
+				console.log(_url);
+				//grab wiki page details
+				$.ajax({
+					url:  _url, 
+					data: {format:"json"},dataType: "jsonp", headers: header,
+					success: function(data) {
+						//find description section
+						var descID = 0;
+						console.log(data);
+						data.parse.sections.forEach(function(section) {
+							if (section.line == "Description" || section.anchor == "Description") {
+								descID = section.index;
+								return;
+							}
+						});
+						
+						$.ajax({
+							url:  _url + "&section=" + descID, 
+							data: {format:"json"},dataType: "jsonp", headers: header,
+							success: function(data) {
+								console.log(data.parse);
+								$(".lightBoxContent #aboutTextBox").append(data.parse.text["*"]);
+							}
+						});
+						
+					}
+				});
+				
+			}
+		});
+		
 		
 		
 		var clusterList = $(infoBox).find("#clusterList.resizeableTextBox");
