@@ -10,6 +10,10 @@ html, body {
 	overflow-y: auto;
 }
 
+/*
+$(body).css("background-image", "url(../images/dinobg.jpg)");
+*/
+
 .HiddenInfoBox {
 	display: none;
 }
