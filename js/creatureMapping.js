@@ -312,20 +312,20 @@ var SpeciesMap = (function() {
 				
 				instance.creatureCache
 					.attr('x', function(d) {
-						var anchoredX = d.continent.anchorX + d.continent.cData.xPos;
-						d.drawX = instance.chartScaler.specieXScale(anchoredX) + translation[0];
+						var anchoredX = d.continent.cData.xPos + (d.continent.anchorX * (d.continent.cData.newWidth / d.continent.cData.width[0]));
+						d.drawX = (instance.chartScaler.specieXScale(anchoredX) + translation[0]);// * (d.continent.cData.newWidth / d.continent.cData.width[0]);
 						return d.drawX;
 					})
 					.attr('y', function(d) {
-						var anchoredY = d.continent.anchorY + d.continent.cData.yPos;
-						d.drawY = instance.chartScaler.specieYScale(anchoredY) + translation[1];
+						var anchoredY = d.continent.cData.yPos + (d.continent.anchorY * (d.continent.cData.newHeight / d.continent.cData.height[0]));
+						d.drawY = (instance.chartScaler.specieYScale(anchoredY) + translation[1]);// * (d.continent.cData.newHeight / d.continent.cData.height[0]);
 						return d.drawY;
 					})
 					.each(function(d) {
 						d3.select(this).select("image").attr("transform", function(d) {
-							var rotAroundX = -d.continent.anchorX * 2 * scale;
-							var rotAroundY = d.continent.anchorY * 2 * scale;
-							var rotation = "rotate(" + d.continent.cData.continentRotation + ", " + rotAroundX + ", " + rotAroundY + ")";
+							var rotAroundX = (-d.continent.anchorX * 2 * scale);// * (d.continent.cData.newWidth / d.continent.cData.width[0]);
+							var rotAroundY = (d.continent.anchorY * 2 * scale);// * (d.continent.cData.newHeight / d.continent.cData.height[0]);
+							var rotation = "rotate(" + d.continent.cData.continentRotation + ", " + rotAroundX  + ", " + rotAroundY + ")";
 							return rotation;
 						});
 					});
@@ -456,12 +456,14 @@ var SpeciesMap = (function() {
 							d.description = specie.description.description;
 					})
 					.attr('x', function(d) {
-						var anchoredX = d.continent.anchorX + d.continent.cData.xPos;
-						return instance.chartScaler.specieXScale(anchoredX) + translation[0];
+						var anchoredX = d.continent.cData.xPos + (d.continent.anchorX * (d.continent.cData.newWidth / d.continent.cData.width[0]));
+						d.drawX = (instance.chartScaler.specieXScale(anchoredX) + translation[0]);// * (d.continent.cData.newWidth / d.continent.cData.width[0]);
+						return d.drawX;
 					})
 					.attr('y', function(d) {
-						var anchoredY = d.continent.anchorY + d.continent.cData.yPos;
-						return instance.chartScaler.specieYScale(anchoredY) + translation[1];
+						var anchoredY = d.continent.cData.yPos + (d.continent.anchorY * (d.continent.cData.newHeight / d.continent.cData.height[0]));
+						d.drawY = (instance.chartScaler.specieYScale(anchoredY) + translation[1]);// * (d.continent.cData.newHeight / d.continent.cData.height[0]);
+						return d.drawY;
 					})
 					.attr("width", "50px")
 					.attr("height", "50px")
@@ -490,7 +492,6 @@ var SpeciesMap = (function() {
 						d3.select(this).attr("transform", function(d) {
 							var rotAroundX = -d.continent.anchorX * 2 * instance.zoomHandler.zoom;
 							var rotAroundY = d.continent.anchorY * 2 * instance.zoomHandler.zoom;
-
 							var rotation = "rotate(" + d.continent.cData.continentRotation + ", " + rotAroundX + ", " + rotAroundY + ")";
 							return rotation;
 						});
