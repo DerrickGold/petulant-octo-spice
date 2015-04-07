@@ -57,6 +57,7 @@ var DataBaseAPI = (function() {
 					dataType: "json",
 					success: function(data) {	
 						specie.scientificName = data.results[0].canonicalName;
+						specie.description = data.results[0].descriptions[0];
 						if(doneCB)doneCB(specie);
 					}
 				});
@@ -75,8 +76,13 @@ var DataBaseAPI = (function() {
 							
 								var continent = [null]
 								var newData = {
+									"remainType": loc.basisOfRecord,
 									"x": loc.decimalLongitude,
 									"y": loc.decimalLatitude,
+									"media": loc.media,
+									"country":loc.country,
+									"longitude": loc.decimalLongitude,
+									"latitude": loc.decimalLatitude,
 									"continent": null
 								};
 

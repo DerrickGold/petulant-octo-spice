@@ -53,7 +53,6 @@ Title Box, and Nav bar elements
 
 #navBar ul {
 	padding: 0;
-	
 	list-style-type: none;
 	margin: 0;
 	display: inline;
@@ -223,6 +222,4 @@ The slider bar section
 	width: 50px;
 	height: 50px;
 }
-
-
 

@@ -1,17 +1,15 @@
-function updateSpeciesBoxTitle(chart, year) {
-	if(!chart.isUsingCustomSpecieList()) {
-		$("#CreaturesBoxTitle")
-			.removeClass("active")
-			.text("Species " + parseFloat(year).toFixed(1) + " Million Years Ago");
-	}	
-}
+//keep track of mouse position
+var mouse = {x: 0, y: 0};
 
-/*
+
+
+
+/*=============================================================================
 When a custom list of species are to be displayed, they lose their time information,
 this restablishes that time information when comparing species of different time periods
 by drawing their relation to the time slider
 
-*/
+=============================================================================*/
 var lineColors = d3.scale.category20b();
 
 function mapSpecieToSlider(slider, specie) {
@@ -134,11 +132,21 @@ function activateUserSpeciesMode() {
 	}		
 }
 
+function updateSpeciesBoxTitle(chart, year) {
+	if(!chart.isUsingCustomSpecieList()) {
+		$("#CreaturesBoxTitle")
+			.removeClass("active")
+			.text("Species " + parseFloat(year).toFixed(1) + " Million Years Ago");
+	}	
+}
+
+
 /*=============================================================================
 Initialize all callbacks that update the html interface from the data changes
 in the d3 application side.
 =============================================================================*/
 function initCallBacks(slider, chart) {
+	
 	var leftOffset = parseInt($(".CreaturesBox").css("min-width").replace("px", ''));
 	var topOffset = parseInt($("#titleBox").css("height").replace("px", ''));
 			
@@ -154,6 +162,18 @@ function initCallBacks(slider, chart) {
 
 	var autoCompleteSource = [];
 			
+	
+	
+	//add listener to tack mouse location
+	//this is used to determine where to popup the window
+	//on specie clicking
+	document.addEventListener('mousemove', function(e){ 
+		mouse.x = e.clientX || e.pageX; 
+		mouse.y = e.clientY || e.pageY 
+	}, false);	
+
+	
+	
 	$('#autocomplete').autocomplete({
 		source: [],
 		select: function(e, o) {
@@ -170,7 +190,6 @@ function initCallBacks(slider, chart) {
 	
 
 
-	
 	
 	chart.onYearChanged(function(e, year) {
 		updateSpeciesBoxTitle(chart, year);
@@ -189,9 +208,7 @@ function initCallBacks(slider, chart) {
 	});
 
 	//set up callbacks for chart actions
-	chart.onCreatureClick(function(e, creature) {
-
-		//console.log(creature);				
+	chart.onCreatureClick(function(e, creature) {			
 		var boxX = parseInt(creature.drawX + creature.width) + leftOffset;
 		var boxY = parseInt(creature.drawY + creature.height) + topOffset;
 
@@ -201,20 +218,67 @@ function initCallBacks(slider, chart) {
 		myLightBox.yPos(boxY);
 
 		var infoBox = $(".InfoBox");
+		
+		$(infoBox).find(".resizeableTextBox").each(function() {
+			$(this).css("display", "none");
+		});
 
 		//add name
 		$(infoBox).find("#nameBox").text(creature.name);
 		//add cluster details
 		$(infoBox).find("#clusterInfo").text(function() {
-			var numCreatures = creature.inCluster.length + 1;
-			return 	numCreatures + " remains";	
+			var numCreatures = creature.inCluster.length;
+			return 	"Locations (" + numCreatures + ")";	
 		});
 
-		$(infoBox).find("#eolURL").attr("href", "http://eol.org/pages/###/overview".replace("###", creature.id));
-
+		//$(infoBox).find("#eolURL").attr("href", "http://eol.org/pages/###/overview".replace("###", creature.id));
+		
+		var aboutText = $(infoBox).find("#aboutTextBox.resizeableTextBox");
+		aboutText.text(creature.description);
+		
+		
+		var clusterList = $(infoBox).find("#clusterList.resizeableTextBox");
+		clusterList.empty();
+		
+		var remainBox = $(document.createElement("li"));
+		creature.inCluster.forEach(function(location){
+			console.log(location);
+			
+			//type of remain
+			$(document.createElement("p")).text(location.remainType).appendTo(remainBox);
+			//country of origin
+			$(document.createElement("p")).text(location.country).appendTo(remainBox);
+			//longitude and latitude it was found
+			$(document.createElement("p")).text("lat: " + location.latitude + " lon: " + location.longitude)
+					.appendTo(remainBox);
+			
+			//next add any media associated with it
+			clusterList.append(remainBox);
+		});
+		
+		//set information to show first on open
 		myLightBox.show($(infoBox).html());	
+		$(".lightBoxContent #aboutTextBox").toggle();
 	});
 
+	$(".lightBoxContent").on("click", "#specieInfo", function() {
+		if($(".lightBoxContent #clusterList").css('display') != 'none')
+			$(".lightBoxContent #clusterList").toggle();
+		
+		$(".lightBoxContent #aboutTextBox").toggle();
+	});
+	
+	$(".lightBoxContent").on("click", "#clusterInfo", function() {
+		if($(".lightBoxContent #aboutTextBox").css('display') != 'none')
+			$(".lightBoxContent #aboutTextBox").toggle();
+		
+		$(".lightBoxContent #clusterList").toggle();
+	});		
+	
+	$(".lightBoxContent").on("click", "#closeInfo", function() {
+		myLightBox.close();
+	});			
+	
 
 	//update creature listing as creatures are instantiated
 	chart.onCreatureUpdate(function(append, c) {
@@ -315,4 +379,5 @@ function initCallBacks(slider, chart) {
 		$(this).toggleClass('CreatureListOff');
 		chart.toggleSpecie($(this).attr('data-filter-id'));
 	});
+	
 }

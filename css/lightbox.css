@@ -1,24 +1,104 @@
+/*
+This is essentially the area out side the box
+that can be clicked to close the box
+*/
 #lightBox {
     position:fixed;
     top:0; 
     left:0; 
     width:100%; 
     height:100%; 
-    text-align:center;
+    
 }
 
 
 #lightBox .lightBoxContent {
-	width: 300px;
-	height: 300px;
-    max-width: 300px;
+	text-align:center;
+	width: 500px;
+	height: auto;
+    max-width: 500px;
     max-height: 300px;
-    overflow: scroll;
-    background-color: white;
+	overflow: hidden;
+    background-color: none;
 	position: absolute;
 	top:0;
 	left: 0;
 	padding: 0;
 	margin: 0;
 	z-index: 1000;
+	
+}
+
+/*=============================================================================
+Popup window css
+
+=============================================================================*/
+.lightBoxContent .InfoBanner {
+	width: 500px;
+	height: 45px;
+	line-height: 45px;
+	background-color: rgba(0,0,0, 0.8);
+	color: white;
+	position: fixed;
+	z-index: 100;
+	white-space:nowrap;
+}
+
+.lightBoxContent .InfoContent {
+	position: relative;
+	top: 45px;
+	height: 255px;
+	overflow-y: auto;
+	overflow-x: hidden;
+	background-color: rgba(255,255,255,0.8);
+	color: black;
+}
+
+.lightBoxContent #nameBox {
+	font-size: 150%;
+	float: left;
+	margin-left: 25px;
+}
+
+.lightBoxContent .InfoBoxTabs {
+	float: center;
+}
+
+.lightBoxContent .infoTab {
+	display: inline;
+	padding-left: 5px;
+	padding-right: 5px;
+	height: 100%;
+	cursor: pointer;
+}
+
+.lightBoxContent .infoTab:hover {
+	background-color: blue;
+}
+
+.lightBoxContent .infoTab .active {
+	background-color: green;
+}
+
+.lightBoxContent #aboutTextBox.resizeableTextBox {
+	overflow: hidden;
+	white-space: pre-wrap;      /* CSS3 */   
+	white-space: -moz-pre-wrap; /* Firefox */    
+	white-space: -pre-wrap;     /* Opera <7 */   
+	white-space: -o-pre-wrap;   /* Opera 7 */    
+	word-wrap: break-word;      /* IE */
+}
+
+
+.resizeableTextBox {
+	display: none;
+	text-align: left;
+	padding: 0;
+	margin: 0;
+}
+
+.resizeableTextBox li {
+	background-color: lightgrey;
+	
+	
 }
