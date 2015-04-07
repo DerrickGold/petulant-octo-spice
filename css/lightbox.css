@@ -14,9 +14,8 @@ that can be clicked to close the box
 
 #lightBox .lightBoxContent {
 	text-align:center;
-	width: 500px;
+	width: auto;
 	height: auto;
-    max-width: 500px;
     max-height: 300px;
 	overflow: hidden;
     background-color: none;
@@ -34,7 +33,7 @@ Popup window css
 
 =============================================================================*/
 .lightBoxContent .InfoBanner {
-	width: 500px;
+	width: inherit;
 	height: 45px;
 	line-height: 45px;
 	background-color: rgba(0,0,0, 0.8);
@@ -99,6 +98,13 @@ Popup window css
 
 .resizeableTextBox li {
 	background-color: lightgrey;
-	
-	
+}
+
+.resizeableTextBox p, .resizeableTextBox h2 {
+	padding: 0px;
+	margin: 0px;
+}
+
+.resizeableTextBox h2 {
+	text-align: center;
 }

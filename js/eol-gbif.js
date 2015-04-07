@@ -1,11 +1,14 @@
 var urlPlaceHolder = "###";
 var gbifSpecies = "http://api.gbif.org/v1/species/search?q=" + urlPlaceHolder;
+var gbifMatch = "http://api.gbif.org/v1/species/match?name=" + urlPlaceHolder;
 var gbifOccurance = "http://api.gbif.org/v1/occurrence/search?scientificname=" + urlPlaceHolder + "&hasCoordinate=true";
+var gbifDescriptions = "http://api.gbif.org/v1/species/" + urlPlaceHolder + "/descriptions";
 var eolIDLookup =  "http://eol.org/api/search/1.0.json?q=" + urlPlaceHolder + "&page=1&exact=true&filter_by_taxon_concept_id=&filter_by_hierarchy_entry_id=&filter_by_string=&cache_ttl=";
 //with this api, we are mostly just grabbing year of appearance for a given species
 var eolTraits = "http://www.eol.org/api/traits/" + urlPlaceHolder + '/';
-
-
+var pageIDURL = "http://en.wikipedia.org/w/api.php?action=query&titles=###&format=json&callback=?&redirects";
+var wikiPageUrl = "http://en.wikipedia.org/w/api.php?action=parse&pageid=###&format=json&callback=?";
+var header = { 'Api-User-Agent': 'Mozilla/5.0 (Windows NT 6.3; rv:36.0) Gecko/20100101 Firefox/36.0' };
 
 var DataBaseAPI = (function() {
 	var instance;
@@ -57,7 +60,12 @@ var DataBaseAPI = (function() {
 					dataType: "json",
 					success: function(data) {	
 						specie.scientificName = data.results[0].canonicalName;
-						specie.description = data.results[0].descriptions[0];
+						if(!specie.scientificName) specie.scientificName = specie.name;
+						specie.gbifID = data.results[0].key;
+						
+						console.log(specie);
+						console.log(data);
+						//specie.description = data.results[0].descriptions[0];
 						if(doneCB)doneCB(specie);
 					}
 				});
@@ -110,6 +118,100 @@ var DataBaseAPI = (function() {
 				});					
 			},
 			
+			gbifGetDescription: function(specie, doneCB) {
+				$.ajax({
+					url: gbifDescriptions.replace(urlPlaceHolder, specie.gbifID),
+					dataType: "json",
+					success: function(data) {
+						console.log("gbif desc");
+						console.log(data);
+						
+						var descriptions = "";
+						data.results.forEach(function(desc) {
+							descriptions = descriptions.concat(desc.description);
+						});
+						
+						if(doneCB) doneCB({status: 0, description: descriptions});	
+					},
+					error: function(data) {
+						console.log("gbif desc failed");
+						console.log(data);
+						if(doneCB) doneCB({status: 1, description: null});		
+					}
+				});
+				
+				
+			},
+			
+			
+			wikipediaGetPageID: function(name, doneCB) {
+				$.ajax({
+					url:  pageIDURL.replace("###", name.replace(' ', "%20")), 
+					data: {format:"json"},
+					dataType: "jsonp", 
+					headers: header,
+					success: function(data) {						
+						var id = Object.keys(data.query.pages)[0];
+						if(id < 0 || !id) {
+							if(doneCB)doneCB({status: 1, pageid: null});	
+							return;
+						}
+						
+						if(doneCB)doneCB({status: 0, pageid: id});
+					},
+					error: function(data) {
+						if(doneCB)doneCB({status: 1, pageid: null});	
+					},
+				});
+			},
+			
+			
+			
+			wikipediaGetDescription: function(pageid, doneCB) {	
+				$.ajax({
+					url:  wikiPageUrl.replace('###', pageid), 
+					data: {format:"json"},
+					dataType: "jsonp", 
+					headers: header,
+					success: function(data) {
+						console.log("wikipedia desc");
+						console.log(data);
+						
+						
+						var descID = 0;
+						data.parse.sections.forEach(function(section) {
+							if (section.line == "Description" || section.anchor == "Description") {
+								descID = section.index;
+								return;
+							}
+						});
+					
+						$.ajax({
+							url:  wikiPageUrl.replace('###', pageid) + "&section=" + descID, 
+							data: {format:"json"},
+							dataType: "jsonp", 
+							headers: header,
+							success: function(descData) {
+								console.log("DesckData");
+								console.log(descData);
+								if(doneCB) doneCB({status: 0, description: descData.parse.text["*"]});
+							},
+							error: function(data) {
+								console.log("Error");
+								if(doneCB) doneCB({status: 1, description: null});
+							}
+						});				
+	
+					},
+					error: function(data) {
+						console.log("wikipedia desc error");
+						if(doneCB) doneCB({status: 1, description: null});
+					}	
+				});
+			},
+			
+			
+			
 			fetchCreatureData: function(specie, cb) {
 				var offset = 0, limit = 300;
 				
@@ -135,6 +237,28 @@ var DataBaseAPI = (function() {
 						});
 					});
 				})(specie);
+			},
+			
+			
+
+			fetchDescription: function(specie, cb) {
+				console.log(specie);
+				instance.wikipediaGetPageID	(specie.scientificName, function(data) {
+					console.log("Wikipedia ID lookup");
+					console.log(data);
+					
+					//couldn't find the wikipedia page, lets try the gbif database
+					if(data.status != 0) {
+						instance.gbifGetDescription(specie, cb);
+					} else {
+						//have page id, lets grab it
+						instance.wikipediaGetDescription(data.pageid, cb);
+					}
+
+
+				});
+				
+				
 			}
 		}
 	}

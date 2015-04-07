@@ -224,7 +224,7 @@ function initCallBacks(slider, chart) {
 		});
 
 		//add name
-		$(infoBox).find("#nameBox").text(creature.name);
+		$(infoBox).find("#nameBox").text(creature.scientificName);
 		//add cluster details
 		$(infoBox).find("#clusterInfo").text(function() {
 			var numCreatures = creature.inCluster.length;
@@ -238,7 +238,7 @@ function initCallBacks(slider, chart) {
 		
 		
 		var pageIDURL = "http://en.wikipedia.org/w/api.php?action=query&titles=###&format=json&callback=?&redirects"
-						.replace("###", creature.name.replace(' ', "%20"));
+						.replace("###", creature.scientificName.replace(' ', "%20"));
 		
 		var wikiPageUrl = "http://en.wikipedia.org/w/api.php?action=parse&pageid=###&format=json&callback=?";
 		
@@ -247,7 +247,7 @@ function initCallBacks(slider, chart) {
 		
 		var aboutText = $(infoBox).find("#aboutTextBox.resizeableTextBox");
 		
-		$.ajax({
+		/*$.ajax({
 			url:  pageIDURL, data: {format:"json"},dataType: "jsonp", headers: header,
 			success: function(data) {
 				var id = Object.keys(data.query.pages)[0];
@@ -261,6 +261,12 @@ function initCallBacks(slider, chart) {
 						//find description section
 						var descID = 0;
 						console.log(data);
+						if(!data.parse) {
+							$(".lightBoxContent #aboutTextBox").append(creature.description);
+							return;
+						}
+						
+						
 						data.parse.sections.forEach(function(section) {
 							if (section.line == "Description" || section.anchor == "Description") {
 								descID = section.index;
@@ -281,8 +287,19 @@ function initCallBacks(slider, chart) {
 				});
 				
 			}
+		});*/
+		var db = DataBaseAPI.init();
+		db.fetchDescription(creature, function(data) {
+			if(data.status) {
+				console.log("Failed to find description");	
+				
+			} else {
+				console.log("Stuff");
+				console.log(data);
+				$(".lightBoxContent #aboutTextBox").append(data.description);
+			}
+			
 		});
-		
 		
 		
 		var clusterList = $(infoBox).find("#clusterList.resizeableTextBox");

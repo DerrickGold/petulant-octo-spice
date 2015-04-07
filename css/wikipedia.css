@@ -1,0 +1,39 @@
+/*
+Hide all of wikipedias
+formatting
+*/
+
+
+.mw-editsection, .reference, .references  {
+	display: none;
+}
+
+.noprint.Inline-Template.Template-Fact {
+	display: none;
+}
+
+#aboutTextBox a {
+	color: inherit;
+	text-decoration: none;
+}
+
+
+.tright {
+	float: right;
+}
+
+.tleft {
+	float: left;
+}
+
+div:has(.infobox.biota) {
+	height: 0px;
+}
+
+.infobox.biota {
+	float: right;
+}
+
+#Timeline-row, #toc {
+	display: none;
+}

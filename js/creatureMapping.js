@@ -456,6 +456,9 @@ var SpeciesMap = (function() {
 						d.height = 50;
 						if(specie.description)
 							d.description = specie.description.description;
+						
+						d.scientificName = specie.scientificName;
+						d.gbifID = specie.gbifID;
 					})
 					.attr('x', function(d) {
 						var anchoredX = d.continent.cData.xPos + (d.continent.anchorX * (d.continent.cData.newWidth / d.continent.cData.width[0]));
