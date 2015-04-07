@@ -60,6 +60,9 @@ var SpeciesMap = (function() {
 			
 			//Keeps track of the largest count of locations for a given specie this is used for statistics and graphing
 			mostLocations: 0,
+
+			//Country to continent list
+			countryToContinent: null,
 			
 			//Set up callback system for creature clicking
 			_onCreatureClick: null,
@@ -116,7 +119,6 @@ var SpeciesMap = (function() {
 			
 			//Finds an anchor point for a cluster to a specific continent
 			findContinentAnchor: function(specieCluster) {
-				
 				var continent = instance.continentData.map(function(c) {
 					var continentScreenX = parseInt(instance.chartScaler.xScale(c.x[0])),
 						continentWidth = parseInt(instance.chartScaler.ContinentScaleLon(c.width[0]));
@@ -143,6 +145,20 @@ var SpeciesMap = (function() {
 					}
 
 				});
+
+				var continentKeys = Object.keys(instance.countryToContinent);
+				continentKeys.forEach(function(name) {
+					//console.log(instance.countryToContinent[name]);
+					if (specieCluster.country == name)
+					{
+						var i;
+						for (i = 0; i < continent.length; i++) {
+							if (continent[i].name == instance.countryToContinent[name] + ".png")
+								continent[i].dist = 0;
+						}
+					}
+				})
+
 				//Return the closest continent
 				return continent.sort(function(a, b) {
 					return a.dist - b.dist;	
@@ -383,7 +399,10 @@ var SpeciesMap = (function() {
 					instance.draw(instance.zoomHandler.offset, instance.zoomHandler.zoom);
 				});
 				
-				
+				d3.json(dataFolder + "countrys.json", function(e, d) {
+					instance.countryToContinent = d;
+				});
+
 				d3.json(dataFolder + "species.json", function(e, species) {
 				//Runs through all our species in our list and fetches the data online.
 					instance.speciesList = species;
