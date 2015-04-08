@@ -43,7 +43,13 @@ var LightBox = {
 		$(this._content).css('height', this._height + "px");
         return this;
     },
-    
+	
+	_onClose: null,
+	onClose: function(v) {
+		this._onClose = function() {
+			v();
+		}
+	},	
     //initialize light box and hide it in page
     init: function() {
             
@@ -82,6 +88,7 @@ var LightBox = {
     },
     
     close: function() {
+		this._onClose();
         $(this._lightBox).find('.lightBoxContent').empty();
         $(this._lightBox).hide();
     },

@@ -162,6 +162,11 @@ Title Box, and Nav bar elements
 	text-decoration: underline;
 }
 
+#navBar li:hover {
+	cursor: pointer;
+	color: #99FFFF;
+}
+
 #searchBar {
 	float: right;
 	display: inline;

@@ -76,6 +76,7 @@ var DataBaseAPI = (function() {
 				var url = gbifOccurance.replace(urlPlaceHolder, specie.scientificName) + "&limit=" + limit + "&offset=" + offset;
 				//console.log(url);
 				//and here we'll grab the location data
+				console.log(url);
 				$.ajax({
 					url: url,
 					dataType: "json",
@@ -111,10 +112,15 @@ var DataBaseAPI = (function() {
 						if (!specie.locations) specie.locations = [];
 						specie.locations = specie.locations.concat(locations);
 						if(doneCB) {
-							doneCB(specie, data.count, offset, limit);
+							if(data.endOfRecords) {
+								doneCB(specie, -1, offset, limit);
+							} else {
+								doneCB(specie, data.count, offset, limit);
+							}
 						}
 							
 					}
+				
 				});					
 			},
 			
@@ -219,7 +225,7 @@ var DataBaseAPI = (function() {
 					
 					instance.gbifGetOccurances(s, o, l, function(z, count, curOffset, curLimit){
 						//we are on the last page
-						if(curOffset + curLimit >= count) {
+						if(curOffset + curLimit >= count || count < 0) {
 							if(cb) cb(specie);
 							return;
 						} else {

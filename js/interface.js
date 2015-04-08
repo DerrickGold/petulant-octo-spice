@@ -301,10 +301,29 @@ function initCallBacks(slider, chart) {
 	});
 
 	//set up callbacks for chart actions
-	chart.onCreatureClick(function(e, creature) {			
+	chart.onCreatureClick(function(e, creature) {
+		var creatureSVG = e;
+		
+		
+		var circling = chart.svgLayers["foreground"].insert("svg")
+						.append("circle")
+						.attr("stroke", "red")
+						.attr("stroke-width", "5")
+						.attr("fill", "none")
+						.attr("r", "25")
+						.attr("cx", e.attr("x"))
+						.attr("cy", e.attr("y"));
+		
 		createCreaturePopup(e, creature);
 	});
 
+	
+	myLightBox.onClose(function() {
+		chart.svgLayers["foreground"].selectAll("circle").remove();
+		
+	});
+	
+	
 	
 	$(".lightBoxContent").on("click", "#specieInfo", function() {
 		if($(".lightBoxContent #aboutTextBox").css('display') != 'none')

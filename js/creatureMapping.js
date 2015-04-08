@@ -513,7 +513,7 @@ var SpeciesMap = (function() {
 					.attr("overflow", "visible")
                     .on('click', function(d, e) {
 						if(instance._onCreatureClick){
-							instance._onCreatureClick(e, d);
+							instance._onCreatureClick(d3.select(this), d);
 						}
 					})
 					.attr("display", function() {
