@@ -197,14 +197,9 @@ function initCallBacks(slider, chart) {
 	
 	
 	chart.onSpecieFetched(function(e, specie) {
-		
-		if(!autoCompleteSource)
-			autoCompleteSource = [];
-		
+		if(!autoCompleteSource) autoCompleteSource = [];
 		autoCompleteSource.push({label: specie.name, value: specie});
-		
 		$('#autocomplete').autocomplete("option", "source", autoCompleteSource);	
-		//console.log("updating auto complete");
 	});
 
 	//set up callbacks for chart actions
@@ -234,68 +229,14 @@ function initCallBacks(slider, chart) {
 		//var eolURL = "http://eol.org/pages/###/overview".replace("###", creature.id);
 		var eolURL = "http://eol.org/###?action=overview&controller=taxa".replace("###", creature.id);
 		//$(infoBox).find("#eolURL").attr("href", "http://eol.org/pages/###/overview".replace("###", creature.id));
-		
-		
-		
-		var pageIDURL = "http://en.wikipedia.org/w/api.php?action=query&titles=###&format=json&callback=?&redirects"
-						.replace("###", creature.scientificName.replace(' ', "%20"));
-		
-		var wikiPageUrl = "http://en.wikipedia.org/w/api.php?action=parse&pageid=###&format=json&callback=?";
-		
-		var header = { 'Api-User-Agent': 'Mozilla/5.0 (Windows NT 6.3; rv:36.0) Gecko/20100101 Firefox/36.0' };
-		
-		
 		var aboutText = $(infoBox).find("#aboutTextBox.resizeableTextBox");
-		
-		/*$.ajax({
-			url:  pageIDURL, data: {format:"json"},dataType: "jsonp", headers: header,
-			success: function(data) {
-				var id = Object.keys(data.query.pages)[0];
-				var _url = wikiPageUrl.replace('###', id);
-				console.log(_url);
-				//grab wiki page details
-				$.ajax({
-					url:  _url, 
-					data: {format:"json"},dataType: "jsonp", headers: header,
-					success: function(data) {
-						//find description section
-						var descID = 0;
-						console.log(data);
-						if(!data.parse) {
-							$(".lightBoxContent #aboutTextBox").append(creature.description);
-							return;
-						}
-						
-						
-						data.parse.sections.forEach(function(section) {
-							if (section.line == "Description" || section.anchor == "Description") {
-								descID = section.index;
-								return;
-							}
-						});
-						
-						$.ajax({
-							url:  _url + "&section=" + descID, 
-							data: {format:"json"},dataType: "jsonp", headers: header,
-							success: function(data) {
-								console.log(data.parse);
-								$(".lightBoxContent #aboutTextBox").append(data.parse.text["*"]);
-							}
-						});
-						
-					}
-				});
-				
-			}
-		});*/
+
 		var db = DataBaseAPI.init();
 		db.fetchDescription(creature, function(data) {
 			if(data.status) {
 				console.log("Failed to find description");	
 				
 			} else {
-				console.log("Stuff");
-				console.log(data);
 				$(".lightBoxContent #aboutTextBox").append(data.description);
 			}
 			
@@ -305,24 +246,51 @@ function initCallBacks(slider, chart) {
 		var clusterList = $(infoBox).find("#clusterList.resizeableTextBox");
 		clusterList.empty();
 		
-		var remainBox = $(document.createElement("li"));
+		
 		creature.inCluster.forEach(function(location){
-			console.log(location);
+			var remainBox = $(document.createElement("div")).addClass("clusterListLI");
+				
+			var li = $(document.createElement("li")).append(remainBox);
 			
-			//type of remain
-			$(document.createElement("p")).text(location.remainType).appendTo(remainBox);
+			var infoDiv = $(document.createElement("div"))
+							.addClass("clusterInner")
+							.attr("height", "100%").attr("vertical-align", "middle")
+							.appendTo(remainBox);
+			//console.log(location);
+			if(location.media) {
+				location.media.forEach(function(m) {
+					$(document.createElement("a")).addClass("clusterLIImg")
+							.attr("href", m.references).text("IMG").appendTo(remainBox);
+				});
+			}
 			//country of origin
-			$(document.createElement("p")).text(location.country).appendTo(remainBox);
+			$(document.createElement("div")).addClass("clusterLIInfo").text(location.country).appendTo(infoDiv);
+			//type of remain
+			$(document.createElement("div")).addClass("clusterLIInfo").text(location.remainType).appendTo(infoDiv);
 			//longitude and latitude it was found
-			$(document.createElement("p")).text("lat: " + location.latitude + " lon: " + location.longitude)
-					.appendTo(remainBox);
+			$(document.createElement("div")).addClass("clusterLIInfo").text("lat: " + location.latitude + " lon: " + location.longitude)
+					.appendTo(infoDiv);
 			
 			//next add any media associated with it
-			clusterList.append(remainBox);
+			clusterList.append(li);
 		});
 		
 		//set information to show first on open
 		myLightBox.show($(infoBox).html());	
+		
+		//make sure the window stays on screen
+		var diffx = parseInt(myLightBox.xPos()) + parseInt(myLightBox.width()) - window.innerWidth;
+		var diffy = parseInt(myLightBox.yPos()) + parseInt(myLightBox.height()) - window.innerHeight;
+		if(diffx > 0 || diffy > 0) {
+			var newPosX = myLightBox.xPos(),
+				newPosY = myLightBox.yPos();
+			
+			newPosX -= (diffx > 0) * diffx;
+			newPosY -= (diffy > 0) * diffy;
+			myLightBox.xPos(newPosX).yPos(newPosY);
+		} 
+		
+		$(".lightBoxContent #aboutTextBox").scrollTop();
 		$(".lightBoxContent #aboutTextBox").toggle();
 	});
 

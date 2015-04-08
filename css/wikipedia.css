@@ -8,7 +8,10 @@ formatting
 	display: none;
 }
 
-.noprint.Inline-Template.Template-Fact {
+.noprint.Inline-Template.Template-Fact,
+.hatnote relarticle mainarticle,
+#Timeline-row, #toc, #Description,
+a[title="e"] {
 	display: none;
 }
 
@@ -34,6 +37,26 @@ div:has(.infobox.biota) {
 	float: right;
 }
 
-#Timeline-row, #toc {
-	display: none;
+
+.thumbcaption {
+	font-size: 80%;
+	line-height: 80%;
+}
+
+.mw-headline {
+	padding-top: 10px;
+	display: block;
+	white-space: normal;      /* CSS3 */   
+	white-space: -moz-normal; /* Firefox */    
+	white-space: -pre-line;     /* Opera <7 */   
+	white-space: -o-normal;   /* Opera 7 */  
+	line-height: 0px;
+}
+
+.thumb {
+	white-space: normal;      /* CSS3 */   
+	white-space: -moz-normal; /* Firefox */    
+	white-space: -pre-line;     /* Opera <7 */   
+	white-space: -o-normal;   /* Opera 7 */    
+	padding: 5px;
 }
