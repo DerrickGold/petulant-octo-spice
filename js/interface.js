@@ -139,6 +139,106 @@ function updateSpeciesBoxTitle(chart, year) {
 			.text("Species " + parseFloat(year).toFixed(1) + " Million Years Ago");
 	}	
 }
+/*=============================================================================
+Popup Menu creation
+=============================================================================*/
+function createCreaturePopup(e, creature) {
+	//grab the lightbox instance
+	var popUpHeight = parseInt($("#lightBox .lightBoxContent").css("height").replace("px", ''));
+	var myLightBox = LightBox.init();
+	
+	myLightBox.height("300");
+	
+	var boxX = mouse.x;
+	var boxY = mouse.y;
+
+	myLightBox.xPos(boxX);
+	myLightBox.yPos(boxY);
+
+	var infoBox = $(".InfoBox");
+
+	$(infoBox).find(".resizeableTextBox").each(function() {
+		$(this).css("display", "none");
+	});
+
+	//add name
+	$(infoBox).find("#nameBox").text(creature.scientificName);
+	//add cluster details
+	$(infoBox).find("#clusterInfo").text(function() {
+		var numCreatures = creature.inCluster.length;
+		return 	"Locations (" + numCreatures + ")";	
+	});
+
+	//var eolURL = "http://eol.org/pages/###/overview".replace("###", creature.id);
+	var eolURL = "http://eol.org/###?action=overview&controller=taxa".replace("###", creature.id);
+	//$(infoBox).find("#eolURL").attr("href", "http://eol.org/pages/###/overview".replace("###", creature.id));
+	var aboutText = $(infoBox).find("#aboutTextBox.resizeableTextBox");
+
+	var db = DataBaseAPI.init();
+	db.fetchDescription(creature, function(data) {
+		if(data.status) {
+			console.log("Failed to find description");	
+
+		} else {
+			$(".lightBoxContent #aboutTextBox").append(data.description);
+		}
+
+	});
+
+
+	var clusterList = $(infoBox).find("#clusterList.resizeableTextBox");
+	clusterList.empty();
+
+
+	creature.inCluster.forEach(function(location){
+		var remainBox = $(document.createElement("div")).addClass("clusterListLI");
+
+		var li = $(document.createElement("li")).append(remainBox);
+
+		var infoDiv = $(document.createElement("div"))
+						.addClass("clusterInner")
+						.attr("height", "100%").attr("vertical-align", "middle")
+						.appendTo(remainBox);
+		//console.log(location);
+		if(location.media) {
+			location.media.forEach(function(m) {
+				$(document.createElement("a")).addClass("clusterLIImg")
+						.attr("href", m.references).text("IMG").appendTo(remainBox);
+			});
+		}
+		//country of origin
+		$(document.createElement("div")).addClass("clusterLIInfo").text(location.country).appendTo(infoDiv);
+		//type of remain
+		$(document.createElement("div")).addClass("clusterLIInfo").text(location.remainType).appendTo(infoDiv);
+		//longitude and latitude it was found
+		$(document.createElement("div")).addClass("clusterLIInfo").text("lat: " + location.latitude + " lon: " + location.longitude)
+				.appendTo(infoDiv);
+
+		//next add any media associated with it
+		clusterList.append(li);
+	});
+
+	//set information to show first on open
+	myLightBox.show($(infoBox).html());	
+
+	//make sure the window stays on screen
+	var diffx = parseInt(myLightBox.xPos()) + parseInt(myLightBox.width()) - window.innerWidth;
+	var diffy = parseInt(myLightBox.yPos()) + parseInt(myLightBox.height()) - window.innerHeight;
+	if(diffx > 0 || diffy > 0) {
+		console.log("off screen!");
+		var newPosX = myLightBox.xPos(),
+			newPosY = myLightBox.yPos();
+
+		newPosX -= (diffx > 0) * diffx;
+		newPosY -= (diffy > 0) * diffy;
+		myLightBox.xPos(newPosX).yPos(newPosY);
+	} 
+
+	$(".lightBoxContent #aboutTextBox").scrollTop();
+	$(".lightBoxContent #aboutTextBox").toggle();
+	$(".lightBoxContent #specieInfo").addClass("active");	
+	
+}
 
 
 /*=============================================================================
@@ -151,7 +251,7 @@ function initCallBacks(slider, chart) {
 	var topOffset = parseInt($("#titleBox").css("height").replace("px", ''));
 			
 	var myLightBox = LightBox.init();
-	var popUpHeight = parseInt($("#lightBox .lightBoxContent").css("height").replace("px", ''));
+	
 	
 	//scale for graphing the number of remains a specie has
 	var remainsScale = d3.scale.linear();
@@ -204,95 +304,7 @@ function initCallBacks(slider, chart) {
 
 	//set up callbacks for chart actions
 	chart.onCreatureClick(function(e, creature) {			
-		var boxX = parseInt(creature.drawX + creature.width) + leftOffset;
-		var boxY = parseInt(creature.drawY + creature.height) + topOffset;
-
-		if(boxY + popUpHeight > window.innerHeight) boxY -= popUpHeight;
-
-		myLightBox.xPos(boxX);
-		myLightBox.yPos(boxY);
-
-		var infoBox = $(".InfoBox");
-		
-		$(infoBox).find(".resizeableTextBox").each(function() {
-			$(this).css("display", "none");
-		});
-
-		//add name
-		$(infoBox).find("#nameBox").text(creature.scientificName);
-		//add cluster details
-		$(infoBox).find("#clusterInfo").text(function() {
-			var numCreatures = creature.inCluster.length;
-			return 	"Locations (" + numCreatures + ")";	
-		});
-		
-		//var eolURL = "http://eol.org/pages/###/overview".replace("###", creature.id);
-		var eolURL = "http://eol.org/###?action=overview&controller=taxa".replace("###", creature.id);
-		//$(infoBox).find("#eolURL").attr("href", "http://eol.org/pages/###/overview".replace("###", creature.id));
-		var aboutText = $(infoBox).find("#aboutTextBox.resizeableTextBox");
-
-		var db = DataBaseAPI.init();
-		db.fetchDescription(creature, function(data) {
-			if(data.status) {
-				console.log("Failed to find description");	
-				
-			} else {
-				$(".lightBoxContent #aboutTextBox").append(data.description);
-			}
-			
-		});
-		
-		
-		var clusterList = $(infoBox).find("#clusterList.resizeableTextBox");
-		clusterList.empty();
-		
-		
-		creature.inCluster.forEach(function(location){
-			var remainBox = $(document.createElement("div")).addClass("clusterListLI");
-				
-			var li = $(document.createElement("li")).append(remainBox);
-			
-			var infoDiv = $(document.createElement("div"))
-							.addClass("clusterInner")
-							.attr("height", "100%").attr("vertical-align", "middle")
-							.appendTo(remainBox);
-			//console.log(location);
-			if(location.media) {
-				location.media.forEach(function(m) {
-					$(document.createElement("a")).addClass("clusterLIImg")
-							.attr("href", m.references).text("IMG").appendTo(remainBox);
-				});
-			}
-			//country of origin
-			$(document.createElement("div")).addClass("clusterLIInfo").text(location.country).appendTo(infoDiv);
-			//type of remain
-			$(document.createElement("div")).addClass("clusterLIInfo").text(location.remainType).appendTo(infoDiv);
-			//longitude and latitude it was found
-			$(document.createElement("div")).addClass("clusterLIInfo").text("lat: " + location.latitude + " lon: " + location.longitude)
-					.appendTo(infoDiv);
-			
-			//next add any media associated with it
-			clusterList.append(li);
-		});
-		
-		//set information to show first on open
-		myLightBox.show($(infoBox).html());	
-		
-		//make sure the window stays on screen
-		var diffx = parseInt(myLightBox.xPos()) + parseInt(myLightBox.width()) - window.innerWidth;
-		var diffy = parseInt(myLightBox.yPos()) + parseInt(myLightBox.height()) - window.innerHeight;
-		if(diffx > 0 || diffy > 0) {
-			var newPosX = myLightBox.xPos(),
-				newPosY = myLightBox.yPos();
-			
-			newPosX -= (diffx > 0) * diffx;
-			newPosY -= (diffy > 0) * diffy;
-			myLightBox.xPos(newPosX).yPos(newPosY);
-		} 
-		
-		$(".lightBoxContent #aboutTextBox").scrollTop();
-		$(".lightBoxContent #aboutTextBox").toggle();
-		$(".lightBoxContent #specieInfo").addClass("active");
+		createCreaturePopup(e, creature);
 	});
 
 	
@@ -329,6 +341,22 @@ function initCallBacks(slider, chart) {
 	$(".lightBoxContent").on("click", "#closeInfo", function() {
 		myLightBox.close();
 	});			
+	
+	$("#aboutButton").on("click", function() {
+		var infoBox = $(".AboutMenuBoxContainer");
+		//get myLightBox instance.
+		var lb = LightBox.init();
+		var pos = $('.chartContainer').position();
+		lb.xPos(pos.left);
+		lb.yPos(pos.top);
+		lb.width(774).height(500);
+		lb.show($(infoBox).html());	
+	});
+	
+	$('.lightBoxContent').on("click", "#aboutCloseButton", function() {
+		myLightBox.close();
+	});
+	
 	
 
 	//update creature listing as creatures are instantiated
@@ -430,5 +458,9 @@ function initCallBacks(slider, chart) {
 		$(this).toggleClass('CreatureListOff');
 		chart.toggleSpecie($(this).attr('data-filter-id'));
 	});
+
+	
+	//start up with about screen
+	$("#aboutButton").trigger('click');
 	
 }

@@ -110,6 +110,7 @@ var SpeciesMap = (function() {
 				}
 			},	
 			
+			
 			//Generate an object with overall statistics for the visualization
 			getStatistics: function() {
 				return {
@@ -434,6 +435,9 @@ var SpeciesMap = (function() {
 								setTimeout(function() {
 									specie.dataFetched = true;
 									$(instance.divSelector).trigger("NewCreatureReady", [specie]);
+									
+									
+									
 								}, 10);
 							});
 						})(d);

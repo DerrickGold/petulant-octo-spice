@@ -33,6 +33,75 @@ $(body).css("background-image", "url(../images/dinobg.jpg)");
 .HiddenInfoBox {
 	display: none;
 }
+
+/*=============================================================================
+About Box Popup.
+
+
+=============================================================================*/
+.AboutMenuBox {
+	background-color: rgba(0,0,0, 0.8);
+	color: white;
+	display: block;
+	width: inherit;
+	height: inherit;
+	position: relative;
+	top: 0;
+	left:0;
+}
+
+.TextBoxStuff {
+
+	white-space: pre-wrap;      /* CSS3 */
+	white-space: -moz-pre-wrap; /* Firefox */
+	white-space: -pre-wrap;     /* Opera <7 */
+	white-space: -o-pre-wrap;   /* Opera 7 */
+	word-wrap: break-word;      /* IE */
+
+	text-align: left;
+	text-indent: 15px;
+}
+
+
+.AboutMenuBox #aboutMainTitle {
+	margin: 0px;
+	padding-top: 20px;
+	padding-bottom: 10px;
+	color: #99FFFF;
+	text-decoration: underline;
+}
+
+.AboutMenuBox .aboutSubTitle {
+	padding: 0;
+	padding-top: 20px;
+	padding-bottom: 10px;
+	margin: 0;
+	color: #99FFFF;
+	text-decoration: underline;
+}
+
+.AboutMenuBox #aboutDescription, .AboutMenuBox #aboutMethods {
+	width: 500px;
+	margin-left: auto;
+	margin-right: auto;
+}
+
+.AboutMenuBox #aboutSources {
+	width: 600px;
+	text-align: left;
+	margin-left: auto;
+	margin-right: auto;
+	margin-top: 0px;
+	margin-bottom: 0px;
+}
+
+.AboutMenuBox #aboutCloseButton {
+	width: 400px;
+	height: 40px;
+	margin-top: 20px;
+}
+
+
 /*=============================================================================
 Title Box, and Nav bar elements
 
@@ -45,8 +114,8 @@ Title Box, and Nav bar elements
 	background-size: cover;
 	background-position: center;
 	vertical-align: middle;
-	
-	
+
+
 }
 
 #titleText {
@@ -57,7 +126,7 @@ Title Box, and Nav bar elements
 	color: white;
 	padding: 0;
 	margin: 0;
-	
+
 }
 
 #navBar {
@@ -142,7 +211,7 @@ Species Box on the left
 #CreaturesBoxTitle.active {
 	text-align: center;
 	background: rgba(0,128,0,0.8);
-	color: white;	
+	color: white;
 }
 
 #CreatureBoxListClip {
@@ -216,7 +285,7 @@ Our Map Container
 	background: #368caf;
 	padding: 0;
 	margin: 0;
-	vertical-align: top; 
+	vertical-align: top;
 }
 
 /*
