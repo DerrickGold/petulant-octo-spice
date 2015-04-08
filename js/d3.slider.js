@@ -167,9 +167,9 @@ d3.slider = function module() {
   }
 
   slider.click = function() {
-    var pos = d3.event.offsetX || d3.event.layerX;
-    slider.move(pos + margin.left);
+    var pos = d3.event.layerX - margin.left;
     console.log("offestX = " + d3.event.offsetX + "     layerX = " + d3.event.layerX);
+    slider.move(pos + margin.left);
 
     moveContinents();
     setBackground();
@@ -178,7 +178,6 @@ d3.slider = function module() {
   slider.drag = function() {
     var pos = d3.event.x;
     slider.move(pos + margin.left);
-    console.log("d3.event.x = " + d3.event.x)
 
     moveContinents();
     setBackground();
@@ -189,7 +188,6 @@ d3.slider = function module() {
     var newValue = scale.invert(pos - margin.left);
     // find tick values that are closest to newValue
     // lower bound
-    console.log(newValue);
     if (stepValues != undefined) {
       l = stepValues.reduce(function(p, c, i, arr){
         if (c < newValue) {

@@ -433,6 +433,21 @@ var SpeciesMap = (function() {
 								if(instance._onSpecieFetched)
 									instance._onSpecieFetched(null, specie);
 								setTimeout(function() {
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+									
 									specie.dataFetched = true;
 									$(instance.divSelector).trigger("NewCreatureReady", [specie]);
 									
