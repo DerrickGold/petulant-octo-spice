@@ -1,10 +1,6 @@
 {
 	"data": [
 		{
-			"id": "38709286",
-			"name": "Aardonyx"
-		},
-		{
 			"id": "4532776",
 			"name": "Abelisaurus"
 		},
@@ -68,11 +64,22 @@
 			"id": "4531287",
 			"name": "Diplodocus"
 		},
-
-		
 		{
 			"id": "4531649",
 			"name": "Edmontosaurus"
+		},
+		{
+			"id": "4530833",
+			"name": "Euoplocephalus"
+		},
+		{
+			"id": "4433732",
+			"name": "Gallimimus"
+		},
+
+		{
+			"id": "4531911",
+			"name": "Hypsilophodon"
 		},
 		{
 			"id": "4531831",
@@ -89,6 +96,10 @@
 		{
 			"id": "4531253",
 			"name": "Spinosaurus"
+		},
+		{
+			"id": "4530774",
+			"name": "Stegosaurus"
 		},
 		{
 			"id": "4531590",

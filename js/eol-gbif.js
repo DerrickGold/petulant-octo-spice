@@ -74,7 +74,6 @@ var DataBaseAPI = (function() {
 			//gets the location for all the occurances of remains in 
 			gbifGetOccurances: function(specie, offset, limit, doneCB) {
 				var url = gbifOccurance.replace(urlPlaceHolder, specie.scientificName) + "&limit=" + limit + "&offset=" + offset;
-				//console.log(url);
 				//and here we'll grab the location data
 				$.ajax({
 					url: url,
