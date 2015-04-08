@@ -25,6 +25,12 @@ html, body {
 	z-index: -1;
 }
 
+#creatureLoadCount {
+	color: white;
+	font-size: 10pt;
+	position: relative;
+	top: -20px;
+}
 
 /*
 $(body).css("background-image", "url(../images/dinobg.jpg)");
@@ -45,8 +51,6 @@ Title Box, and Nav bar elements
 	background-size: cover;
 	background-position: center;
 	vertical-align: middle;
-	
-	
 }
 
 #titleText {

@@ -1,9 +1,6 @@
 //keep track of mouse position
 var mouse = {x: 0, y: 0};
 
-
-
-
 /*=============================================================================
 When a custom list of species are to be displayed, they lose their time information,
 this restablishes that time information when comparing species of different time periods
@@ -199,7 +196,8 @@ function initCallBacks(slider, chart) {
 	chart.onSpecieFetched(function(e, specie) {
 		if(!autoCompleteSource) autoCompleteSource = [];
 		autoCompleteSource.push({label: specie.name, value: specie});
-		$('#autocomplete').autocomplete("option", "source", autoCompleteSource);	
+		$('#autocomplete').autocomplete("option", "source", autoCompleteSource);
+		$("#creatureLoadCount").text("Creatures loaded: " + autoCompleteSource.length + " / " + (chart.speciesList.data.length - 1));
 	});
 
 	//set up callbacks for chart actions

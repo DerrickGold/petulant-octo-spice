@@ -9,8 +9,20 @@
 			"name": "Abelisaurus"
 		},
 		{
+			"id": "4433625",
+			"name": "Albertosaurus"
+		},
+		{
 			"id": "4433671",
 			"name": "Allosaurus"
+		},
+		{
+			"id": "4530828",
+			"name": "Ankylosaurus"
+		},
+		{
+			"id": "4531260",
+			"name": "Apatosaurus"
 		},
 		{
 			"id": "4454130",
@@ -21,8 +33,46 @@
 			"name": "Azendohsaurus"
 		},
 		{
+			"id": "4531245",
+			"name": "Baryonyx"
+		},
+		{
 			"id": "4531362",
 			"name": "Brachiosaurus"
+		},
+		{
+			"id": "4531400",
+			"name": "Camarasaurus"
+		},
+		{
+			"id": "4532780",
+			"name": "Carnotaurus"
+		},
+		{
+			"id": "4433953",
+			"name": "Coelophysis"
+		},
+		{
+			"id": "4433879",
+			"name": "Compsognathus"
+		},
+		{
+			"id": "4531682",
+			"name": "Corythosaurus"
+		},
+		{
+			"id": "4433581",
+			"name": "Deinonychus"
+		},
+		{
+			"id": "4531287",
+			"name": "Diplodocus"
+		},
+
+		
+		{
+			"id": "4531649",
+			"name": "Edmontosaurus"
 		},
 		{
 			"id": "4531831",
