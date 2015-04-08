@@ -292,21 +292,39 @@ function initCallBacks(slider, chart) {
 		
 		$(".lightBoxContent #aboutTextBox").scrollTop();
 		$(".lightBoxContent #aboutTextBox").toggle();
+		$(".lightBoxContent #specieInfo").addClass("active");
 	});
 
+	
 	$(".lightBoxContent").on("click", "#specieInfo", function() {
-		if($(".lightBoxContent #clusterList").css('display') != 'none')
-			$(".lightBoxContent #clusterList").toggle();
+		if($(".lightBoxContent #aboutTextBox").css('display') != 'none')
+			return;
+			
+		if($(".lightBoxContent #clusterList").css('display') != 'none') {
+			$(".lightBoxContent #clusterList").hide();
+			$(".lightBoxContent #clusterInfo").removeClass("active");	
+		}
 		
-		$(".lightBoxContent #aboutTextBox").toggle();
+		$(".lightBoxContent #aboutTextBox").scrollTop();
+		$(".lightBoxContent #aboutTextBox").show();
+		$(".lightBoxContent #specieInfo").addClass("active");
 	});
 	
 	$(".lightBoxContent").on("click", "#clusterInfo", function() {
-		if($(".lightBoxContent #aboutTextBox").css('display') != 'none')
-			$(".lightBoxContent #aboutTextBox").toggle();
+		if($(".lightBoxContent #clusterList").css('display') != 'none')
+			return;		
+	
+		if($(".lightBoxContent #aboutTextBox").css('display') != 'none') {
+			$(".lightBoxContent #aboutTextBox").hide();
+			$(".lightBoxContent #specieInfo").removeClass("active");	
+		}
 		
-		$(".lightBoxContent #clusterList").toggle();
+		$(".lightBoxContent #clusterList").scrollTop();
+		$(".lightBoxContent #clusterList").show();
+		$(".lightBoxContent #clusterInfo").addClass("active");
 	});		
+	
+	
 	
 	$(".lightBoxContent").on("click", "#closeInfo", function() {
 		myLightBox.close();

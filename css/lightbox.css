@@ -60,7 +60,7 @@ Popup window css
 }
 
 .lightBoxContent .InfoBoxTabs {
-	float: center;
+	float: right;
 }
 
 .lightBoxContent .infoTab {
@@ -71,13 +71,22 @@ Popup window css
 	cursor: pointer;
 }
 
-.lightBoxContent .infoTab:hover {
-	background-color: blue;
+.lightBoxContent .infoTab.active {
+	text-decoration: underline;
+	color: #99FFFF;
 }
 
-.lightBoxContent .infoTab .active {
-	background-color: green;
+.lightBoxContent #closeInfo {
+	padding-left: 20px;
+	padding-right: 10px;
 }
+
+.lightBoxContent .infoTab:hover {
+	color: blue;
+}
+
+
+
 
 .lightBoxContent #aboutTextBox.resizeableTextBox {
 	overflow: hidden;
