@@ -63,8 +63,8 @@ var DataBaseAPI = (function() {
 						if(!specie.scientificName) specie.scientificName = specie.name;
 						specie.gbifID = data.results[0].key;
 						
-						console.log(specie);
-						console.log(data);
+						//console.log(specie);
+						//console.log(data);
 						//specie.description = data.results[0].descriptions[0];
 						if(doneCB)doneCB(specie);
 					}
@@ -123,8 +123,8 @@ var DataBaseAPI = (function() {
 					url: gbifDescriptions.replace(urlPlaceHolder, specie.gbifID),
 					dataType: "json",
 					success: function(data) {
-						console.log("gbif desc");
-						console.log(data);
+						//console.log("gbif desc");
+						//console.log(data);
 						
 						var descriptions = "";
 						data.results.forEach(function(desc) {
@@ -134,8 +134,8 @@ var DataBaseAPI = (function() {
 						if(doneCB) doneCB({status: 0, description: descriptions});	
 					},
 					error: function(data) {
-						console.log("gbif desc failed");
-						console.log(data);
+						//console.log("gbif desc failed");
+						//console.log(data);
 						if(doneCB) doneCB({status: 1, description: null});		
 					}
 				});
@@ -174,8 +174,8 @@ var DataBaseAPI = (function() {
 					dataType: "jsonp", 
 					headers: header,
 					success: function(data) {
-						console.log("wikipedia desc");
-						console.log(data);
+						//console.log("wikipedia desc");
+						//console.log(data);
 						
 						
 						var descID = 0;
@@ -192,19 +192,19 @@ var DataBaseAPI = (function() {
 							dataType: "jsonp", 
 							headers: header,
 							success: function(descData) {
-								console.log("DesckData");
-								console.log(descData);
+								//console.log("DesckData");
+								//console.log(descData);
 								if(doneCB) doneCB({status: 0, description: descData.parse.text["*"]});
 							},
 							error: function(data) {
-								console.log("Error");
+								//console.log("Error");
 								if(doneCB) doneCB({status: 1, description: null});
 							}
 						});				
 	
 					},
 					error: function(data) {
-						console.log("wikipedia desc error");
+						//console.log("wikipedia desc error");
 						if(doneCB) doneCB({status: 1, description: null});
 					}	
 				});
@@ -242,10 +242,10 @@ var DataBaseAPI = (function() {
 			
 
 			fetchDescription: function(specie, cb) {
-				console.log(specie);
+				//console.log(specie);
 				instance.wikipediaGetPageID	(specie.scientificName, function(data) {
-					console.log("Wikipedia ID lookup");
-					console.log(data);
+					//console.log("Wikipedia ID lookup");
+					//console.log(data);
 					
 					//couldn't find the wikipedia page, lets try the gbif database
 					if(data.status != 0) {
