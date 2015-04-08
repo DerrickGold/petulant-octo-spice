@@ -78,7 +78,7 @@ var DataBaseAPI = (function() {
 				console.log(url);
 				$.ajax({
 					url: url,
-					dataType: "json",
+					dataType: "jsonp",
 					success: function(data) {
 						var locations = data.results.map(function(loc) {
 							
