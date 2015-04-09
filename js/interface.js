@@ -120,11 +120,11 @@ function activateUserSpeciesMode() {
 		button.on('click', function() {
 			chart.clearCustomSpecieList();
 			clearSpecieSliderMap();
-			$("#CreatureBoxListClip").css("height", "480px");
+			$("#CreatureBoxListClip").css("height", "500px");
 			$(this).remove();
 		});
 
-		$("#CreatureBoxListClip").css("height", "460px");
+		$("#CreatureBoxListClip").css("height", "440px");
 		$(".CreaturesBoxControls").append(button);
 	}		
 }

@@ -224,7 +224,7 @@ Species Box on the left
 }
 
 #CreatureBoxListClip {
-	height: 480px;
+	height: 500px;
 	overflow-y: hidden;
 }
 
@@ -276,7 +276,7 @@ Species Box on the left
 
 #clearButton {
 	position: relative;
-	height: 20px;
+	height: 40px;
 	width: 100%;
 }
 
