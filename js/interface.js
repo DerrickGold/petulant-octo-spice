@@ -146,7 +146,7 @@ function createCreaturePopup(e, creature) {
 	
 	myLightBox.height("300");
 	
-	var boxX = mouse.x;
+	var boxX = mouse.x - (myLightBox.width()/2);
 	var boxY = mouse.y;
 
 	myLightBox.xPos(boxX);
@@ -376,10 +376,11 @@ function initCallBacks(slider, chart) {
 		var creatureImg = e.select("image");
 
 		
-		var circleContainer = d3.select("body").append("svg")
+		var circleContainer = d3.select("body").insert("svg")
 								.attr("class", "circleContainer")
 								.style("display", "inline")
 								.style("position", "absolute")
+								.style("z-index", "0")
 								.attr("width", "70px")
 								.attr("height", "70px")
 								.style("left", mouse.x - 35 + "px")
@@ -391,6 +392,22 @@ function initCallBacks(slider, chart) {
 								.attr("r", "30")
 								.attr("cx", 35)
 								.attr("cy", 35);
+		/*chart.svgLayers["foreground"]
+								.style("display", "inline")
+								.style("position", "absolute")
+								.style("z-index", "0")
+								.attr("width", "70px")
+								.attr("height", "70px")
+								.style("left", mouse.x - 35 + "px")
+								.style("top", mouse.y - 35 + "px" )
+								.append("circle")
+								.attr("class", "circleContainer")
+								.attr("stroke", "red")
+								.attr("stroke-width", "5")
+								.attr("fill", "none")
+								.attr("r", "30")
+								.attr("cx", 35)
+								.attr("cy", 35);*/
 		
 
 						//.attr("transform", creatureImg.attr("transform"));

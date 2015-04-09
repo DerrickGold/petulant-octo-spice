@@ -14,11 +14,7 @@ html, body {
 	position: fixed;
 	top: 0px;
 	left: 0px;
-
-	/*background-image:url(../images/background1.jpg);*/
-	background-size:cover;
 	display: inline;
-
 	width: 100%;
 	height: 100%;
 	opacity: 1;
@@ -59,9 +55,9 @@ About Box Popup.
 .TextBoxStuff {
 
 	white-space: normal;      /* CSS3 */
-	white-space: -moz-pre-wrap; /* Firefox */
-	white-space: -pre-wrap;     /* Opera <7 */
-	white-space: -o-pre-wrap;   /* Opera 7 */
+	white-space: -moz-normal; /* Firefox */
+	white-space: -normal;     /* Opera <7 */
+	white-space: -o-normal;   /* Opera 7 */
 	word-wrap: break-word;      /* IE */
 
 	text-align: left;
