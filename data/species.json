@@ -76,38 +76,139 @@
 			"id": "4433732",
 			"name": "Gallimimus"
 		},
-
+		{
+			"id": "10524970",
+			"name": "Giraffatitan"
+		},
 		{
 			"id": "4531911",
 			"name": "Hypsilophodon"
+		},
+		{
+			"id": "4530741",
+			"name": "Iguanodon"
+		},
+		{
+			"id": "4658489",
+			"name": "Janenschia"
+		},
+
+
+		{
+			"id": "4658551",
+			"name": "Jobaria"
+		},
+		{
+			"id": "4530801",
+			"name": "Kentrosaurus"
 		},
 		{
 			"id": "4531831",
 			"name": "Leptoceratops"
 		},
 		{
+			"id": "4658570",
+			"name": "Lesothosaurus"
+		},
+		{
+			"id": "4530717",
+			"name": "Maiasaura"
+		},
+		{
+			"id": "4658056",
+			"name": "Mamenchisaurus"
+		},
+		{
+			"id": "4531471",
+			"name": "Megalosaurus"
+		},
+		{
+			"id": "4530847",
+			"name": "Minmi"
+		},
+		{
 			"id": "4471366",
 			"name": "Mylodon"
+		},
+		{
+			"id": "4433735",
+			"name": "Ornithomimus"
+		},
+		{
+			"id": "4433855",
+			"name": "Oviraptor"
+		},
+		{
+			"id": "4531869",
+			"name": "Pachycephalosaurus"
+		},
+		{
+			"id": "4531750",
+			"name": "Parasaurolophus"
+		},
+		{
+			"id": "4531216",
+			"name": "Plateosaurus"
 		},
 		{
 			"id": "4532515",
 			"name": "Plesiosaurus"
 		},
 		{
+			"id": "4531823",
+			"name": "Protoceratops"
+		},
+		{
+			"id": "4532049",
+			"name": "Psittacosaurus"
+		},
+		{
+			"id": "4531426",
+			"name": "Riojasaurus"
+		},
+		{
+			"id": "4531758",
+			"name": "Saurolophus"
+		},
+		{
+			"id": "4433687",
+			"name": "Saurophaganax"
+		},
+		{
+			"id": "4531282",
+			"name": "Seismosaurus"
+		},
+		{
 			"id": "4531253",
 			"name": "Spinosaurus"
+		},
+		{
+			"id": "4531853",
+			"name": "Stegoceras"
 		},
 		{
 			"id": "4530774",
 			"name": "Stegosaurus"
 		},
 		{
+			"id": "4531619",
+			"name": "Styracosaurus"
+		},
+		{
 			"id": "4531590",
 			"name": "Triceratops"
 		},
 		{
+			"id": "4433782",
+			"name": "Troodon"
+		},
+		{
 			"id": "4433638",
 			"name": "Tyrannosaurus Rex"
+		},
+		{
+			"id": "4433612",
+			"name": "Tyrannotitan"
 		},
 		{
 			"id": "2866145",
@@ -116,6 +217,14 @@
 		{
 			"id": "4454738",
 			"name": "Woolly Mammoth"
+		},
+		{
+			"id": "4533789",
+			"name": "Xiaosaurus"
+		},
+		{
+			"id": "4433967",
+			"name": "Yangchuanosaurus"
 		}
 	]
 	
