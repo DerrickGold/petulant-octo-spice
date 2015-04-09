@@ -316,6 +316,8 @@ function initCallBacks(slider, chart) {
 			
 	var myLightBox = LightBox.init();
 	
+	//a toggle between the sort modes
+	var sortSwitch = 0;
 	
 	//scale for graphing the number of remains a specie has
 	var remainsScale = d3.scale.linear();
@@ -459,90 +461,40 @@ function initCallBacks(slider, chart) {
 	chart.onCreatureUpdate(function(append, c) {
 		if(append) {
 			displayListing.push(c);
-			displayListing.sort(function(a, b) {
-				return a.name.localeCompare(b.name);
-			});
+			createSpecieListElement(c, remainsScale);
 		} else {
 			displayListing = displayListing.filter(function(a) {
 				return a.name != c.name;
 			});
-		}
-		setTimeout(function() {
-			makeSpeciesList(displayListing, remainsScale);
-		}, 10);
-		/*if(append) {
-
-			var nameEntry = $(document.createElement("div"))
-				.attr("class", "creatureFilter")
-				.attr("data-filter-id", c.id)
-				.attr("sort", c.name)
-				.attr("title", function() {
-					return c.locations.length + " remain(s) found globally."
-				});
-
-
-			var bar = $(document.createElement("div")).addClass("remainsChart")
-						.attr("count", c.locations.length)
-						.css("width", remainsScale(c.locations.length));
-						//.css("overflow", "visible");
-
-
-
-
-			var name = $(document.createElement("div")).text(c.name).appendTo(bar);
-			nameEntry.append(bar);
-
-			//if list is empty, just add the creature
-			if (!$(".creatureFilter").length) {
-				//console.log("empty list!");
-				$(".CreaturesList").append(nameEntry);
-				return; 
-			}
-
-			//otherwise, do binary search to find insertion point
-			//code taken from 
-			//http://stackoverflow.com/questions/14495400/jquery-insert-div-at-right-place-in-list-of-divs
-			//cause I'm lazy
-			var sortval = c.name;
-			var $first = $(".creatureFilter:first");
-			if (sortval <= $first.attr('sort')) {
-				nameEntry.insertBefore($first);
-				return;
-			}
-
-			var $last = $(".creatureFilter:last");
-			if (sortval >= $last.attr('sort')) {
-			   nameEntry.insertAfter($last);
-				return;
-			}
-
-			var count = 0;
-			var $div = $(".creatureFilter");
-			do {
-			   var index = parseInt($div.length / 2)
-			   var $compare = $div.eq(index);
-			   var compare = $compare.attr('sort');
-			   if (sortval == compare) {
-				  break;
-			   }
-			   else if (sortval < compare) {
-				  $div = $div.slice(index, $div.length);
-			   }
-			   else {
-				  $div = $div.slice(0, index);
-			   }
-			}
-			while ($div.length > 1);
-
-			if (sortval <= compare) { nameEntry.insertBefore($compare); }
-			else { nameEntry.insertAfter($compare); }
-
-
-		} else {
 			$('[data-filter-id="' + c.id + '"]').remove();
-		}*/
+		}
 	});
 
+	
+	
+	//when the title is clicked, sort the list
+	$("#CreaturesBoxTitle").on('click', function() {
+		if(sortSwitch == 0) {
+			displayListing.sort(function(a, b) {
+				return a.name.localeCompare(b.name);
+			});
+			sortSwitch++;
+		} else if (sortSwitch == 1) {
+			displayListing.sort(function(a, b) {
+				return remainsScale(a.locations.length) - remainsScale(b.locations.length);
+			});		
+			sortSwitch++;	
+		} else {
+			displayListing.sort(function(a, b) {
+				return remainsScale(b.locations.length) - remainsScale(a.locations.length);
+			});		
+			sortSwitch = 0;	
+		}
+		makeSpeciesList(displayListing, remainsScale);
+	});
+	
+	
+	
 	//some sort of statistical change occured
 	//update the interface accordingly
 	chart.onStatisticsUpdate(function(e, stats) {

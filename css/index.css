@@ -58,7 +58,7 @@ About Box Popup.
 
 .TextBoxStuff {
 
-	white-space: pre-wrap;      /* CSS3 */
+	white-space: normal;      /* CSS3 */
 	white-space: -moz-pre-wrap; /* Firefox */
 	white-space: -pre-wrap;     /* Opera <7 */
 	white-space: -o-pre-wrap;   /* Opera 7 */
@@ -79,7 +79,7 @@ About Box Popup.
 
 .AboutMenuBox .aboutSubTitle {
 	padding: 0;
-	padding-top: 20px;
+	padding-top: 30px;
 	padding-bottom: 10px;
 	margin: 0;
 	color: #99FFFF;
@@ -104,7 +104,7 @@ About Box Popup.
 .AboutMenuBox #aboutCloseButton {
 	width: 400px;
 	height: 40px;
-	margin-top: 20px;
+	margin-top: 50px;
 }
 
 
@@ -223,6 +223,11 @@ Species Box on the left
 	color: white;
 }
 
+#CreaturesBoxTitle:hover {
+	cursor: pointer;
+	color: #aaFFFF;
+}
+
 #CreatureBoxListClip {
 	height: 500px;
 	overflow-y: hidden;
@@ -251,8 +256,7 @@ Species Box on the left
 
 .creatureFilter:hover {
 	font-size: 120%;
-	padding-bottom: 5px;
-	padding-top: 5px;
+	text-indent: 15px;
 }
 
 .creature:hover {
