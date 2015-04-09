@@ -180,7 +180,7 @@ function createCreaturePopup(e, creature) {
 			//cleanup the wikipedia html a bit
 			$(html).each(function() {
 				//if dom is empty, hide it
-				if(!$(this).length) {
+				if(!$(this).length || !$(this).text().length) {
 					$(this).hide();	
 				}
 				
