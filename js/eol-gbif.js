@@ -1,18 +1,18 @@
-var urlPlaceHolder = "###";
-var gbifSpecies = "http://api.gbif.org/v1/species/search?q=" + urlPlaceHolder;
-var gbifMatch = "http://api.gbif.org/v1/species/match?name=" + urlPlaceHolder;
-var gbifOccurance = "http://api.gbif.org/v1/occurrence/search?scientificname=" + urlPlaceHolder + "&hasCoordinate=true";
-var gbifDescriptions = "http://api.gbif.org/v1/species/" + urlPlaceHolder + "/descriptions";
-var eolIDLookup =  "http://eol.org/api/search/1.0.json?q=" + urlPlaceHolder + "&page=1&exact=true&filter_by_taxon_concept_id=&filter_by_hierarchy_entry_id=&filter_by_string=&cache_ttl=";
-//with this api, we are mostly just grabbing year of appearance for a given species
-var eolTraits = "http://www.eol.org/api/traits/" + urlPlaceHolder + '/';
-var pageIDURL = "http://en.wikipedia.org/w/api.php?action=query&titles=###&format=json&callback=?&redirects";
-var wikiPageUrl = "http://en.wikipedia.org/w/api.php?action=parse&pageid=###&format=json&callback=?";
-var header = { 'Api-User-Agent': 'Mozilla/5.0 (Windows NT 6.3; rv:36.0) Gecko/20100101 Firefox/36.0' };
-
 var DataBaseAPI = (function() {
 	var instance;
 	
+	var urlPlaceHolder = "###";
+	var gbifSpecies = "http://api.gbif.org/v1/species/search?q=" + urlPlaceHolder;
+	var gbifMatch = "http://api.gbif.org/v1/species/match?name=" + urlPlaceHolder;
+	var gbifOccurance = "http://api.gbif.org/v1/occurrence/search?scientificname=" + urlPlaceHolder + "&hasCoordinate=true";
+	var gbifDescriptions = "http://api.gbif.org/v1/species/" + urlPlaceHolder + "/descriptions";
+	var eolIDLookup =  "http://eol.org/api/search/1.0.json?q=" + urlPlaceHolder + "&page=1&exact=true&filter_by_taxon_concept_id=&filter_by_hierarchy_entry_id=&filter_by_string=&cache_ttl=";
+	//with this api, we are mostly just grabbing year of appearance for a given species
+	var eolTraits = "http://www.eol.org/api/traits/" + urlPlaceHolder + '/';
+	var pageIDURL = "http://en.wikipedia.org/w/api.php?action=query&titles=###&format=json&callback=?&redirects";
+	var wikiPageUrl = "http://en.wikipedia.org/w/api.php?action=parse&pageid=###&format=json&callback=?";
+	var header = { 'Api-User-Agent': 'Mozilla/5.0 (Windows NT 6.3; rv:36.0) Gecko/20100101 Firefox/36.0' };
+
 	function _init() {
 		return {	
 			//Searches EOL database for the years a specie
