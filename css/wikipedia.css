@@ -11,7 +11,7 @@ formatting
 .noprint.Inline-Template.Template-Fact,
 .hatnote relarticle mainarticle,
 #Timeline-row, #toc, #Description,
-a[title="e"] {
+a[title="e"], .error.mw-ext-cite-error {
 	display: none;
 }
 

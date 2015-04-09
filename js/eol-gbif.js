@@ -15,6 +15,9 @@ var DataBaseAPI = (function() {
 
 	function _init() {
 		return {	
+			wikiBaseUrl: "https://en.wikipedia.org",
+			
+			
 			//Searches EOL database for the years a specie
 			//was alive between
 			eolGetSpecieYears: function (specie, doneCB) {

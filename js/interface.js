@@ -166,18 +166,48 @@ function createCreaturePopup(e, creature) {
 		return 	"Locations (" + numCreatures + ")";	
 	});
 
-	//var eolURL = "http://eol.org/pages/###/overview".replace("###", creature.id);
-	var eolURL = "http://eol.org/###?action=overview&controller=taxa".replace("###", creature.id);
-	//$(infoBox).find("#eolURL").attr("href", "http://eol.org/pages/###/overview".replace("###", creature.id));
 	var aboutText = $(infoBox).find("#aboutTextBox.resizeableTextBox");
 
+	
 	var db = DataBaseAPI.init();
 	db.fetchDescription(creature, function(data) {
 		if(data.status) {
 			console.log("Failed to find description");	
 
 		} else {
-			$(".lightBoxContent #aboutTextBox").append(data.description);
+			
+			var html = $.parseHTML( data.description);
+			//cleanup the wikipedia html a bit
+			$(html).each(function() {
+				//if dom is empty, hide it
+				if(!$(this).length) {
+					$(this).hide();	
+				}
+				
+				//if there is just a table wrapped in div, make the div height 0
+				if($(this).find("> .infobox.biota").length > 0) {
+					$(this).css("height", "0px");
+				}
+				
+				//remove all urls, as they refer to wikipedia stuff
+				$(this).find("a").each(function(i, urls){ 
+					var thisUrl = $(urls).prop("href");
+					var newUrl = db.wikiBaseUrl + thisUrl;
+					//use the wikipedia url, and make it open on new tab/window
+					$(urls).prop("href", "#");
+					$(urls).css("cursor", "initial");
+				});
+				
+				var descTitle = $(this).find("#Description");
+				if($(descTitle).length > 0) {
+					console.log("removing description title");
+					$(this).hide();
+				}
+				
+			});
+			
+			
+			$(".lightBoxContent #aboutTextBox").append(html);
 		}
 
 	});

@@ -89,7 +89,7 @@ Popup window css
 
 .lightBoxContent #aboutTextBox.resizeableTextBox {
 	overflow: hidden;
-	white-space: pre-wrap;      /* CSS3 */   
+	white-space: normal;      /* CSS3 */   
 	white-space: -moz-pre-wrap; /* Firefox */    
 	white-space: -pre-wrap;     /* Opera <7 */   
 	white-space: -o-pre-wrap;   /* Opera 7 */    
@@ -108,9 +108,11 @@ Popup window css
 
 
 .resizeableTextBox p, .resizeableTextBox h2, .resizeableTextBox h3 {
-	padding: 0px;
+	padding-top: 10px;
+	padding-bottom: 5px;
 	margin: 0px;
 	text-indent: 20px;
+	
 }
 
 .resizeableTextBox h2 {
