@@ -275,6 +275,39 @@ function createCreaturePopup(e, creature) {
 }
 
 
+function createSpecieListElement(specie, scale) {
+	var nameEntry = $(document.createElement("div"))
+		.attr("class", "creatureFilter")
+		.attr("data-filter-id", specie.id)
+		.attr("sort", specie.name)
+		.attr("title", function() {
+			return specie.locations.length + " remain(s) found globally."
+		});
+
+
+	var bar = $(document.createElement("div")).addClass("remainsChart")
+				.attr("count", specie.locations.length)
+				.css("width", scale(specie.locations.length));
+				//.css("overflow", "visible");
+
+
+
+
+	var name = $(document.createElement("div")).text(specie.name).appendTo(bar);
+	nameEntry.append(bar);
+
+	$(".CreaturesList").append(nameEntry);	
+}
+
+
+function makeSpeciesList(list, scale) {
+	$(".CreaturesList").empty();
+	list.forEach(function(specie) {
+		createSpecieListElement(specie, scale);
+	});
+}
+
+
 /*=============================================================================
 Initialize all callbacks that update the html interface from the data changes
 in the d3 application side.
@@ -423,11 +456,23 @@ function initCallBacks(slider, chart) {
 		myLightBox.close();
 	});
 	
-	
-
+	var displayListing = [];
 	//update creature listing as creatures are instantiated
 	chart.onCreatureUpdate(function(append, c) {
 		if(append) {
+			displayListing.push(c);
+			displayListing.sort(function(a, b) {
+				return a.name.localeCompare(b.name);
+			});
+		} else {
+			displayListing = displayListing.filter(function(a) {
+				return a.name != c.name;
+			});
+		}
+		setTimeout(function() {
+			makeSpeciesList(displayListing, remainsScale);
+		}, 10);
+		/*if(append) {
 
 			var nameEntry = $(document.createElement("div"))
 				.attr("class", "creatureFilter")
@@ -497,7 +542,7 @@ function initCallBacks(slider, chart) {
 
 		} else {
 			$('[data-filter-id="' + c.id + '"]').remove();
-		}
+		}*/
 	});
 
 	//some sort of statistical change occured
