@@ -225,12 +225,14 @@ var DataBaseAPI = (function() {
 						//we are on the last page
 						if(curOffset + curLimit >= count || count < 0) {
 							if(doneCB) {
+								console.log("Done!");
+								console.log(specie);
 								doneCB(specie, specie.locations.length);
 							}
 						} else {
 							//otherwise, lets keep going
 							curOffset += curLimit;
-							getOccurances(s, curOffset, curLimit);
+							getOccurances(s, name, curOffset, curLimit, doneCB);
 						}
 					});	
 				}

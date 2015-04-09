@@ -194,23 +194,29 @@ function createCreaturePopup(e, creature) {
 
 		var infoDiv = $(document.createElement("div"))
 						.addClass("clusterInner")
-						.attr("height", "100%").attr("vertical-align", "middle")
 						.appendTo(remainBox);
-		//console.log(location);
-		if(location.media) {
-			location.media.forEach(function(m) {
-				$(document.createElement("a")).addClass("clusterLIImg")
-						.attr("href", m.references).text("IMG").appendTo(remainBox);
-			});
-		}
+
 		//country of origin
 		$(document.createElement("div")).addClass("clusterLIInfo").text(location.country).appendTo(infoDiv);
 		//type of remain
 		$(document.createElement("div")).addClass("clusterLIInfo").text(location.remainType).appendTo(infoDiv);
 		//longitude and latitude it was found
-		$(document.createElement("div")).addClass("clusterLIInfo").text("lat: " + location.latitude + " lon: " + location.longitude)
-				.appendTo(infoDiv);
+		$(document.createElement("div")).addClass("clusterLIInfo").text("lat: " + location.latitude.toFixed(2) 
+																		+ " lon: " + location.longitude.toFixed(2))
+																		.appendTo(infoDiv);
 
+		
+		
+		//console.log(location);
+		if(location.media) {
+			var imgDiv = $(document.createElement("div")).addClass("clusterInnerImg").appendTo(remainBox);
+			
+			location.media.forEach(function(m) {
+				$(document.createElement("a")).addClass("clusterLIImg")
+						.attr("href", m.references).attr("target", "_blank").text("IMG").appendTo(imgDiv);
+			});
+			
+		}
 		//next add any media associated with it
 		clusterList.append(li);
 	});
@@ -231,7 +237,8 @@ function createCreaturePopup(e, creature) {
 		myLightBox.xPos(newPosX).yPos(newPosY);
 	} 
 
-	$(".lightBoxContent #aboutTextBox").scrollTop();
+	$(".lightBoxContent .InfoContent").scrollTop();
+	//$(".lightBoxContent #clusterList").scrollTop();
 	$(".lightBoxContent #aboutTextBox").toggle();
 	$(".lightBoxContent #specieInfo").addClass("active");	
 	
@@ -303,24 +310,36 @@ function initCallBacks(slider, chart) {
 	//set up callbacks for chart actions
 	chart.onCreatureClick(function(e, creature) {
 		var creatureSVG = e;
+		var creatureImg = e.select("image");
+
 		
+		var circleContainer = d3.select("body").append("svg")
+								.attr("class", "circleContainer")
+								.style("display", "inline")
+								.style("position", "absolute")
+								.attr("width", "70px")
+								.attr("height", "70px")
+								.style("left", mouse.x - 35 + "px")
+								.style("top", mouse.y - 35 + "px" )
+								.append("circle")
+								.attr("stroke", "red")
+								.attr("stroke-width", "5")
+								.attr("fill", "none")
+								.attr("r", "30")
+								.attr("cx", 35)
+								.attr("cy", 35);
 		
-		var circling = chart.svgLayers["foreground"].insert("svg")
-						.append("circle")
-						.attr("stroke", "red")
-						.attr("stroke-width", "5")
-						.attr("fill", "none")
-						.attr("r", "25")
-						.attr("cx", e.attr("x"))
-						.attr("cy", e.attr("y"));
+
+						//.attr("transform", creatureImg.attr("transform"));
+						
 		
 		createCreaturePopup(e, creature);
 	});
 
 	
 	myLightBox.onClose(function() {
-		chart.svgLayers["foreground"].selectAll("circle").remove();
-		
+		//chart.svgLayers["foreground"].selectAll("circle").remove();
+		d3.selectAll(".circleContainer").remove();
 	});
 	
 	
@@ -334,7 +353,7 @@ function initCallBacks(slider, chart) {
 			$(".lightBoxContent #clusterInfo").removeClass("active");	
 		}
 		
-		$(".lightBoxContent #aboutTextBox").scrollTop();
+		$(".lightBoxContent .InfoContent").scrollTop();
 		$(".lightBoxContent #aboutTextBox").show();
 		$(".lightBoxContent #specieInfo").addClass("active");
 	});
@@ -348,7 +367,7 @@ function initCallBacks(slider, chart) {
 			$(".lightBoxContent #specieInfo").removeClass("active");	
 		}
 		
-		$(".lightBoxContent #clusterList").scrollTop();
+		$(".lightBoxContent .InfoContent").scrollTop();
 		$(".lightBoxContent #clusterList").show();
 		$(".lightBoxContent #clusterInfo").addClass("active");
 	});		

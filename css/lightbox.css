@@ -136,13 +136,20 @@ Popup window css
 }
 
 .clusterInner {
-	float: center;
+	width: 100%;
+	vertical-align: middle;
 }
 
-a.clusterLIImg {
+.clusterInnerImg {
+	width: 100%;
 	text-align: center;
-	display: block;
-	
+}
+
+
+
+a.clusterLIImg {
+	display: inline-block;
+	padding-right: 5px;
 }
 
 div.clusterLIInfo{
