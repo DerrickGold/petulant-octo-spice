@@ -216,7 +216,6 @@ function createCreaturePopup(e, creature) {
 	var clusterList = $(infoBox).find("#clusterList.resizeableTextBox");
 	clusterList.empty();
 
-
 	creature.inCluster.forEach(function(location){
 		var remainBox = $(document.createElement("div")).addClass("clusterListLI");
 
@@ -235,8 +234,6 @@ function createCreaturePopup(e, creature) {
 																		+ " lon: " + location.longitude.toFixed(2))
 																		.appendTo(infoDiv);
 
-		
-		
 		//console.log(location);
 		if(location.media) {
 			var imgDiv = $(document.createElement("div")).addClass("clusterInnerImg").appendTo(remainBox);
@@ -362,12 +359,13 @@ function initCallBacks(slider, chart) {
 		updateSpeciesBoxTitle(chart, year);
 	});
 	
-	
 	chart.onSpecieFetched(function(e, specie) {
 		if(!autoCompleteSource) autoCompleteSource = [];
 		autoCompleteSource.push({label: specie.name, value: specie});
 		$('#autocomplete').autocomplete("option", "source", autoCompleteSource);
-		$("#creatureLoadCount").text("Creatures loaded: " + autoCompleteSource.length + " / " + (chart.speciesList.data.length));
+		$("#creatureLoadCount").text("Creatures loading... " + Math.floor(((autoCompleteSource.length) / chart.speciesList.data.length) * 100) + "%");
+		if (autoCompleteSource.length == chart.speciesList.data.length)
+			$("#creatureLoadCount").text("All Creatures Loaded!");
 	});
 
 	//set up callbacks for chart actions
