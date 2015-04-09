@@ -64,28 +64,46 @@
 				});
 			});
 
-			var currentImage = 0, previousImage = 0;
+			var currentImage = 0, previousImage = 0, guiAlpha = 0;
 			function setBackground() {
 				var value = -slider.value();
 
-				if (value >= 0 && value < 65)
+				if (value >= 0 && value < 65){
+					guiAlpha = 0.8;
 					currentImage = 0;
-				else if (value >= 65 && value < 98)
+				}
+				else if (value >= 65 && value < 98){
+					guiAlpha = 0.5;
 					currentImage = 1;
-				else if (value >= 98 && value < 144)
+				}
+				else if (value >= 98 && value < 144){
+					guiAlpha = 0.8;
 					currentImage = 2;
-				else if (value >= 144 && value < 159)
+				}
+				else if (value >= 144 && value < 159){
+					guiAlpha = 0.8;
 					currentImage = 3;
-				else if (value >= 159 && value < 180)
+				}
+				else if (value >= 159 && value < 180){
+					guiAlpha = 0.8;
 					currentImage = 4;
-				else if (value >= 180 && value < 205)
+				}
+				else if (value >= 180 && value < 205){
+					guiAlpha = 0.5;
 					currentImage = 5;
-				else if (value >= 205 && value < 250)
+				}
+				else if (value >= 205 && value < 250){
+					guiAlpha = 0.8;
 					currentImage = 6;
+				}
 
 				if (currentImage != previousImage){
 					previousImage = currentImage;
 					$('.background').cycle(currentImage);
+					$("#titleText").css("background-color", "rgba(0,0,0," + guiAlpha + ")");
+					$("#navBar").css("background-color", "rgba(0,0,0," + guiAlpha + ")");
+					$("#slider").css("background-color", "rgba(0,0,0," + guiAlpha + ")");
+					$("#CreaturesBoxTitle").css("background-color", "rgba(0,0,0," + guiAlpha + ")");
 				}
 			}
 		</script>

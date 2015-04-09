@@ -304,7 +304,7 @@ function initCallBacks(slider, chart) {
 		if(!autoCompleteSource) autoCompleteSource = [];
 		autoCompleteSource.push({label: specie.name, value: specie});
 		$('#autocomplete').autocomplete("option", "source", autoCompleteSource);
-		$("#creatureLoadCount").text("Creatures loaded: " + autoCompleteSource.length + " / " + (chart.speciesList.data.length - 1));
+		$("#creatureLoadCount").text("Creatures loaded: " + autoCompleteSource.length + " / " + (chart.speciesList.data.length));
 	});
 
 	//set up callbacks for chart actions
