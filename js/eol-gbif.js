@@ -72,8 +72,8 @@ var DataBaseAPI = (function() {
 			},
 			
 			//gets the location for all the occurances of remains in 
-			gbifGetOccurances: function(specie, offset, limit, doneCB) {
-				var url = gbifOccurance.replace(urlPlaceHolder, specie.scientificName) + "&limit=" + limit + "&offset=" + offset;
+			gbifGetOccurances: function(specie, name, offset, limit, doneCB) {
+				var url = gbifOccurance.replace(urlPlaceHolder, name) + "&limit=" + limit + "&offset=" + offset;
 				//and here we'll grab the location data
 				console.log(url);
 				$.ajax({
@@ -118,8 +118,7 @@ var DataBaseAPI = (function() {
 							}
 						}
 							
-					}
-				
+					}		
 				});					
 			},
 			
@@ -220,13 +219,14 @@ var DataBaseAPI = (function() {
 			fetchCreatureData: function(specie, cb) {
 				var offset = 0, limit = 300;
 				
-				function getOccurances(s, o, l) {
+				function getOccurances(s, name, o, l, doneCB) {
 					
-					instance.gbifGetOccurances(s, o, l, function(z, count, curOffset, curLimit){
+					instance.gbifGetOccurances(s, name, o, l, function(z, count, curOffset, curLimit){
 						//we are on the last page
 						if(curOffset + curLimit >= count || count < 0) {
-							if(cb) cb(specie);
-							return;
+							if(doneCB) {
+								doneCB(specie, specie.locations.length);
+							}
 						} else {
 							//otherwise, lets keep going
 							curOffset += curLimit;
@@ -238,7 +238,17 @@ var DataBaseAPI = (function() {
 				(function(z) {
 					instance.eolGetSpecieYears(z, function(){
 						instance.gbifGetScientificName(z, function(){
-							getOccurances(z, 0, 300);	
+							getOccurances(z, z.scientificName, 0, 300, function(fetched, count){
+								if(count > 0) {
+									//locational data was found based on the more specific specie name
+									if(cb) cb(fetched);	
+								} else {
+									//otherwise, we need to try the regular name	
+									getOccurances(z, z.name, 0, 300, function(newFetched, newCount){
+										if(cb) cb(newFetched);	
+									});
+								}
+							});	
 						});
 					});
 				})(specie);
