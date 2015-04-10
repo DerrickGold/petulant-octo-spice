@@ -240,8 +240,21 @@ function createCreaturePopup(e, creature) {
 			var imgDiv = $(document.createElement("div")).addClass("clusterInnerImg").appendTo(remainBox);
 			
 			location.media.forEach(function(m) {
-				$(document.createElement("a")).addClass("clusterLIImg")
-						.attr("href", m.references).attr("target", "_blank").text("IMG").appendTo(imgDiv);
+				console.log(m);
+				var url = null;
+				
+				if(m.references) {
+					url = m.references;
+				}
+				else if (m.identifier) {
+					url = m.identifier;
+				}
+				
+				if(url) {
+					$(document.createElement("a")).addClass("clusterLIImg")
+							.attr("href", url).attr("target", "_blank")
+							.text("IMG").appendTo(imgDiv);
+				}
 			});
 			
 		}
