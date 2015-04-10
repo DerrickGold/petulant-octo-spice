@@ -110,6 +110,13 @@ var SpeciesMap = (function() {
 				}
 			},	
 			
+			//Set up callback system for when the year is changed
+			_onCreatureRightClick: null,
+			onCreatureRightClick: function(v) {
+				instance._onCreatureRightClick = function(e, s) {
+					v(e, s);
+				}
+			},	
 			
 			//Generate an object with overall statistics for the visualization
 			getStatistics: function() {
@@ -497,6 +504,11 @@ var SpeciesMap = (function() {
 						if(instance._onCreatureClick){
 							instance._onCreatureClick(d3.select(this), d);
 						}
+					})
+					.on('contextmenu', function(d) {
+						d3.event.preventDefault();	
+						if(instance._onCreatureRightClick)
+							instance._onCreatureRightClick(null, d);
 					})
 					.attr("display", function() {
 						if(specie.hide) return "none";

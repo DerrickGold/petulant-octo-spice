@@ -544,6 +544,13 @@ function initCallBacks(slider, chart) {
 
 	});
 	
+	chart.onCreatureRightClick(function(e, s) {
+		chart.toggleSpecie(s.id);
+		var attr = '[sort="' + s.name + '"]';
+		$('.CreaturesList .creatureFilter' + attr)
+			.toggleClass('CreatureListOff');
+	});
+	
 	//set listener to filter stuff
 	$('.CreaturesList').on('click', '.creatureFilter', function() {
 		//console.log("click");
