@@ -96,6 +96,11 @@ Popup window css
 	word-wrap: break-word;      /* IE */
 }
 
+.lightBoxContent #infoBoxLoadMsg {
+	line-height: 255px;
+	vertical-align: middle;
+}
+
 
 .resizeableTextBox {
 	display: none;

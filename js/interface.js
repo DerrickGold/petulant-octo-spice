@@ -172,8 +172,7 @@ function createCreaturePopup(e, creature) {
 	var db = DataBaseAPI.init();
 	db.fetchDescription(creature, function(data) {
 		if(data.status) {
-			console.log("Failed to find description");	
-
+			$('.lightBoxContent #infoBoxLoadMsg').text("Failed to look up description. :(");
 		} else {
 			
 			var html = $.parseHTML( data.description);
@@ -203,6 +202,8 @@ function createCreaturePopup(e, creature) {
 					console.log("removing description title");
 					$(this).hide();
 				}
+				
+				$('.lightBoxContent #infoBoxLoadMsg').hide();
 				
 			});
 			
@@ -250,7 +251,7 @@ function createCreaturePopup(e, creature) {
 
 	//set information to show first on open
 	myLightBox.show($(infoBox).html());	
-
+	$('.lightBoxContent #infoBoxLoadMsg').show();
 	//make sure the window stays on screen
 	var diffx = parseInt(myLightBox.xPos()) + parseInt(myLightBox.width()) - window.innerWidth;
 	var diffy = parseInt(myLightBox.yPos()) + parseInt(myLightBox.height()) - window.innerHeight;

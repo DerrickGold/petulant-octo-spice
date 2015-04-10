@@ -100,7 +100,8 @@ About Box Popup.
 .AboutMenuBox #aboutCloseButton {
 	width: 400px;
 	height: 40px;
-	margin-top: 50px;
+	margin-top: 30px;
+	-webkit-box-sizing: initial;
 }
 
 
