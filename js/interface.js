@@ -95,10 +95,10 @@ function mapSpecieToSlider(slider, specie) {
 		.attr("xlink:href", function(d){
 			return  "creatureIcons/" + specie.name.replace(' ', '') + ".png";
 		})
-		.attr("title", function() {
+		.attr("width", "50px").attr("height", "50px")
+		.append("svg:title").text(function() {
 			return specie.name + ": " + specie.dates[0] + "mya - " + specie.dates[1] + "mya";	
-		})
-		.attr("width", "50px").attr("height", "50px");
+		});
 }
 
 function clearSpecieSliderMap() {
@@ -292,7 +292,8 @@ function createSpecieListElement(specie, scale) {
 		.attr("data-filter-id", specie.id)
 		.attr("sort", specie.name)
 		.attr("title", function() {
-			return specie.locations.length + " remain(s) found globally."
+			return specie.locations.length + " remain(s) found globally.\n" +
+					"Click to hide specie icons."
 		});
 
 

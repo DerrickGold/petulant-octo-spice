@@ -524,7 +524,6 @@ var SpeciesMap = (function() {
 					.attr('x', "-25px")
 					.attr('y', "-25px")
 					.attr("preserveAspectRatio", "none")
-					.attr("title", specie.name)
 					.each(function(d) {
 						d3.select(this).attr("transform", function(d) {
 							var rotAroundX = -d.continent.anchorX * 2 * instance.zoomHandler.zoom;
@@ -532,6 +531,10 @@ var SpeciesMap = (function() {
 							var rotation = "rotate(" + d.continent.cData.continentRotation + ", " + rotAroundX + ", " + rotAroundY + ")";
 							return rotation;
 						});
+					})
+					.append("svg:title").text( function() {
+						return specie.name + '\n' +
+								'Right-click to hide.';
 					});
 				return creatures;
 			},
